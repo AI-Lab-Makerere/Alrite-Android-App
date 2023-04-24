@@ -2,13 +2,12 @@ package com.ug.air.alrite.Activities;
 
 import static com.ug.air.alrite.Activities.DiagnosisActivity.DATE_2;
 import static com.ug.air.alrite.Activities.DiagnosisActivity.DURATION_2;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.BRONCHODILATOR;
+import static com.ug.air.alrite.Fragments.Patient.Assess.FINAL_DIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DURATION;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.FILENAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USERNAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.UUIDS;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.BRONC;
 import static com.ug.air.alrite.Fragments.Patient.Initials.CIN;
 import static com.ug.air.alrite.Fragments.Patient.Initials.INITIAL_DATE;
 import static com.ug.air.alrite.Fragments.Patient.Initials.PIN;
@@ -16,7 +15,10 @@ import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.INITIAL_DATE_2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Dialog;
@@ -27,21 +29,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.ug.air.alrite.BuildConfig;
+import com.makeramen.roundedimageview.BuildConfig;
 import com.ug.air.alrite.Fragments.Patient.ActivePatients;
-import com.ug.air.alrite.Fragments.Patient.HIVStatus;
-import com.ug.air.alrite.Fragments.Patient.Initials;
+import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
 import com.ug.air.alrite.Fragments.Patient.OtherPatients;
-import com.ug.air.alrite.Fragments.Patient.Wheezing;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Credentials;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -49,7 +52,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class PatientActivity extends AppCompatActivity {
+public class PatientActivity extends AppCompatActivity implements MultipleChoiceFragment.onGetResultListener {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String INCOMPLETE = "incomplete";
@@ -70,7 +73,12 @@ public class PatientActivity extends AppCompatActivity {
             frag = intent.getExtras().getInt("Fragment");
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             if (frag == 1){
-                fragmentTransaction.add(R.id.fragment_container, new Initials());
+                // fragmentTransaction.add(R.id.fragment_container, new Initials());
+                try {
+                    implementEditableDecisionTree();
+                } catch (JSONException e) {
+                    throw new RuntimeException("JSONException in Patient: " + e);
+                }
             }else if (frag == 2){
                 fragmentTransaction.add(R.id.fragment_container, new ActivePatients());
             }else {
@@ -228,5 +236,138 @@ public class PatientActivity extends AppCompatActivity {
         Intent intent;
         intent = new Intent(PatientActivity.this, Dashboard.class);
         startActivity(intent);
+    }
+
+    // TODO: ensure that the strings are not hard-coded in the future
+    private void implementEditableDecisionTree() throws JSONException {
+        pages = createTestingJson();
+        // This is just an array because it needs to be mutable: think of it as
+        // its own element
+        JSONObject nextPage = pages.getJSONObject(0);
+
+        // Continue looping through each page in sequence: depending on the component,
+        // inflate a new fragment for that component type
+        // If the next page is the final page, exit the loop
+        getNextPage(nextPage);
+    }
+
+    private JSONArray createTestingJson() throws JSONException {
+        JSONObject multi_choice = new JSONObject();
+        multi_choice.put("type", "multiple-choice");
+        multi_choice.put("question", "What is the date?");
+        multi_choice.put("choices", new JSONArray(new String[]{"yes", "no"}));
+        multi_choice.put("diagnoses", new JSONArray(new String[]{"very ill", "probably fine"}));
+        multi_choice.put("gotos", new JSONArray(new String[]{"final_diagnosis", "final_diagnosis"}));
+
+        JSONObject date_page = new JSONObject();
+        date_page.put("page_id", "date_page");
+        date_page.put("component", multi_choice);
+        date_page.put("final", true);
+
+        JSONObject final_diagnosis = new JSONObject();
+        final_diagnosis.put("page_id", "final_diagnosis");
+
+        JSONArray pages = new JSONArray();
+        pages.put(date_page);
+        pages.put(final_diagnosis);
+
+        return pages;
+    }
+
+    /**
+     * NOTE: THIS SHOULD ONLY BE USED FOR SINGLE-LAYER ARRAYS
+     *
+     * @param jsonArray
+     * @return
+     * @throws JSONException
+     */
+    private ArrayList<String> jsonArrayToList(JSONArray jsonArray) throws JSONException {
+        ArrayList<String> ret = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            ret.add(jsonArray.getString(i));
+        }
+        return ret;
+    }
+
+    /**
+     * This will add the given fragment to the back stack, and do a transaction
+     * which replaces the current fragment with the given fragment
+     *
+     * @param fragment the fragment to swap to
+     */
+    private void completeFragmentTransaction(Fragment fragment) {
+        // Begin the transaction
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        // Replace the contents of the container with the new fragment
+        ft.replace(R.id.fragment_container, fragment);
+        // Complete the changes added above
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
+    // Full JSON infos to call getNextPage
+    JSONArray pages;
+
+    // Information gotten from JSON
+    String question;
+    ArrayList<String> choices;
+    ArrayList<String> diagnoses;
+    ArrayList<String> gotos;
+
+    private void getNextPage(JSONObject currNextPage) throws JSONException {
+        if (currNextPage.getString("page_id").equals("final_diagnosis")) {
+            // We're done! Let's exit out to the diagnosis page after finalizing our result
+            startActivity(new Intent(getApplicationContext(), DiagnosisActivity.class));
+            return;
+        }
+
+        JSONObject nextPageComponent = currNextPage.getJSONObject("component");
+
+        // Multiple choice option:
+        if (nextPageComponent.getString("type").equals("multiple-choice")) {
+            // Collect the important arguments from the component
+            question = nextPageComponent.getString("question");
+            choices = jsonArrayToList(nextPageComponent.getJSONArray("choices"));
+            diagnoses = jsonArrayToList(nextPageComponent.getJSONArray("diagnoses"));
+            gotos = jsonArrayToList(nextPageComponent.getJSONArray("gotos"));
+
+            // Get the new page's fragment, and set a listener for when the next button
+            // is clicked
+            MultipleChoiceFragment mc_fragment = MultipleChoiceFragment.newInstance(question, choices);
+
+            // Replace and commit the fragment
+            completeFragmentTransaction(mc_fragment);
+
+        } else {
+            throw new IllegalStateException("should never get here lol");
+        }
+    }
+
+    @Override
+    public void getResultFromMultipleChoiceFragment(int choiceIndex) throws JSONException {
+        // Enter the result into the editor
+        editor.putString(question, diagnoses.get(choiceIndex));
+        editor.apply();
+
+        // Decide on the next page based on the result
+        String nextPageName = gotos.get(choiceIndex);
+        int pagesIdx = findIndexInPagesGivenPageId(nextPageName);
+        JSONObject nextPage = pages.getJSONObject(pagesIdx);
+        try {
+            getNextPage(nextPage);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int findIndexInPagesGivenPageId(String pageID) throws JSONException {
+        for (int i = 0; i < pages.length(); i++) {
+            JSONObject currPage = pages.getJSONObject(i);
+            String pageName = currPage.getString("page_id");
+            if (pageID.equals(pageName)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
