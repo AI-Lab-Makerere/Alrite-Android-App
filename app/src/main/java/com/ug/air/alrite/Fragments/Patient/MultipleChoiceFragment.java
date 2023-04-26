@@ -91,11 +91,16 @@ public class MultipleChoiceFragment extends Fragment {
         // Then, set the information for each question/choice to line up with our givens
         TextView questionDisplay = view.findViewById(R.id.mc_question);
         questionDisplay.setText(question);
+
         // TODO: create buttons in here, and then choose their ids more easily
+        // Currently storing 3 radio buttons will update later
+        // Set for demo might add more or create optimized loop
         RadioButton choice1 = view.findViewById(R.id.choice1);
         choice1.setText(choices.get(0));
         RadioButton choice2 = view.findViewById(R.id.choice2);
         choice2.setText(choices.get(1));
+        RadioButton choice3 = view.findViewById(R.id.choice3);
+        choice3.setText(choices.get(2));
 
         // All of the buttons/things that we'll need to reference
         nextButton = view.findViewById(R.id.next);
