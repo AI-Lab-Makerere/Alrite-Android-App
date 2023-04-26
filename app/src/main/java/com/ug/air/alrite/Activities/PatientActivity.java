@@ -48,6 +48,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -258,18 +260,6 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         getNextPage(nextPage);
     }
 
-    private JSONObject createTestingJson() throws JSONException {
-        try {
-            // Get the file that has the json in it
-            Object o = new JsonParser().parse(new FileReader("example.json"));
-            JSONObject jsonStr = (JSONObject) o;
-
-            return jsonStr;
-
-        } catch(FileNotFoundException e) {
-            throw new RuntimeException("issue with finding the json file: " + e);
-        }
-    }
 
     /**
      * NOTE: THIS SHOULD ONLY BE USED FOR SINGLE-LAYER ARRAYS
@@ -371,5 +361,109 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
             }
         }
         return -1;
+    }
+
+    private JSONObject createTestingJson() throws JSONException {
+
+        // Get the file that has the json in it
+//            String name1 = getFilesDir().getAbsolutePath();
+//            String name =  getApplicationContext().getApplicationInfo().dataDir + "/Activities/example.json";
+//
+//            Object o = new JsonParser().parse(new FileReader(name));
+//            JSONObject jsonStr = (JSONObject) o;
+
+        JSONObject fin = new JSONObject("{\n" +
+                "  \"pages\":\n" +
+                "  [\n" +
+                "    {\n" +
+                "      \"pageID\": \"page_1\",\n" +
+                "      \"pageTitle\": \"smoke_tobacco\",\n" +
+                "      \"content\":\n" +
+                "      [\n" +
+                "        {\n" +
+                "          \"type\": \"multiple-choice\",\n" +
+                "          \"text\": \"Does anyone in the child's home smoke tobacco?\",\n" +
+                "          \"choices\":\n" +
+                "          [\n" +
+                "            {\n" +
+                "              \"text\": \"Yes\",\n" +
+                "              \"link\": \"page_2\",\n" +
+                "              \"valueID\": \"yes\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"text\": \"No\",\n" +
+                "              \"link\": \"page_3\",\n" +
+                "              \"valueID\": \"no\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"text\": \"Not sure\",\n" +
+                "              \"link\": \"page_3\",\n" +
+                "              \"valueID\": \"unsure\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"pageID\": \"page_2\",\n" +
+                "      \"pageTitle\": \"kerosene\",\n" +
+                "      \"content\":\n" +
+                "      [\n" +
+                "        {\n" +
+                "          \"type\": \"multiple-choice\",\n" +
+                "          \"text\": \"Does any of the family members use kerosene, charcoal, or other biomass in the home?\",\n" +
+                "          \"choices\":\n" +
+                "          [\n" +
+                "            {\n" +
+                "              \"text\": \"Yes\",\n" +
+                "              \"link\": \"final_page\",\n" +
+                "              \"valueID\": \"yes\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"text\": \"No\",\n" +
+                "              \"link\": \"final_page\",\n" +
+                "              \"valueID\": \"no\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"text\": \"Not sure\",\n" +
+                "              \"link\": \"final_page\",\n" +
+                "              \"valueID\": \"unsure\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"pageID\": \"page_3\",\n" +
+                "      \"pageTitle\": \"allergies\",\n" +
+                "      \"content\":\n" +
+                "      [\n" +
+                "        {\n" +
+                "          \"type\": \"multiple-choice\",\n" +
+                "          \"text\": \"Has the child’s parents or siblings had similar breathing problems, other diseases with breathing problems or allergies?\",\n" +
+                "          \"choices\":\n" +
+                "          [\n" +
+                "            {\n" +
+                "              \"text\": \"Yes\",\n" +
+                "              \"link\": \"final_page\",\n" +
+                "              \"valueID\": \"yes\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"text\": \"No\",\n" +
+                "              \"link\": \"final_page\",\n" +
+                "              \"valueID\": \"no\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"text\": \"Not sure\",\n" +
+                "              \"link\": \"final_page\",\n" +
+                "              \"valueID\": \"unsure\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}");
+        return fin;
     }
 }
