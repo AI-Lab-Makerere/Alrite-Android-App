@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.ug.air.alrite.R;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -66,11 +67,12 @@ public class MultipleChoiceFragment extends Fragment {
      * @param choices the given choices for the user to choose from
      * @return the fragment to be used in the future
      */
-    public static MultipleChoiceFragment newInstance(String question, ArrayList<String> choices) {
+    public static MultipleChoiceFragment newInstance(String question, ArrayList<JSONObject> choices) throws JSONException {
         MultipleChoiceFragment mfc = new MultipleChoiceFragment();
         Bundle args = new Bundle();
         args.putString(QUESTION, question);
-        args.putStringArrayList(CHOICES, choices);
+        ArrayList<String> text_choices = getTextFromChoices(choices);
+        args.putStringArrayList(CHOICES, text_choices);
         mfc.setArguments(args);
         return mfc;
     }
@@ -158,5 +160,21 @@ public class MultipleChoiceFragment extends Fragment {
                 return;
             }
         }
+    }
+
+    /**
+     * This is used specifically for newInstance, and relies on the JSON being set
+     * up as in the "example.json" file. This will extract all of the text answers
+     * from the given choices list.
+     *
+     * @param list is an ArrayList of JSONObjects (choices)
+     * @return the list of strings of text for each choice, in order
+     */
+    private static ArrayList<String> getTextFromChoices(ArrayList<JSONObject> list) throws JSONException {
+        ArrayList<String> ret = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            ret.add(list.get(i).getString("text"));
+        }
+        return ret;
     }
 }
