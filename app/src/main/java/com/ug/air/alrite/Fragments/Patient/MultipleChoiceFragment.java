@@ -25,7 +25,8 @@ import java.util.ArrayList;
 public class MultipleChoiceFragment extends Fragment {
 
     public interface onGetResultListener {
-        public void getResultFromMultipleChoiceFragment(int choiceIndex) throws JSONException;
+        void getResultFromMultipleChoiceFragment(int choiceIndex) throws JSONException;
+        void getLastPage() throws JSONException;
     }
     onGetResultListener getResultListener;
 
@@ -135,6 +136,17 @@ public class MultipleChoiceFragment extends Fragment {
                 // and start the next fragment sequence up
                 try {
                     getResultListener.getResultFromMultipleChoiceFragment(index);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    getResultListener.getLastPage();
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
