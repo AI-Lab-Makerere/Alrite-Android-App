@@ -127,6 +127,8 @@ public class TextInputFragment extends Fragment {
         etDay.addTextChangedListener(textWatcher);
 
         next.setOnClickListener(new View.OnClickListener() {
+            //if there is nothing inputted
+            //get the int result from the id and get the text from there!
             @Override
             public void onClick(View v) {
                 userInput = etDay.getText().toString();
@@ -141,22 +143,16 @@ public class TextInputFragment extends Fragment {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                String assess = sharedPreferences.getString(S4, "");
-                String care = sharedPreferences.getString(CHOICEHC, "");
-
-                FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-                if (!assess.equals("None of these")){
-                    fr.replace(R.id.fragment_container, new CoughD());
-                }else{
-                    if (care.isEmpty()){
-                        fr.replace(R.id.fragment_container, new HIVStatus());
-                    }else{
-                        fr.replace(R.id.fragment_container, new HIVCare());
+                back.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        try {
+                            getResultListener.getLastPage();
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
-                }
-
-                fr.commit();
+                });
             }
         });
 
