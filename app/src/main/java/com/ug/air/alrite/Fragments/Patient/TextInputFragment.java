@@ -1,8 +1,6 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
 import static com.ug.air.alrite.Fragments.Patient.FTouch.TOUCH;
-import static com.ug.air.alrite.Fragments.Patient.HIVCare.CHOICEHC;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -11,7 +9,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -30,17 +27,15 @@ import androidx.fragment.app.FragmentTransaction;
 import com.ug.air.alrite.R;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 
 public class TextInputFragment extends Fragment {
+    //Fragment wise should be done may need listener for skip
     public interface onGetResultListener {
         void getResultFromTextInputFragment(int choiceIndex) throws JSONException;
         void getLastPage() throws JSONException;
     }
-    MultipleChoiceFragment.onGetResultListener getResultListener;
+    onGetResultListener getResultListener;
     View view;
     EditText etDay;
     Button back, next, btnSkip, btnSave;
@@ -185,7 +180,7 @@ public class TextInputFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            getResultListener = (MultipleChoiceFragment.onGetResultListener) activity;
+            getResultListener = (TextInputFragment.onGetResultListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement onSomeEventListener");
         }
@@ -223,26 +218,11 @@ public class TextInputFragment extends Fragment {
     private void saveData() {
         deleteSharedPreferences();
 
-        String assess = sharedPreferences.getString(S4, "");
-        editor.putString(Question, userInput);
-        editor.apply();
-        float tp = Float.parseFloat(userInput);
-        if (tp >= diagnosisCutoff && assess.contains("None of these")){
-            diagnosis = "Enter Diagnosis here";
-            editor.putString(TDIAGNOSIS, diagnosis);
-            editor.apply();
-            showDialog();
-        }else if (tp >= diagnosisCutoff){
-            editor.remove(TDIAGNOSIS);
-            editor.apply();
-            showDialog();
-        }else {
-            editor.remove(TDIAGNOSIS);
-            editor.apply();
-            FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-            fr.replace(R.id.fragment_container, new Oxygen());
-            fr.addToBackStack(null);
-            fr.commit();
+        int tp = Integer.parseInt(userInput);
+        try {
+            getResultListener.getResultFromTextInputFragment(tp);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
 
     }
