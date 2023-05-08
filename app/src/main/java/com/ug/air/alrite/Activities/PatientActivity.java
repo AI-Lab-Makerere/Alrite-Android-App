@@ -32,11 +32,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.makeramen.roundedimageview.BuildConfig;
 import com.ug.air.alrite.APIs.ApiClient;
-import com.ug.air.alrite.APIs.DecisionTreeJSON;
+//import com.ug.air.alrite.APIs.DecisionTreeJSON;
 import com.ug.air.alrite.APIs.JsonPlaceHolder;
 import com.ug.air.alrite.Fragments.Patient.ActivePatients;
 import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
 import com.ug.air.alrite.Fragments.Patient.OtherPatients;
+import com.ug.air.alrite.Fragments.Patient.TextInputFragment;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Credentials;
 
@@ -317,6 +318,14 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     String question;
     ArrayList<JSONObject> choices;
     ArrayList<String> backstack;
+    // Other than question there is more information needed
+    // from the JSON for text input
+    String InputHint;
+    String InputInformation;
+    String SkipInformation;
+    int MinValue;
+    int MaxValue;
+    int diagnosisCutoff;
 
     private void getNextPage(JSONObject currNextPage) throws JSONException {
         // Get all of the items that should be displayed on the page
@@ -361,7 +370,36 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         // Replace and commit the fragment
         completeFragmentTransaction(mc_fragment);
     }
+    /**
+     * Creating the Fragment for Text Input
+     *
+     * @throws JSONException because we use json objects
+     */
+    private void createTextInputFragment(JSONObject page) throws JSONException {
+        // Collect the important arguments from the component
+        question = page.getString("text");
+        InputHint = page.getString("text");
+        InputInformation = page.getString("");
+        SkipInformation = page.getString("");
+        MinValue = page.getInt("");
+        MaxValue = page.getInt("");
+        diagnosisCutoff = page.getInt("");
 
+        // Get the new page's fragment, and set a listener for when the next button
+        // is clicked
+        TextInputFragment ti_fragment = TextInputFragment.newInstance(question, InputHint, InputInformation, SkipInformation,
+        MinValue, MaxValue, diagnosisCutoff);
+
+        // Replace and commit the fragment
+        completeFragmentTransaction(ti_fragment);
+    }
+    public void getResultFromTextInputFragment(int numberInputted) throws JSONException {
+        String diagnosis = "";
+        // Enter the diagnosis into the editor
+        editor.putString(question, diagnosis);
+        editor.apply();
+
+    }
     /**
      * Listener for clicking the next button: we can move to the correct next
      * page, as given by the user's sent JSON

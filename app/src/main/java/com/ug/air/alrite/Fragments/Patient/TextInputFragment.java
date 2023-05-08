@@ -4,6 +4,7 @@ import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
 import static com.ug.air.alrite.Fragments.Patient.FTouch.TOUCH;
 import static com.ug.air.alrite.Fragments.Patient.HIVCare.CHOICEHC;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -35,7 +36,11 @@ import java.util.ArrayList;
 
 
 public class TextInputFragment extends Fragment {
-
+    public interface onGetResultListener {
+        void getResultFromTextInputFragment(int choiceIndex) throws JSONException;
+        void getLastPage() throws JSONException;
+    }
+    MultipleChoiceFragment.onGetResultListener getResultListener;
     View view;
     EditText etDay;
     Button back, next, btnSkip, btnSave;
@@ -169,12 +174,27 @@ public class TextInputFragment extends Fragment {
         return view;
     }
 
+    /**
+     * This is where we do what we usually do in the onAttach section, except that
+     * we also add a listener for sending the result of the Text Input up to
+     * the activity
+     *
+     * @param activity the PatientActivity that we're running this fragment on
+     */
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            getResultListener = (MultipleChoiceFragment.onGetResultListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement onSomeEventListener");
+        }
+    }
     TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
         }
-
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             userInput = etDay.getText().toString();
