@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.ug.air.alrite.Activities.PatientActivity;
 import com.ug.air.alrite.R;
 
 import org.json.JSONException;
@@ -185,7 +186,7 @@ public class MultipleChoiceFragment extends Fragment {
     private static ArrayList<String> getTextFromChoices(ArrayList<JSONObject> list) throws JSONException {
         ArrayList<String> ret = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
-            ret.add(list.get(i).getString("text"));
+            ret.add(list.get(i).getString(PatientActivity.TEXT));
         }
         return ret;
     }

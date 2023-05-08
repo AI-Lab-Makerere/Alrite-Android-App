@@ -14,6 +14,7 @@ import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.INITIAL_DATE_2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -32,7 +33,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.makeramen.roundedimageview.BuildConfig;
 import com.ug.air.alrite.APIs.ApiClient;
-//import com.ug.air.alrite.APIs.DecisionTreeJSON;
+import com.ug.air.alrite.APIs.DecisionTreeJSON;
 import com.ug.air.alrite.APIs.JsonPlaceHolder;
 import com.ug.air.alrite.Fragments.Patient.ActivePatients;
 import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
@@ -68,10 +69,11 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Retrofit;
+import retrofit2.Response;
 
 public class PatientActivity extends AppCompatActivity implements MultipleChoiceFragment.onGetResultListener {
 
@@ -95,11 +97,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             if (frag == 1){
                 // fragmentTransaction.add(R.id.fragment_container, new Initials());
-                try {
-                    implementEditableDecisionTree();
-                } catch (JSONException | IOException e) {
-                    throw new RuntimeException("JSONException in Patient: " + e);
-                }
+                getJSONFromBackend();
             }else if (frag == 2){
                 fragmentTransaction.add(R.id.fragment_container, new ActivePatients());
             }else {
@@ -259,18 +257,63 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         startActivity(intent);
     }
 
+
+    /**---------------------------------------------------------------------------------------------
+     *
+     * Decision Tree creation and maintenance functions below vv
+     *
+     *--------------------------------------------------------------------------------------------*/
+
+    // Strings for the JSON identifiers
+    public static final String COMPONENT = "component";
+    public static final String MULTISELECT = "multiselect";
+    public static final String PAGE_ID = "pageID";
+    public static final String PAGES = "pages";
+    public static final String LABEL = "label";
+    public static final String CHOICES = "choices";
+    public static final String TEXT = "text";
+    public static final String VALUE = "value";
+    public static final String LINK = "link";
+    public static final String CONTENT = "content";
+    public static final String MULTIPLE_CHOICE = "MultipleChoice";
+    public static final String TEXT_INPUT = "TextInput";
+    public static final String DIAGNOSIS_PAGE = "Diagnosis Page";
+    public static final String TITLE = "title";
+
+     // Full JSON infos to call getNextPage
+     JSONArray pages;
+
+     // Information gotten from JSON for the current page
+     // Information gotten from JSON
+     String question;
+     ArrayList<JSONObject> choices;
+     ArrayList<String> backstack;
+     // Other than question there is more information needed
+     // from the JSON for text input
+     String InputHint;
+     String InputInformation;
+     String SkipInformation;
+     int MinValue;
+     int MaxValue;
+     int diagnosisCutoff;
+
+    /**
+     *
+     * @throws JSONException
+     * @throws IOException
+     */
     // TODO: ensure that the strings are not hard-coded in the future
-    private void implementEditableDecisionTree() throws JSONException, IOException {
+    private void implementEditableDecisionTree(JSONObject json) throws JSONException, IOException {
 //        DecisionTreeJSON json = ApiClient.getClient(ApiClient.TEMP_SERV_URL)
 //                                    .create(DecisionTreeJSON.class);
 //        Call<String> call = DecisionTreeJSON.getJson();
 //        System.out.println(json);
 
         backstack = new ArrayList<>();
-        pages = Objects.requireNonNull(createTestingJson()).getJSONArray("pages");
+        pages = json.getJSONArray(PAGES);
         // This is just an array because it needs to be mutable: think of it as
         // its own element
-        JSONObject nextPage = pages.getJSONObject(0);
+        String nextPage = pages.getJSONObject(0).getString(PAGE_ID);
 
         // Handling the intent
 
@@ -311,42 +354,86 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         ft.commit();
     }
 
-    // Full JSON infos to call getNextPage
-    JSONArray pages;
-
-    // Information gotten from JSON
-    String question;
-    ArrayList<JSONObject> choices;
-    ArrayList<String> backstack;
-    // Other than question there is more information needed
-    // from the JSON for text input
-    String InputHint;
-    String InputInformation;
-    String SkipInformation;
-    int MinValue;
-    int MaxValue;
-    int diagnosisCutoff;
-
-    private void getNextPage(JSONObject currNextPage) throws JSONException {
-        // Get all of the items that should be displayed on the page
-        // TODO: we're not accounting for multiple things on a page, fix in the future
-        JSONArray nextPageComponents = currNextPage.getJSONArray("content");
-
+    /**
+     * Given a page from the json object, we create the fragment for that page and
+     * populate it with the necessary information.
+     *
+     * @param nextPageID the ID of the next page to be displayed in the app
+     * @throws JSONException if the json is mad at you for calling it improperly
+     */
+    private void getNextPage(String nextPageID) throws JSONException {
         // Add the new page to the backstack, if it's not already there somewhere
-        if (!backstack.contains(currNextPage.getString("pageID"))) {
-            backstack.add(currNextPage.getString("pageID"));
+        if (!backstack.contains(nextPageID)) {
+            backstack.add(nextPageID);
         }
 
-        for (int i = 0; i < nextPageComponents.length(); i++) {
-            JSONObject nextPageComponent = nextPageComponents.getJSONObject(i);
+        // Get all of the items that should be displayed on the page
+        JSONObject nextPageJSON = pages.getJSONObject(findIndexInPagesGivenPageId(nextPageID));
+        JSONArray nextPageContent = nextPageJSON.getJSONArray(CONTENT);
 
-            // Multiple choice option:
-            if (nextPageComponent.getString("type").equals("multiple-choice")) {
-                createMultipleChoiceFragment(nextPageComponent);
+        // If the next page would be the final page, then the assessment is over!
+        // So, start up the diagnosis activity
+        if (nextPageJSON.get(TITLE).equals(DIAGNOSIS_PAGE)) {
+            exitActivity();
+            return;
+        }
+
+        // Then, for each component that we're given within the page, display a
+        // fragment for that component.
+        for (int i = 0; i < nextPageContent.length(); i++) {
+            JSONObject nextPageComponent = nextPageContent.getJSONObject(i);
+            String nextPageComponentType = nextPageComponent.getString(COMPONENT);
+
+            // Multiple choice option(s):
+            if (nextPageComponentType.equals(MULTIPLE_CHOICE)) {
+                Boolean isMultiSelect = nextPageComponent.getBoolean(MULTISELECT);
+                if (isMultiSelect) {
+                    createMultiSelectFragment(nextPageComponent);
+                } else {
+                    createMultipleChoiceFragment(nextPageComponent);
+                }
+
+            // Text input option:
+            } else if (nextPageComponentType.equals(TEXT_INPUT)) {
+                createTextInputFragment(nextPageComponent);
+
+            // There was an issue with identifying the page...
             } else {
                 throw new IllegalStateException("should never get here lol");
             }
         }
+    }
+
+    /**
+     * Essentially, make an asynchronous API call to get the HTTP
+     */
+    private void getJSONFromBackend() {
+        DecisionTreeJSON dtJson = ApiClient.getClient(ApiClient.TEMP_SERV_URL).create(DecisionTreeJSON.class);
+        Call<String> call = dtJson.getJson();
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                if (!response.isSuccessful()) {
+                    System.out.println("no site, plase try again");
+                    return;
+                }
+
+                // We've received a response! We can turn this into a JSONObject
+                // and store the result locally
+                try {
+                    assert response.body() != null;
+                    JSONObject json = new JSONObject(response.body());
+                    implementEditableDecisionTree(json);
+                } catch (JSONException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                throw new RuntimeException(t);
+            }
+        });
     }
 
     /**
@@ -358,10 +445,10 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         this.finish();
     }
 
-    private void createMultipleChoiceFragment(JSONObject page) throws JSONException {
+    private void createMultipleChoiceFragment(JSONObject nextPageComponent) throws JSONException {
         // Collect the important arguments from the component
-        question = page.getString("text");
-        choices = JSONArrayToListOfJSONObjects(page.getJSONArray("choices"));
+        question = nextPageComponent.getString(LABEL);
+        choices = JSONArrayToListOfJSONObjects(nextPageComponent.getJSONArray(CHOICES));
 
         // Get the new page's fragment, and set a listener for when the next button
         // is clicked
@@ -400,40 +487,51 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         editor.apply();
 
     }
+    private void createMultiSelectFragment(JSONObject nextPageComponent) throws JSONException {
+//        // Collect the important arguments from the component
+//        question = page.getString(LABEL);
+//        choices = JSONArrayToListOfJSONObjects(page.getJSONArray(CHOICES));
+//
+//        // Get the new page's fragment, and set a listener for when the next button
+//        // is clicked
+//        MultiSelectFragment ms_fragment = MultiSelectFragment.newInstance(question, choices);
+//
+//        // Replace and commit the fragment
+//        completeFragmentTransaction(ms_fragment);
+    }
+
     /**
      * Listener for clicking the next button: we can move to the correct next
-     * page, as given by the user's sent JSON
+     * page, as given by the user's sent JSON. This one is specifically for the
+     * multiple choice fragment.
      *
      * @param choiceIndex the radiobutton choice that the user picked
      * @throws JSONException because we use json objects
      */
     @Override
     public void getResultFromMultipleChoiceFragment(int choiceIndex) throws JSONException {
-        String diagnosis = choices.get(choiceIndex - 1).getString("text");
-        String nextPageName = choices.get(choiceIndex - 1).getString("link");
+        String diagnosis = choices.get(choiceIndex - 1).getString(TEXT);
+        String nextPageName = choices.get(choiceIndex - 1).getString(LINK);
         System.out.println("NEXT PAGE NAME:" + nextPageName);
 
         // Enter the diagnosis into the editor
         editor.putString(question, diagnosis);
         editor.apply();
 
-        // If the next page would be the final page, then the assessment is over!
-        // So, start up the diagnosis activity
-        if (nextPageName.equals("final_page")) {
-            exitActivity();
-            return;
-        }
-
         // Decide on the next page based on the result
-        int pagesIdx = findIndexInPagesGivenPageId(nextPageName);
-        JSONObject nextPage = pages.getJSONObject(pagesIdx);
         try {
-            getNextPage(nextPage);
+            getNextPage(nextPageName);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Listener for clicking the back button: calls up the next page based on the
+     * current backstack of pages
+     *
+     * @throws JSONException if the json hates you
+     */
     @Override
     public void getLastPage() throws JSONException {
         // TODO: exit to main activity, if it's the first page
@@ -441,10 +539,8 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         // Get the last page JSON object that we put on to the backstack
         backstack.remove(backstack.size() - 1);
         String backPageName = backstack.get(backstack.size() - 1);
-        int pagesIndex = findIndexInPagesGivenPageId(backPageName);
-        JSONObject lastPage = pages.getJSONObject(pagesIndex);
 
-        getNextPage(lastPage);
+        getNextPage(backPageName);
     }
 
     private int findIndexInPagesGivenPageId(String pageID) throws JSONException {
@@ -456,109 +552,5 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
             }
         }
         return -1;
-    }
-
-    private JSONObject createTestingJson() throws JSONException {
-
-        // Get the file that has the json in it
-//            String name1 = getFilesDir().getAbsolutePath();
-//            String name =  getApplicationContext().getApplicationInfo().dataDir + "/Activities/example.json";
-//
-//            Object o = new JsonParser().parse(new FileReader(name));
-//            JSONObject jsonStr = (JSONObject) o;
-
-        JSONObject fin = new JSONObject("{\n" +
-                "  \"pages\":\n" +
-                "  [\n" +
-                "    {\n" +
-                "      \"pageID\": \"page_1\",\n" +
-                "      \"pageTitle\": \"smoke_tobacco\",\n" +
-                "      \"content\":\n" +
-                "      [\n" +
-                "        {\n" +
-                "          \"type\": \"multiple-choice\",\n" +
-                "          \"text\": \"Does anyone in the child's home smoke tobacco?\",\n" +
-                "          \"choices\":\n" +
-                "          [\n" +
-                "            {\n" +
-                "              \"text\": \"Yes\",\n" +
-                "              \"link\": \"page_2\",\n" +
-                "              \"valueID\": \"yes\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"text\": \"No\",\n" +
-                "              \"link\": \"page_3\",\n" +
-                "              \"valueID\": \"no\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"text\": \"Not sure\",\n" +
-                "              \"link\": \"page_3\",\n" +
-                "              \"valueID\": \"unsure\"\n" +
-                "            }\n" +
-                "          ]\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"pageID\": \"page_2\",\n" +
-                "      \"pageTitle\": \"kerosene\",\n" +
-                "      \"content\":\n" +
-                "      [\n" +
-                "        {\n" +
-                "          \"type\": \"multiple-choice\",\n" +
-                "          \"text\": \"Does any of the family members use kerosene, charcoal, or other biomass in the home?\",\n" +
-                "          \"choices\":\n" +
-                "          [\n" +
-                "            {\n" +
-                "              \"text\": \"Yes\",\n" +
-                "              \"link\": \"final_page\",\n" +
-                "              \"valueID\": \"yes\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"text\": \"No\",\n" +
-                "              \"link\": \"final_page\",\n" +
-                "              \"valueID\": \"no\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"text\": \"Not sure\",\n" +
-                "              \"link\": \"final_page\",\n" +
-                "              \"valueID\": \"unsure\"\n" +
-                "            }\n" +
-                "          ]\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"pageID\": \"page_3\",\n" +
-                "      \"pageTitle\": \"allergies\",\n" +
-                "      \"content\":\n" +
-                "      [\n" +
-                "        {\n" +
-                "          \"type\": \"multiple-choice\",\n" +
-                "          \"text\": \"Has the child’s parents or siblings had similar breathing problems, other diseases with breathing problems or allergies?\",\n" +
-                "          \"choices\":\n" +
-                "          [\n" +
-                "            {\n" +
-                "              \"text\": \"Yes\",\n" +
-                "              \"link\": \"final_page\",\n" +
-                "              \"valueID\": \"yes\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"text\": \"No\",\n" +
-                "              \"link\": \"final_page\",\n" +
-                "              \"valueID\": \"no\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"text\": \"Not sure\",\n" +
-                "              \"link\": \"final_page\",\n" +
-                "              \"valueID\": \"unsure\"\n" +
-                "            }\n" +
-                "          ]\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}");
-        return fin;
     }
 }
