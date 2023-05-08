@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,9 +34,9 @@ public class MultipleSelectionFragment extends Fragment {
     public static final String DEFAULT = "**default string**";
     String previousResponse;
     String question;
-    ArrayList<String> choices;
+    ArrayList<String> choices; // list of the texts of the checkboxes
+    ArrayList<CheckBox> choiceGroup; // list of checkboxes
     View view;
-    RadioGroup choiceGroup;
     Button backButton, nextButton;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -87,7 +86,7 @@ public class MultipleSelectionFragment extends Fragment {
         // Retrieve the information for the question/choices of the page
         assert getArguments() != null;
         question = getArguments().getString(QUESTION);
-        choices = getArguments().getStringArrayList(CHOICES);
+        choices = getArguments().getStringArrayList(CHOICES); // list of strings
 
         // Then, set the information for each question/choice to line up with our givens
         TextView questionDisplay = view.findViewById(R.id.mc_question);
@@ -95,8 +94,7 @@ public class MultipleSelectionFragment extends Fragment {
 
         // create buttons in here, and then choose their ids more easily
         // Currently storing 5 checkboxes will update later
-        // Set for demo might add more or create optimized loop
-        ArrayList<CheckBox> choiceGroup = new ArrayList<CheckBox>();
+        // might add more or create optimized loop
 
         CheckBox choice1 = view.findViewById(R.id.choice1);
         choice1.setText(choices.get(0));
@@ -114,6 +112,7 @@ public class MultipleSelectionFragment extends Fragment {
         choiceGroup.add(choice3);
         choiceGroup.add(choice4);
         choiceGroup.add(choice5);
+        System.out.println(choiceGroup);
 
 
         // All of the buttons/things that we'll need to reference
@@ -121,7 +120,7 @@ public class MultipleSelectionFragment extends Fragment {
         backButton = view.findViewById(R.id.back);
 
         // If we've already seen this page, reload our past choices
-        loadSelectedChoiceIfAlreadySelected();
+        loadSelectedChoicesIfAlreadySelected();
 
         // This is a listener for, if the next button is pressed, whether we can go
         // on or not, and what information should be sent up
@@ -133,7 +132,9 @@ public class MultipleSelectionFragment extends Fragment {
                 ArrayList<Integer> chosenOptions = new ArrayList<Integer>();
                 for (CheckBox choice : choiceGroup) {
                     if (choice.isChecked()) {
-                        multipleSelectedOptions.add(choice);
+                        // get the id of this choice
+                        int id = choice.getId();
+                        chosenOptions.add(id);
                     }
                 }
                 if (chosenOptions.size() <= 1) {
@@ -143,17 +144,19 @@ public class MultipleSelectionFragment extends Fragment {
 
                 // Get the indices of the choices in the set of buttons: relies on the
                 // buttons having names with their index at the end
-                ArrayList<String> chosenOptionIds = new ArrayList<String>();
-                for (CheckBox c : multipleSelectedOptions) {
-
+                ArrayList<Integer> chosenOptionIds = new ArrayList<Integer>();
+                for (int c : chosenOptions) {
+                    String chosenOptionId = v.getResources().getResourceName(c);
+                    int index = Integer.parseInt(chosenOptionId.substring(chosenOptionId.length() - 1));
+                    chosenOptionIds.add(index);
                 }
-                String chosenOptionIds = v.getResources().getResourceName(chosenOptions);
-                int index = Integer.parseInt(chosenOptionId.substring(chosenOptionId.length() - 1));
 
                 // Send the result back up to main: a listener there will trigger
                 // and start the next fragment sequence up
                 try {
-                    getResultListener.getResultFromMultipleChoiceFragment(index);
+                    for (int index : chosenOptionIds) {
+                        getResultListener.getResultFromMultipleChoiceFragment(index);
+                    }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -163,22 +166,18 @@ public class MultipleSelectionFragment extends Fragment {
         return view;
     }
 
+
     /**
      * In the case that we're creating this view again after we've already stepped
      * through this option, pre-select the choice that we already made, so that we
      * don't get inconsistent answers from this
      */
-    private void loadSelectedChoiceIfAlreadySelected() {
+    private void loadSelectedChoicesIfAlreadySelected() {
+        // TODO: how to make it response multiple ones
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         previousResponse = sharedPreferences.getString(question, DEFAULT);
 
-        for (int i = 0; i < choices.size(); i++) {
-            if (previousResponse.equals(choices.get(i))) {
-                RadioGroup allChoices = view.findViewById(R.id.mc_options);
-                allChoices.check(i);
-                return;
-            }
-        }
+        //
     }
 
     /**
