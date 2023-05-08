@@ -271,4 +271,14 @@
     <string name="mc_question">%s</string>
     <string name="choice1">%s</string>
     <string name="choice2">%s</string>
+
+    <!--   New Strings for the text input -->
+    <string name="ti_question">%s</string>
+    <string name="ti_IHint">%s</string>
+    <string name="ti_IInformation">%s</string>
+    <string name="ti_SInformation">%s</string>
+    <string name="ti_minval">%s</string>
+    <string name="ti_maxval">%s</string>
+    <string name="ti_minvalforDiagnosis">%s</string>
+
 </resources>

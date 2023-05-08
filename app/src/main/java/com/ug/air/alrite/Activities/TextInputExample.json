@@ -1,0 +1,92 @@
+{
+  "pages":
+  [
+    {
+      "pageID": "page_1",
+      "pageTitle": "Text",
+      "content":
+      [
+        {
+          "type": "multiple-choice",
+          "text": "Does anyone in the child's home smoke tobacco?",
+          "choices":
+          [
+            {
+              "text": "Yes",
+              "link": "page_2",
+              "valueID": "yes"
+            },
+            {
+              "text": "No",
+              "link": "page_3",
+              "valueID": "no"
+            },
+            {
+              "text": "Not sure",
+              "link": "page_3",
+              "valueID": "unsure"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageID": "page_2",
+      "pageTitle": "kerosene",
+      "content":
+      [
+        {
+          "type": "multiple-choice",
+          "text": "Does any of the family members use kerosene, charcoal, or other biomass in the home?",
+          "choices":
+          [
+            {
+              "text": "Yes",
+              "link": "final_page",
+              "valueID": "yes"
+            },
+            {
+              "text": "No",
+              "link": "final_page",
+              "valueID": "no"
+            },
+            {
+              "text": "Not sure",
+              "link": "final_page",
+              "valueID": "unsure"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageID": "page_3",
+      "pageTitle": "allergies",
+      "content":
+      [
+        {
+          "type": "multiple-choice",
+          "text": "Has the child’s parents or siblings had similar breathing problems, other diseases with breathing problems or allergies?",
+          "choices":
+          [
+            {
+              "text": "Yes",
+              "link": "final_page",
+              "valueID": "yes"
+            },
+            {
+              "text": "No",
+              "link": "final_page",
+              "valueID": "no"
+            },
+            {
+              "text": "Not sure",
+              "link": "final_page",
+              "valueID": "unsure"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

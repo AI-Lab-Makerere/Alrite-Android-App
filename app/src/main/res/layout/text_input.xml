@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Fragments.Patient.Fever">
+    tools:context=".Fragments.Patient.Temperature">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,50 +46,73 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/mc_question"
+                    android:id="@+id/ti_question"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="25dp"
                     android:gravity="center_horizontal"
-                    android:text="@string/mc_question"
+                    android:text="@string/ti_question"
                     android:textColor="@color/black"
                     android:textSize="18sp" />
 
-                <RadioGroup
-                    android:id="@+id/mc_options"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp">
+                    android:layout_marginTop="5dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
 
-                    <RadioButton
-                        android:id="@+id/choice1"
-                        android:layout_width="wrap_content"
+                    <EditText
+                        android:id="@+id/IHint"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="10dp"
+                        android:layout_weight=".5"
+                        android:background="@drawable/text_input_bg"
+                        android:gravity="center"
+                        android:hint="@string/ti_IHint"
+                        android:inputType="numberDecimal"
+                        android:maxLength="4" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/ti_IInformation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="@string/ti_IInformation"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/ti_SInformation"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:buttonTint="@color/black"
-                        android:text="@string/choice1"
-                        android:textSize="18sp" />
+                        android:gravity="center_horizontal"
+                        android:text="@string/ti_SInformation"
+                        android:textSize="12sp" />
 
-                    <RadioButton
-                        android:id="@+id/choice2"
+                    <Button
+                        android:id="@+id/skip"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:buttonTint="@color/black"
-                        android:text="@string/choice2"
-                        android:textSize="18sp" />
+                        android:layout_height="30dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:background="@drawable/bg_button"
+                        android:text="Skip"
+                        android:textColor="@color/color_background" />
 
-                    <RadioButton
-                        android:id="@+id/choice3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:buttonTint="@color/black"
-                        android:text="%s"
-                        android:textSize="18sp" />
-
-                </RadioGroup>
+                </LinearLayout>
 
             </LinearLayout>
+
 
         </ScrollView>
 
