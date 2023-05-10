@@ -12,11 +12,11 @@
           "component": "TextInput"
         },
         {
-          "label": "Enter child's age:",
-          "type": "numeric",
-          "valueID": "age",
-          "units": "years",
-          "component": "TextInput"
+          "type": "=",
+          "valueID": "child_initials",
+          "threshold": "IN",
+          "satisfiedLink": "page_4",
+          "notSatisfiedLink": "page_2"
         }
       ],
       "defaultLink": "page_2"
