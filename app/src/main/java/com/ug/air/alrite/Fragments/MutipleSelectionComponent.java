@@ -30,16 +30,16 @@ public class MutipleSelectionComponent {
      * @param ChoiceValue Value which corresponds to the numbering
      * of the choice within the Map
     */
-    public void addBooleanValue(Boolean ChoiceValue, String ChoiceName) {
-            if(ChoiceName == null) {
-                throw new IllegalArgumentException("Need to have an input for the string");
-            }
-            if(ChoiceValue != true || ChoiceValue != false) {
-                throw new IllegalArgumentException("For a true or false value we need to have a" +
-                        "true or false choice answer");
-            }
-            this.TrueOrFalse.put(ChoiceValue, ChoiceName);
-    }
+//    public void addBooleanValue(Boolean ChoiceValue, String ChoiceName) {
+//            if(ChoiceName == null) {
+//                throw new IllegalArgumentException("Need to have an input for the string");
+//            }
+//            if(ChoiceValue != true || ChoiceValue != false) {
+//                throw new IllegalArgumentException("For a true or false value we need to have a" +
+//                        "true or false choice answer");
+//            }
+//            this.TrueOrFalse.put(ChoiceValue, ChoiceName);
+//    }
 
     /**
      * Add a new choice into the table

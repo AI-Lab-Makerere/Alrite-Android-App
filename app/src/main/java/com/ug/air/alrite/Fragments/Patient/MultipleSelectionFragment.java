@@ -25,6 +25,7 @@ public class MultipleSelectionFragment extends Fragment {
 
     public interface onGetResultListener {
         public void getResultFromMultipleChoiceFragment(int choiceIndex) throws JSONException;
+        void getLastPage() throws JSONException;
     }
     onGetResultListener getResultListener;
 
@@ -120,7 +121,7 @@ public class MultipleSelectionFragment extends Fragment {
         backButton = view.findViewById(R.id.back);
 
         // If we've already seen this page, reload our past choices
-        loadSelectedChoicesIfAlreadySelected();
+        // loadSelectedChoicesIfAlreadySelected();
 
         // This is a listener for, if the next button is pressed, whether we can go
         // on or not, and what information should be sent up
@@ -137,8 +138,8 @@ public class MultipleSelectionFragment extends Fragment {
                         chosenOptions.add(id);
                     }
                 }
-                if (chosenOptions.size() <= 1) {
-                    Toast.makeText(getActivity(), "Please select more than one of the options", Toast.LENGTH_SHORT).show();
+                if (chosenOptions.size() < 1) {
+                    Toast.makeText(getActivity(), "Please select at least one of the options", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -155,8 +156,19 @@ public class MultipleSelectionFragment extends Fragment {
                 // and start the next fragment sequence up
                 try {
                     for (int index : chosenOptionIds) {
-                        getResultListener.getResultFromMultipleChoiceFragment(index);
+                        getResultListener.getResultFromMultipleChoiceFragment(index);  // adding to the diagnosis
                     }
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    getResultListener.getLastPage();
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -172,13 +184,13 @@ public class MultipleSelectionFragment extends Fragment {
      * through this option, pre-select the choice that we already made, so that we
      * don't get inconsistent answers from this
      */
-    private void loadSelectedChoicesIfAlreadySelected() {
-        // TODO: how to make it response multiple ones
-        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        previousResponse = sharedPreferences.getString(question, DEFAULT);
-
-        //
-    }
+//    private void loadSelectedChoicesIfAlreadySelected() {
+//
+//        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+//        previousResponse = sharedPreferences.getString(question, DEFAULT);
+//
+//        //
+//    }
 
     /**
      * This is used specifically for newInstance, and relies on the JSON being set
