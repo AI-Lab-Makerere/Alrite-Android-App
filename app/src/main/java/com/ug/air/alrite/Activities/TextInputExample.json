@@ -1,92 +1,85 @@
 {
-  "pages":
-  [
+  "name": "test",
+  "pages": [
     {
       "pageID": "page_1",
-      "pageTitle": "Text",
-      "content":
-      [
+      "title": "Patient Details",
+      "content": [
         {
-          "type": "multiple-choice",
-          "text": "Does anyone in the child's home smoke tobacco?",
-          "choices":
-          [
-            {
-              "text": "Yes",
-              "link": "page_2",
-              "valueID": "yes"
-            },
-            {
-              "text": "No",
-              "link": "page_3",
-              "valueID": "no"
-            },
-            {
-              "text": "Not sure",
-              "link": "page_3",
-              "valueID": "unsure"
-            }
-          ]
+          "label": "Enter child's initials:",
+          "type": "default",
+          "valueID": "child_initials",
+          "component": "TextInput"
+        },
+        {
+          "label": "Enter child's age:",
+          "type": "numeric",
+          "valueID": "age",
+          "units": "years",
+          "component": "TextInput"
         }
-      ]
+      ],
+      "defaultLink": "page_2"
     },
     {
       "pageID": "page_2",
-      "pageTitle": "kerosene",
-      "content":
-      [
+      "title": "Assess Patient",
+      "content": [
         {
-          "type": "multiple-choice",
-          "text": "Does any of the family members use kerosene, charcoal, or other biomass in the home?",
-          "choices":
-          [
+          "label": "What symptoms does the child have?",
+          "valueID": "child_symptoms",
+          "multiselect": true,
+          "choices": [
             {
-              "text": "Yes",
-              "link": "final_page",
-              "valueID": "yes"
+              "text": "Uncontrolled jerking or convulsions",
+              "value": "convulsions",
+              "link": "page_1"
             },
             {
-              "text": "No",
-              "link": "final_page",
-              "valueID": "no"
+              "text": "Unresponsive or no awareness of surroundings",
+              "value": "unresponsive",
+              "link": "page_1"
             },
             {
-              "text": "Not sure",
-              "link": "final_page",
-              "valueID": "unsure"
+              "text": "Vomiting everything",
+              "value": "vomiting",
+              "link": "page_1"
             }
-          ]
+          ],
+          "component": "MultipleChoice"
+        },
+        {
+          "type": "at_least_one",
+          "targetValueID": "child_symptoms",
+          "satisfiedLink": "page_3",
+          "component": "Selection"
         }
-      ]
+      ],
+      "defaultLink": "page_4"
     },
     {
       "pageID": "page_3",
-      "pageTitle": "allergies",
-      "content":
-      [
+      "title": "Severe Disease",
+      "content": [
         {
-          "type": "multiple-choice",
-          "text": "Has the child’s parents or siblings had similar breathing problems, other diseases with breathing problems or allergies?",
-          "choices":
-          [
-            {
-              "text": "Yes",
-              "link": "final_page",
-              "valueID": "yes"
-            },
-            {
-              "text": "No",
-              "link": "final_page",
-              "valueID": "no"
-            },
-            {
-              "text": "Not sure",
-              "link": "final_page",
-              "valueID": "unsure"
-            }
-          ]
+          "fileName": "test.mp3",
+          "label": "something something idk",
+          "component": "MediaItem"
         }
-      ]
+      ],
+      "defaultLink": "page_4"
+    },
+    {
+      "pageID": "page_4",
+      "title": "Diagnosis Page",
+      "content": [],
+      "defaultLink": "page_1"
     }
-  ]
+  ],
+  "meta": {
+    "version": 4,
+    "apipath": "/alrite/apis/workflows/test/4/",
+    "time_created": "2023-05-01 23:01:05.383028+00:00",
+    "created_by": null
+  }
 }
