@@ -19,12 +19,13 @@ import com.ug.air.alrite.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MultipleSelectionFragment extends Fragment {
 
     public interface onGetResultListener {
-        public void getResultFromMultipleChoiceFragment(int choiceIndex) throws JSONException;
+        public void getResultFromMultipleSelectionFragment(ArrayList<Integer> chosenOptions) throws JSONException;
         void getLastPage() throws JSONException;
     }
     onGetResultListener getResultListener;
@@ -155,11 +156,9 @@ public class MultipleSelectionFragment extends Fragment {
                 // Send the result back up to main: a listener there will trigger
                 // and start the next fragment sequence up
                 try {
-                    for (int index : chosenOptionIds) {
-                        getResultListener.getResultFromMultipleChoiceFragment(index);  // adding to the diagnosis
-                    }
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                        getResultListener.getResultFromMultipleSelectionFragment(chosenOptionIds);  // adding to the diagnosis
+                    } catch (JSONException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         });

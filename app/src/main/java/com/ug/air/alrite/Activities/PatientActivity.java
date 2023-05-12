@@ -33,6 +33,7 @@ import com.ug.air.alrite.APIs.ApiClient;
 import com.ug.air.alrite.APIs.DecisionTreeJSON;
 import com.ug.air.alrite.Fragments.Patient.ActivePatients;
 import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
+import com.ug.air.alrite.Fragments.Patient.MultipleSelectionFragment;
 import com.ug.air.alrite.Fragments.Patient.OtherPatients;
 import com.ug.air.alrite.Fragments.Patient.TextInputFragment;
 import com.ug.air.alrite.R;
@@ -44,6 +45,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -280,7 +282,8 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     int MaxValue; //The maximum value allowed to be inputted
     int diagnosisCutoff; //The minimum value to be inputted in order to get the diagnosis
      JSONObject pageID;
-    String targetValue_id;
+    String targetValue_id; // for text input
+    String targetValueID; // for multiple selection
 
     /**
      *
@@ -467,18 +470,25 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         // Replace and commit the fragment
         completeFragmentTransaction(ti_fragment);
     }
-    private void createMultiSelectFragment(JSONObject nextPageComponent) throws JSONException {
-//        // Collect the important arguments from the component
-//        question = page.getString(LABEL);
-//        choices = JSONArrayToListOfJSONObjects(page.getJSONArray(CHOICES));
-//
-//        // Get the new page's fragment, and set a listener for when the next button
-//        // is clicked
-//        MultiSelectFragment ms_fragment = MultiSelectFragment.newInstance(question, choices);
-//
-//        // Replace and commit the fragment
-//        completeFragmentTransaction(ms_fragment);
+
+    /**
+     * Fragment for multiple selection
+     *
+     * @throws JSONException because we use json objects
+     */
+    private void createMultiSelectFragment(JSONObject page) throws JSONException {
+        question = page.getString(LABEL);
+        choices = JSONArrayToListOfJSONObjects(page.getJSONArray(CHOICES));
+        targetValueID = page.getString("targetValueID");
+
+        // Get the new page's fragment
+        // set a listener for when the next button is clicked
+        MultipleSelectionFragment ms_fragment = MultipleSelectionFragment.newInstance(question, choices);
+
+        // Replace and commit the fragment
+        completeFragmentTransaction(ms_fragment);
     }
+
 
     /**
      * Listener for clicking the next button: we can move to the correct next
@@ -501,6 +511,32 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         // Decide on the next page based on the result
         try {
             getNextPage(nextPageName);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void getResultFromMultipleSelectionFragment(ArrayList<Integer> chosenOptionIds) throws JSONException {
+        // add the selected choices to the diagnosis
+        for (int choiceIndex : chosenOptionIds) {
+            String diagnosis = choices.get(choiceIndex - 1).getString(TEXT);
+            // Enter the diagnosis into the editor
+            editor.putString(question, diagnosis);
+            editor.apply();
+        }
+
+        JSONObject foundLink = getContentFromPageID(pageID, targetValueID);
+        String NextPage;
+        if (foundLink == null) {
+            NextPage =  pageID.getString("defaultLink");
+        }
+        else {
+            NextPage = foundLink.getString("satisfiedLink");
+        }
+
+        // Decide on the next page based on the result
+        try {
+            getNextPage(NextPage);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
