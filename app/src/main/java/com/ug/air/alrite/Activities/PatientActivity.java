@@ -23,20 +23,17 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.makeramen.roundedimageview.BuildConfig;
 import com.ug.air.alrite.APIs.ApiClient;
 import com.ug.air.alrite.APIs.DecisionTreeJSON;
-import com.ug.air.alrite.APIs.JsonPlaceHolder;
 import com.ug.air.alrite.Fragments.Patient.ActivePatients;
 import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
+import com.ug.air.alrite.Fragments.Patient.MultipleSelectionFragment;
 import com.ug.air.alrite.Fragments.Patient.OtherPatients;
 import com.ug.air.alrite.Fragments.Patient.TextInputFragment;
 import com.ug.air.alrite.R;
@@ -46,16 +43,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Path;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,16 +53,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Retrofit;
 import retrofit2.Response;
 
 public class PatientActivity extends AppCompatActivity implements MultipleChoiceFragment.onGetResultListener {
@@ -290,12 +275,15 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
      ArrayList<String> backstack;
      // Other than question there is more information needed
      // from the JSON for text input
-     String InputHint;
-     String InputInformation;
-     String SkipInformation;
-     int MinValue;
-     int MaxValue;
-     int diagnosisCutoff;
+     String InputHint; //The preview text shown in the input bubble (enter the value here)  *optional (prefer this not to be optional)
+    String InputInformation; //Extra stuff below the input bubble telling user more information (its in celcius) *optional
+    String SkipInformation; //Text shown above the skip button telling user when to skip (no thermometer available) *optional
+    int MinValue; //The minimum value allowed to be inputted
+    int MaxValue; //The maximum value allowed to be inputted
+    int diagnosisCutoff; //The minimum value to be inputted in order to get the diagnosis
+     JSONObject pageID;
+    String targetValue_id; // for text input
+    String targetValueID; // for multiple selection
 
     /**
      *
@@ -377,6 +365,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
             exitActivity();
             return;
         }
+        pageID = nextPageJSON;
 
         // Then, for each component that we're given within the page, display a
         // fragment for that component.
@@ -471,6 +460,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         MinValue = page.getInt("");
         MaxValue = page.getInt("");
         diagnosisCutoff = page.getInt("");
+        targetValue_id = page.getString("valueID");
 
         // Get the new page's fragment, and set a listener for when the next button
         // is clicked
@@ -480,25 +470,25 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         // Replace and commit the fragment
         completeFragmentTransaction(ti_fragment);
     }
-    public void getResultFromTextInputFragment(int numberInputted) throws JSONException {
-        String diagnosis = "";
-        // Enter the diagnosis into the editor
-        editor.putString(question, diagnosis);
-        editor.apply();
 
+    /**
+     * Fragment for multiple selection
+     *
+     * @throws JSONException because we use json objects
+     */
+    private void createMultiSelectFragment(JSONObject page) throws JSONException {
+        question = page.getString(LABEL);
+        choices = JSONArrayToListOfJSONObjects(page.getJSONArray(CHOICES));
+        targetValueID = page.getString("targetValueID");
+
+        // Get the new page's fragment
+        // set a listener for when the next button is clicked
+        MultipleSelectionFragment ms_fragment = MultipleSelectionFragment.newInstance(question, choices);
+
+        // Replace and commit the fragment
+        completeFragmentTransaction(ms_fragment);
     }
-    private void createMultiSelectFragment(JSONObject nextPageComponent) throws JSONException {
-//        // Collect the important arguments from the component
-//        question = page.getString(LABEL);
-//        choices = JSONArrayToListOfJSONObjects(page.getJSONArray(CHOICES));
-//
-//        // Get the new page's fragment, and set a listener for when the next button
-//        // is clicked
-//        MultiSelectFragment ms_fragment = MultiSelectFragment.newInstance(question, choices);
-//
-//        // Replace and commit the fragment
-//        completeFragmentTransaction(ms_fragment);
-    }
+
 
     /**
      * Listener for clicking the next button: we can move to the correct next
@@ -524,6 +514,101 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void getResultFromMultipleSelectionFragment(ArrayList<Integer> chosenOptionIds) throws JSONException {
+        // add the selected choices to the diagnosis
+        for (int choiceIndex : chosenOptionIds) {
+            String diagnosis = choices.get(choiceIndex - 1).getString(TEXT);
+            // Enter the diagnosis into the editor
+            editor.putString(question, diagnosis);
+            editor.apply();
+        }
+
+        JSONObject foundLink = getContentFromPageID(pageID, targetValueID);
+        String NextPage;
+        if (foundLink == null) {
+            NextPage =  pageID.getString("defaultLink");
+        }
+        else {
+            NextPage = foundLink.getString("satisfiedLink");
+        }
+
+        // Decide on the next page based on the result
+        try {
+            getNextPage(NextPage);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void getResultFromTextInputFragment(int numberInputted) throws JSONException {
+        String diagnosis = String.valueOf(numberInputted);
+        JSONObject foundLink = getContentFromPageID(pageID, targetValue_id);;
+        String NextPage;
+        if(foundLink == null) {
+            NextPage =  pageID.getString("defaultLink");
+        } else {
+            // Replace BranchedLink with whatever the name is for the link field
+            // once the branched link logic is completed in the JSON file
+            if(foundLink.get("type").equals(">")) {
+                if (numberInputted > diagnosisCutoff) {
+                    NextPage = foundLink.getString("satisfiedLink");
+                } else {
+                    NextPage = foundLink.getString("notSatisfiedLink");
+                }
+            } else if(foundLink.get("type").equals("<")) {
+                if (numberInputted < diagnosisCutoff) {
+                    NextPage = foundLink.getString("satisfiedLink");
+                } else {
+                    NextPage = foundLink.getString("notSatisfiedLink");
+                }
+            } else {
+                if (numberInputted == diagnosisCutoff) {
+                    NextPage = foundLink.getString("satisfiedLink");
+                } else {
+                    NextPage = foundLink.getString("notSatisfiedLink");
+                }
+            }
+        }
+        // Enter the diagnosis into the editor
+        editor.putString(question, diagnosis);
+        editor.apply();
+        try {
+            getNextPage(NextPage);
+        } catch(JSONException e) {
+            throw new RuntimeException();
+        }
+    }
+
+    /**
+     * Takes the page id and returns where we wish to go
+     *
+     * @param pageid the page ID we wish to use
+     * @param targetValueID the valueID of the current component that we are using
+     * @return
+     */
+    public JSONObject getContentFromPageID(JSONObject pageid, String targetValueID) throws JSONException {
+        JSONArray contentVal;
+        if(pageid != null) {
+            try {
+                // Get the content from the JSONArray
+                contentVal = pageid.getJSONArray("content");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            for(int i = 0; i < contentVal.length(); i++ ) {
+                // Check to see if the ID's match up
+                // With the build in has method
+                JSONObject RetrievedTargetID = ((JSONObject)contentVal.get(i));
+                if ( RetrievedTargetID.has("targetValueID")) {
+                    if(RetrievedTargetID.get("targetValueID").equals(targetValueID)) {
+                        return RetrievedTargetID;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
