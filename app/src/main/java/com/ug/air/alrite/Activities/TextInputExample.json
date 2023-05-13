@@ -6,17 +6,18 @@
       "title": "Patient Details",
       "content": [
         {
-          "label": "Enter child's initials:",
-          "type": "default",
-          "valueID": "child_initials",
+          "label": "Enter child's age:",
+          "type": "numeric",
+          "valueID": "age",
+          "units": "years",
           "component": "TextInput"
         },
         {
-          "type": "=",
-          "valueID": "child_initials",
-          "threshold": "IN",
-          "satisfiedLink": "page_4",
-          "notSatisfiedLink": "page_2"
+          "type": "<",
+          "valueID": "age",
+          "threshold": "6",
+          "satisfiedLink": "page_2",
+          "notSatisfiedLink": "page_4"
         }
       ],
       "defaultLink": "page_2"

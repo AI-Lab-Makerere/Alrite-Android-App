@@ -2,13 +2,12 @@ package com.ug.air.alrite.Worker;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static android.content.Context.VIBRATOR_SERVICE;
 
-import static com.ug.air.alrite.Activities.PatientActivity.INCOMPLETE;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.BRONCHODILATOR;
+import static com.ug.air.alrite.Activities.PatientActivity.ASSESS_INCOMPLETE;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USED_BRONCHODILATOR;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator2.REASON;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.BRONC;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.AFTER_BRONCHODILATOR;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -17,10 +16,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
 
@@ -33,8 +30,6 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.ug.air.alrite.BuildConfig;
-import com.ug.air.alrite.Models.Item;
-import com.ug.air.alrite.Models.Patient;
 import com.ug.air.alrite.R;
 
 import java.io.File;
@@ -91,9 +86,9 @@ public class NotifyWorker2 extends Worker {
                         if (!name.equals("sharedPrefs") && !name.equals("counter_file")){
                             SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(name, MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            String bron = sharedPreferences.getString(BRONCHODILATOR, "");
-                            String fin = sharedPreferences.getString(BRONC, "");
-                            String incomplete = sharedPreferences.getString(INCOMPLETE, "");
+                            String bron = sharedPreferences.getString(USED_BRONCHODILATOR, "");
+                            String fin = sharedPreferences.getString(AFTER_BRONCHODILATOR, "");
+                            String incomplete = sharedPreferences.getString(ASSESS_INCOMPLETE, "");
                             if (incomplete.isEmpty() && bron.equals("Bronchodialtor Given") && fin.isEmpty()){
                                 String date = sharedPreferences.getString(DATE, "");
                                 try {
@@ -104,7 +99,7 @@ public class NotifyWorker2 extends Worker {
                                     if (minutes >= 30 && minutes < 240){
                                         value = value + 1;
                                     }else if (minutes >= 240){
-                                        editor.putString(BRONCHODILATOR, "Bronchodialtor Not Given");
+                                        editor.putString(USED_BRONCHODILATOR, "Bronchodialtor Not Given");
                                         editor.putString(REASON, "A 4 hour time period elapsed");
                                         editor.apply();
                                     }

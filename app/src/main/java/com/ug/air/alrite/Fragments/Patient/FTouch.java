@@ -1,12 +1,11 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
 import static com.ug.air.alrite.Fragments.Patient.Sex.KILO;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -28,16 +27,13 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ug.air.alrite.Activities.DiagnosisActivity;
 import com.ug.air.alrite.Adapters.AssessmentAdapter;
 import com.ug.air.alrite.Models.Assessment;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Calculations.Instructions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class FTouch extends Fragment {
 
@@ -129,7 +125,7 @@ public class FTouch extends Fragment {
         editor.putString(TOUCH, value6);
         editor.apply();
 
-        String assess = sharedPreferences.getString(S4, "");
+        String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
         if (value6.equals("Yes") && !assess.equals("None of these")){
             showDialog();
         }else {
@@ -183,7 +179,7 @@ public class FTouch extends Fragment {
         assessments = new ArrayList<>();
         assessmentAdapter = new AssessmentAdapter(assessments);
 
-        String age = sharedPreferences.getString(AGE, "");
+        String age = sharedPreferences.getString(AGE_IN_MONTHS, "");
         String weight = sharedPreferences.getString(KILO, "");
         int ag = Integer.parseInt(age);
 

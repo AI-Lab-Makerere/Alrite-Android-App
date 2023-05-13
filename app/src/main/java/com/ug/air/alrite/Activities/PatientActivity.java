@@ -7,9 +7,9 @@ import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DURATION;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.FILENAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USERNAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.UUIDS;
-import static com.ug.air.alrite.Fragments.Patient.Initials.CIN;
+import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
 import static com.ug.air.alrite.Fragments.Patient.Initials.INITIAL_DATE;
-import static com.ug.air.alrite.Fragments.Patient.Initials.PIN;
+import static com.ug.air.alrite.Fragments.Patient.Initials.PARENT_INITIALS;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.INITIAL_DATE_2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
@@ -43,7 +43,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.text.ParseException;
@@ -53,17 +57,25 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Retrofit;
 import retrofit2.Response;
 
 public class PatientActivity extends AppCompatActivity implements MultipleChoiceFragment.onGetResultListener {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String INCOMPLETE = "incomplete";
+
+
+    public static final String ASSESS_INCOMPLETE = "incomplete";
     SharedPreferences sharedPreferences, sharedPreferences1;
     SharedPreferences.Editor editor, editor1;
     int frag = 0;
@@ -99,8 +111,8 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
             finish();
         }
         else {
-            String pin = sharedPreferences.getString(PIN, "");
-            String cin = sharedPreferences.getString(CIN, "");
+            String pin = sharedPreferences.getString(PARENT_INITIALS, "");
+            String cin = sharedPreferences.getString(CHILD_INITIALS, "");
 
             Dialog dialog = new Dialog(this);
             dialog.setContentView(R.layout.exit);
@@ -488,7 +500,6 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         // Replace and commit the fragment
         completeFragmentTransaction(ms_fragment);
     }
-
 
     /**
      * Listener for clicking the next button: we can move to the correct next

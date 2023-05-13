@@ -23,11 +23,21 @@ import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Counter;
 import com.ug.air.alrite.Utils.Credentials;
 
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.http.GET;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -62,7 +72,6 @@ public class SplashActivity extends AppCompatActivity {
         logo = findViewById(R.id.logo);
 
         databaseHelper = new DatabaseHelper(this);
-
     }
 
     @Override
@@ -108,15 +117,15 @@ public class SplashActivity extends AppCompatActivity {
 
     private void checkDatabase() {
         File src = new File("/data/data/" + BuildConfig.APPLICATION_ID + "/databases/alrite.db");
-        if (src.exists()){
+        if (src.exists()) {
 
             Credentials credentials = new Credentials();
             String username = credentials.creds(this).getUsername();
-            if (!username.equals("None")){
+            if (!username.equals("None")) {
                 Counter counter = new Counter();
                 counter.Count(this, APP_OPENING_COUNT);
             }
-        }else {
+        } else {
             databaseHelper.insertData(1, "None", "None", "None", "None", "None", "None");
         }
         i = new Intent(SplashActivity.this, Dashboard.class);

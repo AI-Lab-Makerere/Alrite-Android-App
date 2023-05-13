@@ -1,26 +1,19 @@
 package com.ug.air.alrite.Fragments.Patient;
 
 import static com.ug.air.alrite.Activities.SplashActivity.CHESTINDRWAING_COUNT;
-import static com.ug.air.alrite.Activities.SplashActivity.STRIDOR_COUNT;
-import static com.ug.air.alrite.Activities.SplashActivity.WHEEZING_COUNT;
 import static com.ug.air.alrite.Fragments.Patient.Assess.DIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Assess.FINAL_DIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
-import static com.ug.air.alrite.Fragments.Patient.Cough.CHOICE2;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
+import static com.ug.air.alrite.Fragments.Patient.Cough.DIFFICULTY_BREATHING;
 import static com.ug.air.alrite.Fragments.Patient.HIVStatus.HDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Nasal.CHOICEGN;
 import static com.ug.air.alrite.Fragments.Patient.Nasal.GNDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Oxygen.OXDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.RRCounter.RATE;
-import static com.ug.air.alrite.Fragments.Patient.RRCounter.RATE2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
-import static com.ug.air.alrite.Fragments.Patient.Sex.KILO;
 import static com.ug.air.alrite.Fragments.Patient.Stridor.STDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Wheezing.CHOICE8;
+import static com.ug.air.alrite.Fragments.Patient.Wheezing.WHEEZING_SOUNDS;
 import static com.ug.air.alrite.Fragments.Patient.CoughD.DAY1;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING;
-import static com.ug.air.alrite.Fragments.Patient.Wheezing.CHOICE82;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -32,11 +25,9 @@ import android.os.Bundle;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,8 +50,6 @@ import com.ug.air.alrite.Utils.Calculations.Instructions;
 import com.ug.air.alrite.Utils.Counter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ChestIndrawing extends Fragment {
 
@@ -154,7 +143,7 @@ public class ChestIndrawing extends Fragment {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String assess = sharedPreferences.getString(S4, "");
+                String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
 
                 if (second.isEmpty()){
@@ -187,7 +176,7 @@ public class ChestIndrawing extends Fragment {
         if (second.isEmpty()){
             editor.putString(CHOICE7, value8);
             editor.apply();
-            String assess = sharedPreferences.getString(S4, "");
+            String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
 
             if (!assess.equals("None of these")){
                 startActivity(new Intent(getActivity(), DiagnosisActivity.class));
@@ -277,7 +266,7 @@ public class ChestIndrawing extends Fragment {
     }
 
     private void makeAssessment(){
-        String cough = sharedPreferences.getString(CHOICE2, "");
+        String cough = sharedPreferences.getString(DIFFICULTY_BREATHING, "");
         String fDiagnosis = sharedPreferences.getString(DIAGNOSIS, "");
         String oxDiagnosis = sharedPreferences.getString(OXDIAGNOSIS, "");
         String stDiagnosis = sharedPreferences.getString(STDIAGNOSIS, "");
@@ -285,7 +274,7 @@ public class ChestIndrawing extends Fragment {
         String hDiagnosis = sharedPreferences.getString(HDIAGNOSIS, "");
         String oneDiagnosis = sharedPreferences.getString(FINAL_DIAGNOSIS, "");
         fastBreathing = sharedPreferences.getString(FASTBREATHING, "");
-        wheezing = sharedPreferences.getString(CHOICE8, "");
+        wheezing = sharedPreferences.getString(WHEEZING_SOUNDS, "");
         String days = sharedPreferences.getString(DAY1, "");
         day = Long.parseLong(days);
         boolean cx = oneDiagnosis.isEmpty() && hDiagnosis.isEmpty();

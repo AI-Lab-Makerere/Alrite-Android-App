@@ -1,17 +1,13 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Activities.SplashActivity.STRIDOR_COUNT;
 import static com.ug.air.alrite.Activities.SplashActivity.WHEEZING_COUNT;
-import static com.ug.air.alrite.Fragments.Patient.Assess.DATE;
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,10 +15,8 @@ import android.os.Bundle;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,31 +26,19 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.ug.air.alrite.Activities.Dashboard;
-import com.ug.air.alrite.Activities.DiagnosisActivity;
 import com.ug.air.alrite.Adapters.AssessmentAdapter;
 import com.ug.air.alrite.Models.Assessment;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Calculations.Instructions;
 import com.ug.air.alrite.Utils.Counter;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 public class Wheezing extends Fragment {
 
@@ -65,7 +47,7 @@ public class Wheezing extends Fragment {
     RadioGroup radioGroup;
     CheckBox checkBox;
     RadioButton radioButton1, radioButton2, radioButton3;
-    String value9 = "none";
+    String breathSounds = "none";
     TextView txtDisease, txtDefinition, txtOk, txtDiagnosis;
     LinearLayout linearLayoutDisease;
     LinearLayout linearLayout_instruction;
@@ -79,8 +61,8 @@ public class Wheezing extends Fragment {
     private static final int YES = 0;
     private static final int NO = 1;
     private static final int NOT = 2;
-    public static final String CHECKSTETHO = "stethoscope_used";
-    public static final String CHOICE8 = "wheezing";
+    public static final String STETHOSCOPE_USED = "stethoscope_used";
+    public static final String WHEEZING_SOUNDS = "wheezing";
     public static final String CHOICE82 = "wheezing_2";
     public static final String SHARED_PREFS = "sharedPrefs";
     SharedPreferences sharedPreferences, sharedPreferences1;
@@ -104,7 +86,7 @@ public class Wheezing extends Fragment {
         sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
-        assess = sharedPreferences.getString(S4, "");
+        assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
         second = sharedPreferences.getString(SECOND, "");
 
         if (second.isEmpty()){
@@ -120,13 +102,13 @@ public class Wheezing extends Fragment {
 
                 switch (index) {
                     case YES:
-                        value9 = "Wheezing";
+                        breathSounds = "Wheezing";
                         break;
                     case NO:
-                        value9 = "Other abnormal breath sounds";
+                        breathSounds = "Other abnormal breath sounds";
                         break;
                     case NOT:
-                        value9 = "Normal breath sounds";
+                        breathSounds = "Normal breath sounds";
                         break;
                     default:
                         break;
@@ -137,7 +119,7 @@ public class Wheezing extends Fragment {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (value9.isEmpty()){
+                if (breathSounds.isEmpty()){
                     Toast.makeText(getActivity(), "Please select at least one of the options", Toast.LENGTH_SHORT).show();
                 }else {
                     saveData();
@@ -178,8 +160,8 @@ public class Wheezing extends Fragment {
     private void saveData() {
 
         if (second.isEmpty()){
-            editor.putString(CHOICE8, value9);
-            editor.putBoolean(CHECKSTETHO, checkBox.isChecked());
+            editor.putString(WHEEZING_SOUNDS, breathSounds);
+            editor.putBoolean(STETHOSCOPE_USED, checkBox.isChecked());
             editor.apply();
             if (!assess.equals("None of these")){
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
@@ -191,7 +173,7 @@ public class Wheezing extends Fragment {
                 int point = Integer.parseInt(pt);
 
                 Instructions instructions = new Instructions();
-                int pot = instructions.GetWheezing(value9, point);
+                int pot = instructions.GetWheezing(breathSounds, point);
                 editor.putString(POINT, String.valueOf(pot));
                 editor.apply();
 
@@ -201,15 +183,15 @@ public class Wheezing extends Fragment {
                 fr.commit();
             }
         }else {
-            editor.putString(CHOICE82, value9);
-            editor.putBoolean(CHECKSTETHO, checkBox.isChecked());
+            editor.putString(CHOICE82, breathSounds);
+            editor.putBoolean(STETHOSCOPE_USED, checkBox.isChecked());
             editor.apply();
 
             String pt = sharedPreferences.getString(POINT2, "");
             int point = Integer.parseInt(pt);
 
             Instructions instructions = new Instructions();
-            int pot = instructions.GetWheezing(value9, point);
+            int pot = instructions.GetWheezing(breathSounds, point);
             editor.putString(POINT2, String.valueOf(pot));
             editor.apply();
 
@@ -223,16 +205,16 @@ public class Wheezing extends Fragment {
 
     private void loadData() {
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        value9 = sharedPreferences.getString(CHOICE8, "");
-        check1 = sharedPreferences.getBoolean(CHECKSTETHO, false);
+        breathSounds = sharedPreferences.getString(WHEEZING_SOUNDS, "");
+        check1 = sharedPreferences.getBoolean(STETHOSCOPE_USED, false);
     }
 
     private void updateViews() {
-        if (value9.equals("Wheezing")){
+        if (breathSounds.equals("Wheezing")){
             radioButton1.setChecked(true);
-        }else if (value9.equals("Noisy breathing")){
+        }else if (breathSounds.equals("Noisy breathing")){
             radioButton2.setChecked(true);
-        }else if (value9.equals("Normal breathing")){
+        }else if (breathSounds.equals("Normal breathing")){
             radioButton3.setChecked(true);
         }else {
             radioButton1.setChecked(false);

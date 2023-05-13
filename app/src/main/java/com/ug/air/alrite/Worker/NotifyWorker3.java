@@ -3,12 +3,11 @@ package com.ug.air.alrite.Worker;
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Context.NOTIFICATION_SERVICE;
 
-import static com.ug.air.alrite.Activities.PatientActivity.INCOMPLETE;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.BRONCHODILATOR;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.BRONC;
+import static com.ug.air.alrite.Activities.PatientActivity.ASSESS_INCOMPLETE;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USED_BRONCHODILATOR;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.AFTER_BRONCHODILATOR;
 import static com.ug.air.alrite.Fragments.Patient.Initials.STUDY_ID;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,14 +15,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
-import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.work.ForegroundInfo;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -78,7 +75,7 @@ public class NotifyWorker3 extends Worker {
 
     private void readData3() {
 //        createForeInfo();
-        jsonPlaceHolder = ApiClient.getClient().create(JsonPlaceHolder.class);
+        jsonPlaceHolder = ApiClient.getClient(ApiClient.BASE_URL).create(JsonPlaceHolder.class);
         File src = new File("/data/data/" + BuildConfig.APPLICATION_ID + "/shared_prefs");
         if (src.exists()){
             contents = src.listFiles();
@@ -90,9 +87,9 @@ public class NotifyWorker3 extends Worker {
                             String names = name.replace(".xml", "");
                             SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(names, MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            String bron = sharedPreferences.getString(BRONCHODILATOR, "");
-                            String fin = sharedPreferences.getString(BRONC, "");
-                            String incomplete = sharedPreferences.getString(INCOMPLETE, "");
+                            String bron = sharedPreferences.getString(USED_BRONCHODILATOR, "");
+                            String fin = sharedPreferences.getString(AFTER_BRONCHODILATOR, "");
+                            String incomplete = sharedPreferences.getString(ASSESS_INCOMPLETE, "");
 
                             if (!incomplete.isEmpty() || (bron.isEmpty() || bron.equals("Bronchodialtor Not Given") || !fin.isEmpty())){
                                 String studyID = sharedPreferences.getString(STUDY_ID, "");

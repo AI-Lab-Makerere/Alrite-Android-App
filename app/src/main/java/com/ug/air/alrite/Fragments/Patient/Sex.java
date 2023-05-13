@@ -28,28 +28,27 @@ import com.ug.air.alrite.Utils.XML.ItemFactory;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.util.Objects;
 
 
 public class Sex extends Fragment {
     View view;
-    EditText etYears, etKilo1, etKilo2, etMonths, etMuac;
-    Button back, next;
+    EditText etYears, etKilo, etKilo2, etMonths, etMuac;
+    Button buttonBack, buttonNext;
     LinearLayout linearLayout;
-    RadioGroup radioGroup;
-    RadioButton radioButton1, radioButton2;
-    String age, age2, weight, text, kg1, fileName, months, years, muac, diagnosis, score, message;
+    RadioGroup rgSex;
+    RadioButton rbMale, rbFemale;
+    String ageInMonths, ageInYearsAndMonths, weight, text, kg, fileName, months, years, muac, diagnosis, score, message;
     Spinner spinner;
     Dialog dialog;
-    String value2 = "none";
+    String value_sex = "none";
     private static final int YES = 0;
     private static final int NO = 1;
-    public static final String MDIAGNOSIS = "diagnosis_2";
-    public static final String AGE = "age";
-    public static final String AGE2 = "age2";
+    public static final String MDIAGNOSIS = "diagnosis_malnutrition";
+    public static final String AGE_IN_MONTHS = "age";
+    public static final String AGE_IN_YEARS = "age2";
     public static final String KILO = "weight";
     public static final String MUAC = "muac";
-    public static final String CHOICE = "gender";
+    public static final String SEX = "gender";
     public static final String SHARED_PREFS = "sharedPrefs";
     SharedPreferences sharedPreferences, sharedPreferences1;
     SharedPreferences.Editor editor;
@@ -61,29 +60,29 @@ public class Sex extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_sex, container, false);
 
-        next = view.findViewById(R.id.next);
-        back = view.findViewById(R.id.back);
-        radioGroup = view.findViewById(R.id.radioGroup);
-        radioButton1 = view.findViewById(R.id.yes);
-        radioButton2 = view.findViewById(R.id.no);
+        buttonNext = view.findViewById(R.id.next);
+        buttonBack = view.findViewById(R.id.back);
+        rgSex = view.findViewById(R.id.radioGroup);
+        rbMale = view.findViewById(R.id.yes);
+        rbFemale = view.findViewById(R.id.no);
         etYears = view.findViewById(R.id.years);
         etMonths = view.findViewById(R.id.months);
-        etKilo1 = view.findViewById(R.id.kg1);
+        etKilo = view.findViewById(R.id.kg1);
         etMuac = view.findViewById(R.id.muac);
         linearLayout = view.findViewById(R.id.linearMUAC);
 
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        rgSex.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                View radioButton = radioGroup.findViewById(checkedId);
-                int index = radioGroup.indexOfChild(radioButton);
+                View radioButton = rgSex.findViewById(checkedId);
+                int index = rgSex.indexOfChild(radioButton);
 
                 switch (index) {
                     case YES:
-                        value2 = "Male";
+                        value_sex = "Male";
                         break;
                     case NO:
-                        value2 = "Female";
+                        value_sex = "Female";
                         break;
 
                     default:
@@ -92,10 +91,10 @@ public class Sex extends Fragment {
             }
         });
 
-        etKilo1.addTextChangedListener(textWatcher1);
-        etYears.addTextChangedListener(textWatcher2);
-        etMonths.addTextChangedListener(textWatcher3);
-        etMuac.addTextChangedListener(textWatcher4);
+        etKilo.addTextChangedListener(textListenerWeight);
+        etYears.addTextChangedListener(textListenerYears);
+        etMonths.addTextChangedListener(textListenerMonths);
+        etMuac.addTextChangedListener(textListenerMUAC);
 
 
         sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
@@ -104,29 +103,29 @@ public class Sex extends Fragment {
         loadData();
         updateViews();
 
-        next.setOnClickListener(new View.OnClickListener() {
+        buttonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 years = etYears.getText().toString();
                 months = etMonths.getText().toString();
-                kg1 = etKilo1.getText().toString();
+                kg = etKilo.getText().toString();
                 muac = etMuac.getText().toString();
 //                kg2 = etKilo2.getText().toString();
 
-                if (value2.equals("none") || years.isEmpty() || months.isEmpty()){
+                if (value_sex.equals("none") || years.isEmpty() || months.isEmpty()){
                     Toast.makeText(getActivity(), "Please fill in all the fields", Toast.LENGTH_SHORT).show();
                 }else{
                     int year = Integer.parseInt(years);
-                    int ag = (year*12) + Integer.parseInt(months);
-                    age = String.valueOf(ag);
-                    age2 = years + "." + months;
-                    weight = kg1;
+                    int ageInMos = (year*12) + Integer.parseInt(months);
+                    ageInMonths = String.valueOf(ageInMonths);
+                    ageInYearsAndMonths = years + "." + months;
+                    weight = kg;
                     saveData();
                 }
             }
         });
 
-        back.setOnClickListener(new View.OnClickListener() {
+        buttonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
@@ -138,7 +137,7 @@ public class Sex extends Fragment {
         return view;
     }
 
-    public TextWatcher textWatcher1 = new TextWatcher() {
+    public TextWatcher textListenerWeight = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -146,17 +145,17 @@ public class Sex extends Fragment {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            kg1 = etKilo1.getText().toString();
-            if (!kg1.isEmpty()){
-                float k1 = Float.parseFloat(kg1);
+            kg = etKilo.getText().toString();
+            if (!kg.isEmpty()){
+                float k1 = Float.parseFloat(kg);
                 if (k1 > 30.0){
-                    etKilo1.setError("The maximum kilograms for a child has to be 30.0kgs");
-                    next.setEnabled(false);
+                    etKilo.setError("The maximum kilograms for a child has to be 30.0kgs");
+                    buttonNext.setEnabled(false);
                 }else if (k1 < 0.5){
-                    etKilo1.setError("The minimum kilograms for a child has to be 0.5kgs");
-                    next.setEnabled(false);
+                    etKilo.setError("The minimum kilograms for a child has to be 0.5kgs");
+                    buttonNext.setEnabled(false);
                 }else {
-                    next.setEnabled(true);
+                    buttonNext.setEnabled(true);
                 }
 
             }
@@ -169,7 +168,7 @@ public class Sex extends Fragment {
         }
     };
 
-    public TextWatcher textWatcher4 = new TextWatcher() {
+    public TextWatcher textListenerMUAC = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -182,12 +181,12 @@ public class Sex extends Fragment {
                 float k1 = Float.parseFloat(muac);
                 if (k1 > 40.0){
                     etMuac.setError("The maximum value for MUAC has to be 40.0cm");
-                    next.setEnabled(false);
+                    buttonNext.setEnabled(false);
                 }else if (k1 < 9.0){
                     etMuac.setError("The minimum value for MUAC has to be 9.0cm");
-                    next.setEnabled(false);
+                    buttonNext.setEnabled(false);
                 }else {
-                    next.setEnabled(true);
+                    buttonNext.setEnabled(true);
                 }
             }
 
@@ -199,7 +198,7 @@ public class Sex extends Fragment {
         }
     };
 
-    public TextWatcher textWatcher2 = new TextWatcher() {
+    public TextWatcher textListenerYears = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -212,9 +211,9 @@ public class Sex extends Fragment {
                 int yr = Integer.parseInt(years);
                 if (yr > 4){
                     etYears.setError("The maximum number of years should be 4");
-                    next.setEnabled(false);
+                    buttonNext.setEnabled(false);
                 }else {
-                    next.setEnabled(true);
+                    buttonNext.setEnabled(true);
                 }
             }
         }
@@ -225,7 +224,7 @@ public class Sex extends Fragment {
         }
     };
 
-    public TextWatcher textWatcher3 = new TextWatcher() {
+    public TextWatcher textListenerMonths = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -238,9 +237,9 @@ public class Sex extends Fragment {
                 int mt = Integer.parseInt(months);
                 if (mt > 11){
                     etMonths.setError("The maximum number of months should be 11");
-                    next.setEnabled(false);
+                    buttonNext.setEnabled(false);
                 }else {
-                    next.setEnabled(true);
+                    buttonNext.setEnabled(true);
                 }
             }
         }
@@ -259,10 +258,10 @@ public class Sex extends Fragment {
             float we = Float.parseFloat(weight);
             ItemFactory itemFactory = new ItemFactory();
             try {
-                if (value2.equals("Male")){
-                    score = itemFactory.GetMaleItem(requireActivity(), age, we);
+                if (value_sex.equals("Male")){
+                    score = itemFactory.GetMaleItem(requireActivity(), ageInMonths, we);
                 }else{
-                    score = itemFactory.GetFemaleItem(requireActivity(), age, we);
+                    score = itemFactory.GetFemaleItem(requireActivity(), ageInMonths, we);
                 }
                 makeDecisions();
 
@@ -279,32 +278,32 @@ public class Sex extends Fragment {
     }
 
     private void loadData() {
-        age = sharedPreferences.getString(AGE, "");
-        age2 = sharedPreferences.getString(AGE2, "");
+        ageInMonths = sharedPreferences.getString(AGE_IN_MONTHS, "");
+        ageInYearsAndMonths = sharedPreferences.getString(AGE_IN_YEARS, "");
         muac = sharedPreferences.getString(MUAC, "");
         weight = sharedPreferences.getString(KILO, "");
-        value2 = sharedPreferences.getString(CHOICE, "");
+        value_sex = sharedPreferences.getString(SEX, "");
     }
 
     private void updateViews() {
-        if (value2.equals("Male")){
-            radioButton1.setChecked(true);
-        }else if (value2.equals("Female")){
-            radioButton2.setChecked(true);
+        if (value_sex.equals("Male")){
+            rbMale.setChecked(true);
+        }else if (value_sex.equals("Female")){
+            rbFemale.setChecked(true);
         }else {
-            radioButton1.setChecked(false);
-            radioButton2.setChecked(false);
+            rbMale.setChecked(false);
+            rbFemale.setChecked(false);
         }
 
         if (!weight.isEmpty()){
-            etKilo1.setText(weight);
+            etKilo.setText(weight);
         }
         if (!muac.isEmpty()){
             etMuac.setText(muac);
         }
 
-        if (!age2.isEmpty()) {
-            String[] separated = age2.split("\\.");
+        if (!ageInYearsAndMonths.isEmpty()) {
+            String[] separated = ageInYearsAndMonths.split("\\.");
             etYears.setText(separated[0]);
             etMonths.setText(separated[1]);
         }
@@ -358,8 +357,8 @@ public class Sex extends Fragment {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
-                etKilo1.setText("");
-                etKilo1.requestFocus();
+                etKilo.setText("");
+                etKilo.requestFocus();
                 Toast.makeText(getActivity(), "Please check your scale and enter the weight again", Toast.LENGTH_LONG).show();
             }
         });
@@ -386,9 +385,9 @@ public class Sex extends Fragment {
             }
         }
 
-        editor.putString(AGE, age);
-        editor.putString(AGE2, age2);
-        editor.putString(CHOICE, value2);
+        editor.putString(AGE_IN_MONTHS, ageInMonths);
+        editor.putString(AGE_IN_YEARS, ageInYearsAndMonths);
+        editor.putString(SEX, value_sex);
         editor.apply();
 
         FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();

@@ -18,28 +18,24 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.ug.air.alrite.Activities.Dashboard;
-import com.ug.air.alrite.BuildConfig;
-import com.ug.air.alrite.Database.DatabaseHelper;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Credentials;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 public class Initials extends Fragment {
 
    View view;
-   EditText etCin, etPin, etStudy, etCode;
+   EditText etChildInitials, etParentInitials, etStudy, etCode;
    Button back, next;
-   String cin, pin, formattedDate, studyId, code, h_code, counter, filename;
-   public static final String CIN = "patient_initials";
+   String childInitials, parentInitials, formattedDate, studyId, code, h_code, counter, filename;
+   public static final String CHILD_INITIALS = "patient_initials";
     public static final String  VERSION = "app_version";
-   public static final String PIN = "parent_initials";
+   public static final String PARENT_INITIALS = "parent_initials";
    public static final String STUDY_ID = "study_id";
     public static final String STUDY_ID_2 = "study_id_2";
    public static final String INITIAL_DATE = "start_date";
@@ -54,14 +50,16 @@ public class Initials extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_initials, container, false);
 
-        etCin = view.findViewById(R.id.cin);
+        etChildInitials = view.findViewById(R.id.cin);
         etCode = view.findViewById(R.id.code);
         etStudy = view.findViewById(R.id.studyId);
-        etPin = view.findViewById(R.id.pin);
+        etParentInitials = view.findViewById(R.id.pin);
         next = view.findViewById(R.id.next);
         back = view.findViewById(R.id.back);
 
         Intent intent = getActivity().getIntent();
+        // If ____, then we can combine the data for
+        // Otherwise, just get the current activity's shared preferences
         if (intent.hasExtra("filename")) {
             filename = intent.getExtras().getString("filename");
             sharedPreferences1 = requireActivity().getSharedPreferences(filename, Context.MODE_PRIVATE);
@@ -79,20 +77,26 @@ public class Initials extends Fragment {
             sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         }
 
+        // Get an editor for the shared preferences
         editor = sharedPreferences.edit();
 
+        // Get the parent's initials and the child's initials and store them in
+        // the fragment, if they exist: otherwise ""
         loadData();
+
+        // Get the credentials for the current user, and set the current variables
+        // to those values
         updateViews();
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                cin = etCin.getText().toString();
-                pin = etPin.getText().toString();
+                childInitials = etChildInitials.getText().toString();
+                parentInitials = etParentInitials.getText().toString();
                 studyId = etStudy.getText().toString();
 
-                if (cin.isEmpty() || pin.isEmpty() || studyId.equals("0") || studyId.isEmpty()){
+                if (childInitials.isEmpty() || parentInitials.isEmpty() || studyId.equals("0") || studyId.isEmpty()){
                     Toast.makeText(getActivity(), "Please fill in all the fields", Toast.LENGTH_SHORT).show();
                 }else {
                     saveData();
@@ -114,8 +118,8 @@ public class Initials extends Fragment {
 
         String new_study = etCode.getText().toString();
         new_study = new_study + "_" + studyId;
-        editor.putString(CIN, cin);
-        editor.putString(PIN, pin);
+        editor.putString(CHILD_INITIALS, childInitials);
+        editor.putString(PARENT_INITIALS, parentInitials);
         editor.putString(VERSION, "2");
         editor.putString(STUDY_ID_2, studyId);
         editor.putString(STUDY_ID, new_study);
@@ -147,15 +151,15 @@ public class Initials extends Fragment {
     }
 
     private void loadData() {
-        pin = sharedPreferences.getString(PIN, "");
-        cin = sharedPreferences.getString(CIN, "");
+        parentInitials = sharedPreferences.getString(PARENT_INITIALS, "");
+        childInitials = sharedPreferences.getString(CHILD_INITIALS, "");
         studyId = sharedPreferences.getString(STUDY_ID_2, "");
         formattedDate = sharedPreferences.getString(INITIAL_DATE, "");
     }
 
     private void updateViews() {
-        etPin.setText(pin);
-        etCin.setText(cin);
+        etParentInitials.setText(parentInitials);
+        etChildInitials.setText(childInitials);
 
         Credentials credentials = new Credentials();
         credentials.creds2(getActivity());

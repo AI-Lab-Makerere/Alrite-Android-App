@@ -1,9 +1,9 @@
 package com.ug.air.alrite.Fragments.Patient;
 
 import static com.ug.air.alrite.Fragments.Patient.Assess.FINAL_DIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
 import static com.ug.air.alrite.Fragments.Patient.FTouch.TOUCH;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
 import static com.ug.air.alrite.Fragments.Patient.Sex.KILO;
 
 import android.app.Dialog;
@@ -244,8 +244,8 @@ public class Oxygen extends Fragment {
         assessments = new ArrayList<>();
         assessmentAdapter = new AssessmentAdapter(assessments);
 
-        String age = sharedPreferences.getString(AGE, "");
-        String s = sharedPreferences.getString(S4, "");
+        String age = sharedPreferences.getString(AGE_IN_MONTHS, "");
+        String s = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
         String weight = sharedPreferences.getString(KILO, "");
         int ag = Integer.parseInt(age);
 

@@ -41,7 +41,7 @@ public class TextInputFragment extends Fragment {
     Button back, next, btnSkip, btnSave;
     String userInput, diagnosis;
     public static final String Question = "What is the childs temperature";
-    public static final String TDIAGNOSIS = "diagnosis_4";
+    public static final String TDIAGNOSIS = "diagnosis_fever";
     public static final String SHARED_PREFS = "sharedPrefs";
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;

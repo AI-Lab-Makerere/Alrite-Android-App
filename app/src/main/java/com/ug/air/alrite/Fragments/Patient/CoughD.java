@@ -1,49 +1,26 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Fragments.Patient.Assess.DATE;
-import static com.ug.air.alrite.Fragments.Patient.Assess.DIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ug.air.alrite.Activities.Dashboard;
-import com.ug.air.alrite.Adapters.AssessmentAdapter;
-import com.ug.air.alrite.Models.Assessment;
 import com.ug.air.alrite.R;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 
 public class CoughD extends Fragment {
@@ -137,7 +114,7 @@ public class CoughD extends Fragment {
 
         int dt = Integer.parseInt(day1);
 
-        String assess = sharedPreferences.getString(S4, "");
+        String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
 
         if (!assess.equals("None of these")){
             FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
