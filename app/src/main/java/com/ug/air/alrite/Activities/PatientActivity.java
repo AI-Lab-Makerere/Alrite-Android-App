@@ -40,6 +40,7 @@ import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
 import com.ug.air.alrite.Fragments.Patient.MultipleSelectionFragment;
 import com.ug.air.alrite.Fragments.Patient.OtherPatients;
 import com.ug.air.alrite.Fragments.Patient.TextInputFragment;
+import com.ug.air.alrite.Fragments.Patient.TextInputTextFragment;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Credentials;
 
@@ -74,7 +75,9 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.Response;
 
-public class PatientActivity extends AppCompatActivity implements MultipleChoiceFragment.onGetResultListener, MultipleSelectionFragment.onGetResultListener, TextInputFragment.onGetResultListener {
+public class PatientActivity extends AppCompatActivity implements
+        MultipleChoiceFragment.onGetResultListener, MultipleSelectionFragment.onGetResultListener,
+        TextInputFragment.onGetResultListener, TextInputTextFragment.onGetResultListener {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String INCOMPLETE = "incomplete";
@@ -292,6 +295,12 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     public static final String VALUE_ID = "valueID";
     public static final String SATISFIED_LINK = "satisfiedLink";
     public static final String NOT_SATISFIED_LINK = "notSatisfiedLink";
+    public static final String TYPE = "type";
+    public static final String THRESHOLD = "threshold";
+    public static final String NUMERIC_TYPE = "numeric";
+    public static final String ALPHANUMERIC_TYPE = "alphanumeric";
+    public static final String TEXT_TYPE = "text";
+    public static final String ANY_TYPE = "any";
 
      // Full JSON infos to call getNextPage
      JSONArray pages;
@@ -410,7 +419,11 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
 
         // Text input option:
         } else if (nextPageComponentType.equals(TEXT_INPUT)) {
-            createTextInputFragment(nextPageComponent);
+            if (nextPageJSON.getString(TYPE).equals(NUMERIC_TYPE)) {
+                createTextInputFragment(nextPageComponent);
+            } else {
+                createTextInputTextFragment(nextPageComponent);
+            }
 
         // There was an issue with identifying the page...
         } else {
@@ -491,6 +504,27 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     }
 
     /**
+     * Create the TextInputTextFragment
+     *
+     * @param nextPageComponent the component to be displayed on screen
+     * @throws JSONException because json
+     */
+    private void createTextInputTextFragment(JSONObject nextPageComponent) throws JSONException {
+        question = nextPageComponent.getString(LABEL);
+        InputHint = "none right now";
+        InputInformation = "none right now";
+        SkipInformation = "none right now";
+        targetValue_id = nextPageComponent.getString(VALUE_ID);
+
+        // Get the new page's fragment, and set a listener for when the next button
+        // is clicked
+        TextInputTextFragment tit_fragment = TextInputTextFragment.newInstance(question, InputHint, InputInformation, SkipInformation);
+
+        // Replace and commit the fragment
+        completeFragmentTransaction(tit_fragment);
+    }
+
+    /**
      * Fragment for multiple selection
      *
      * @throws JSONException because we use json objects
@@ -543,7 +577,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         // add the selected choices to the diagnosis
         String allDiagnoses = choices.get(chosenOptionIds.get(0)).getString(TEXT);
         for (int i = 1; i < chosenOptionIds.size(); i++) {
-            allDiagnoses += ", " + choices.get(i).getString(TEXT);
+            allDiagnoses += "\n" + choices.get(i).getString(TEXT);
             // Enter the diagnosis into the editor
         }
         enterSymptomIntoEditor(question, allDiagnoses);
@@ -568,7 +602,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     @Override
     public void getResultFromTextInputFragment(int numberInputted) throws JSONException {
         String diagnosis = String.valueOf(numberInputted);
-        JSONObject foundLink = getContentFromPageID(pageID, targetValue_id);;
+        JSONObject foundLink = getContentFromPageID(pageID, targetValue_id);
         String NextPage = pageID.getString(DEFAULT_LINK);
         if(foundLink != null) {
             // Replace BranchedLink with whatever the name is for the link field
@@ -591,6 +625,27 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         enterSymptomIntoEditor(question, diagnosis);
         try {
             getNextPage(NextPage);
+        } catch(JSONException e) {
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void getResultFromTextInputTextFragment(String textInputted) throws JSONException {
+        String recordedSymptom = textInputted;
+        JSONObject logicComponent = getContentFromPageID(pageID, targetValue_id);
+        String nextPage = pageID.getString(DEFAULT_LINK);
+        if (logicComponent != null) {
+            if (logicComponent.getString(TYPE).equals("=")) {
+                if (recordedSymptom.equals(logicComponent.getString(THRESHOLD))) {
+                    nextPage = logicComponent.getString(SATISFIED_LINK);
+                }
+            }
+        }
+
+        enterSymptomIntoEditor(question, recordedSymptom);
+        try {
+            getNextPage(nextPage);
         } catch(JSONException e) {
             throw new RuntimeException();
         }
