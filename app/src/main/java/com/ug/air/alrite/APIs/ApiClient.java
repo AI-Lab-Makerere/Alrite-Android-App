@@ -16,6 +16,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class ApiClient {
     public static final String BASE_URL = "http://140.142.142.94/alrite/apis/";
     public static final String TEMP_SERV_URL = "http://10.0.2.2:8000";
+    public static final String REMOTE_URL_TEMP = "http://54.190.44.215:8000";
 
     //    private static final String BASE_URL = "http://10.0.2.2:8000/alrite/apis/";
     private static Retrofit retrofit;
