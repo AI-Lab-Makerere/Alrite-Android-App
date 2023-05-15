@@ -602,22 +602,27 @@ public class PatientActivity extends AppCompatActivity implements
     @Override
     public void getResultFromTextInputFragment(int numberInputted) throws JSONException {
         String diagnosis = String.valueOf(numberInputted);
-        JSONObject foundLink = getContentFromPageID(pageID, targetValue_id);
+        ArrayList<JSONObject> foundLinks = getContentFromPageIDArray(pageID, targetValue_id);
         String NextPage = pageID.getString(DEFAULT_LINK);
-        if(foundLink != null) {
+        if(!foundLinks.isEmpty()) {
             // Replace BranchedLink with whatever the name is for the link field
             // once the branched link logic is completed in the JSON file
-            if(foundLink.get("type").equals(">")) {
-                if (numberInputted > diagnosisCutoff) {
-                    NextPage = foundLink.getString(SATISFIED_LINK);
-                }
-            } else if(foundLink.get("type").equals("<")) {
-                if (numberInputted < diagnosisCutoff) {
-                    NextPage = foundLink.getString(SATISFIED_LINK);
-                }
-            } else {
-                if (numberInputted == diagnosisCutoff) {
-                    NextPage = foundLink.getString(SATISFIED_LINK);
+            for (JSONObject foundLink : foundLinks) {
+                if (foundLink.get("type").equals(">")) {
+                    if (numberInputted > Integer.parseInt(foundLink.getString(THRESHOLD))) {
+                        NextPage = foundLink.getString(SATISFIED_LINK);
+                        break;
+                    }
+                } else if (foundLink.get("type").equals("<")) {
+                    if (numberInputted < Integer.parseInt(foundLink.getString(THRESHOLD))) {
+                        NextPage = foundLink.getString(SATISFIED_LINK);
+                        break;
+                    }
+                } else {
+                    if (numberInputted == Integer.parseInt(foundLink.getString(THRESHOLD))) {
+                        NextPage = foundLink.getString(SATISFIED_LINK);
+                        break;
+                    }
                 }
             }
         }
@@ -679,6 +684,37 @@ public class PatientActivity extends AppCompatActivity implements
             }
         }
         return null;
+    }
+
+    /**
+     * Takes the page id and returns a list of targetids
+     *
+     * @param pageid the page ID we wish to use
+     * @param targetValueID the valueID of the current component that we are using
+     * @return
+     */
+    public ArrayList<JSONObject> getContentFromPageIDArray(JSONObject pageid, String targetValueID) throws JSONException {
+        JSONArray contentVal;
+        ArrayList<JSONObject> RetrievedTargetIDs = new ArrayList<>();
+        if(pageid != null) {
+            try {
+                // Get the content from the JSONArray
+                contentVal = pageid.getJSONArray(CONTENT);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            for(int i = 0; i < contentVal.length(); i++) {
+                // Check to see if the ID's match up
+                // With the build in has method
+                JSONObject RetrievedTargetID = ((JSONObject)contentVal.get(i));
+                if ( RetrievedTargetID.has(TARGET_VALUE_ID)) {
+                    if(RetrievedTargetID.get(TARGET_VALUE_ID).equals(targetValueID)) {
+                        RetrievedTargetIDs.add(RetrievedTargetID);
+                    }
+                }
+            }
+        }
+        return RetrievedTargetIDs;
     }
 
     /**
