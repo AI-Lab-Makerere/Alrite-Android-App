@@ -47,12 +47,12 @@ public class TextInputFragment extends Fragment {
     SharedPreferences.Editor editor;
     Dialog dialog;
     TextView txtMessage;
-    public static final String IHint = "";
-    public static final String IInformation = "";
-    public static final String SInformation = "";
-    public static final String min_value = "";
-    public static final String max_value = "";
-    public static final String minValueforDiagnosis = "";
+    public static final String IHint = "IHint";
+    public static final String IInformation = "IInformation";
+    public static final String SInformation = "SInformation";
+    public static final String min_value = "min_value";
+    public static final String max_value = "max_value";
+    public static final String minValueforDiagnosis = "minValueforDiagnosis";
     String question;
     String InputHint;
     String InputInformation;
@@ -107,8 +107,8 @@ public class TextInputFragment extends Fragment {
 
         TextView questionDisplay = view.findViewById(R.id.ti_question);
         questionDisplay.setText(question);
-        TextView InputHintDisplay = view.findViewById(R.id.IHint);
-        InputHintDisplay.setText(InputHint);
+        etDay = view.findViewById(R.id.IHint);
+        etDay.setHint(InputHint);
         TextView InputInformationDisplay = view.findViewById(R.id.ti_IInformation);
         InputInformationDisplay.setText(InputInformation);
         TextView SkipInformationDisplay = view.findViewById(R.id.ti_SInformation);

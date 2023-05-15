@@ -569,29 +569,21 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     public void getResultFromTextInputFragment(int numberInputted) throws JSONException {
         String diagnosis = String.valueOf(numberInputted);
         JSONObject foundLink = getContentFromPageID(pageID, targetValue_id);;
-        String NextPage;
-        if(foundLink == null) {
-            NextPage =  pageID.getString(DEFAULT_LINK);
-        } else {
+        String NextPage = pageID.getString(DEFAULT_LINK);
+        if(foundLink != null) {
             // Replace BranchedLink with whatever the name is for the link field
             // once the branched link logic is completed in the JSON file
             if(foundLink.get("type").equals(">")) {
                 if (numberInputted > diagnosisCutoff) {
                     NextPage = foundLink.getString(SATISFIED_LINK);
-                } else {
-                    NextPage = foundLink.getString(NOT_SATISFIED_LINK);
                 }
             } else if(foundLink.get("type").equals("<")) {
                 if (numberInputted < diagnosisCutoff) {
                     NextPage = foundLink.getString(SATISFIED_LINK);
-                } else {
-                    NextPage = foundLink.getString(NOT_SATISFIED_LINK);
                 }
             } else {
                 if (numberInputted == diagnosisCutoff) {
                     NextPage = foundLink.getString(SATISFIED_LINK);
-                } else {
-                    NextPage = foundLink.getString(NOT_SATISFIED_LINK);
                 }
             }
         }

@@ -311,8 +311,8 @@ public class DiagnosisActivityModified extends AppCompatActivity {
         System.out.println(all);
         for (Map.Entry<String, ?> x : all.entrySet()) {
             String question = x.getKey();
-            if (question.substring(0, 2).equals("?:")) {
-                addToSummaryList(question, (String) x.getValue());
+            if (question.substring(0, 3).equals("?: ")) {
+                addToSummaryList(question.substring(3), (String) x.getValue());
             }
         }
 
