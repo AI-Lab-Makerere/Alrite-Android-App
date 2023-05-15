@@ -34,6 +34,8 @@ import com.makeramen.roundedimageview.BuildConfig;
 import com.ug.air.alrite.APIs.ApiClient;
 import com.ug.air.alrite.APIs.DecisionTreeJSON;
 import com.ug.air.alrite.Fragments.Patient.ActivePatients;
+import com.ug.air.alrite.Fragments.Patient.Initials;
+import com.ug.air.alrite.Fragments.Patient.InitialsModified;
 import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
 import com.ug.air.alrite.Fragments.Patient.MultipleSelectionFragment;
 import com.ug.air.alrite.Fragments.Patient.OtherPatients;
@@ -96,9 +98,9 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
             frag = intent.getExtras().getInt("Fragment");
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             if (frag == 1){
-                // fragmentTransaction.add(R.id.fragment_container, new Initials());
+//                fragmentTransaction.add(R.id.fragment_container, new Initials());
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    getJSONFromBackend();
+                    fragmentTransaction.add(R.id.fragment_container, new InitialsModified());
                 } else {
                     System.out.println("Cant read from file because it's too old of an SDK build version");
                 }
@@ -288,6 +290,8 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     public static final String DEFAULT_LINK = "defaultLink";
     public static final String TARGET_VALUE_ID = "targetValueID";
     public static final String VALUE_ID = "valueID";
+    public static final String SATISFIED_LINK = "satisfiedLink";
+    public static final String NOT_SATISFIED_LINK = "notSatisfiedLink";
 
      // Full JSON infos to call getNextPage
      JSONArray pages;
@@ -314,7 +318,6 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
      * @throws JSONException
      * @throws IOException
      */
-    // TODO: ensure that the strings are not hard-coded in the future
     private void implementEditableDecisionTree(JSONObject json) throws JSONException, IOException {
 //        DecisionTreeJSON json = ApiClient.getClient(ApiClient.TEMP_SERV_URL)
 //                                    .create(DecisionTreeJSON.class);
@@ -325,7 +328,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         pages = json.getJSONArray(PAGES);
         // This is just an array because it needs to be mutable: think of it as
         // its own element
-        String nextPage = pages.getJSONObject(2).getString(PAGE_ID);
+        String nextPage = pages.getJSONObject(0).getString(PAGE_ID);
 
         // Handling the intent
 
@@ -411,7 +414,8 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
 
         // There was an issue with identifying the page...
         } else {
-            throw new IllegalStateException("should never get here lol");
+            System.out.println("should never get here lol: just go to the next page");
+            getNextPage(pageID.getString(DEFAULT_LINK));
         }
     }
 
@@ -419,7 +423,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
      * Essentially, make an asynchronous API call to get the HTTP
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void getJSONFromBackend() {
+    public void getJSONFromBackend() {
         File assessment = new File(getFilesDir(), "assessment.json");
 
         try {
@@ -445,7 +449,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
      * the activity.
      */
     private void exitActivity() {
-        startActivity(new Intent(PatientActivity.this, DiagnosisActivity.class));
+        startActivity(new Intent(PatientActivity.this, DiagnosisActivityModified.class));
         this.finish();
     }
 
@@ -524,8 +528,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         System.out.println("NEXT PAGE NAME:" + nextPageName);
 
         // Enter the diagnosis into the editor
-        editor.putString(question, diagnosis);
-        editor.apply();
+        enterSymptomIntoEditor(question, diagnosis);
 
         // Decide on the next page based on the result
         try {
@@ -538,12 +541,12 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     @Override
     public void getResultFromMultipleSelectionFragment(ArrayList<Integer> chosenOptionIds) throws JSONException {
         // add the selected choices to the diagnosis
-        for (int choiceIndex : chosenOptionIds) {
-            String diagnosis = choices.get(choiceIndex - 1).getString(TEXT);
+        String allDiagnoses = choices.get(chosenOptionIds.get(0)).getString(TEXT);
+        for (int i = 1; i < chosenOptionIds.size(); i++) {
+            allDiagnoses += ", " + choices.get(i).getString(TEXT);
             // Enter the diagnosis into the editor
-            editor.putString(question, diagnosis);
-            editor.apply();
         }
+        enterSymptomIntoEditor(question, allDiagnoses);
 
         JSONObject foundLink = getContentFromPageID(pageID, targetValueID);
         String NextPage;
@@ -568,33 +571,32 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         JSONObject foundLink = getContentFromPageID(pageID, targetValue_id);;
         String NextPage;
         if(foundLink == null) {
-            NextPage =  pageID.getString("defaultLink");
+            NextPage =  pageID.getString(DEFAULT_LINK);
         } else {
             // Replace BranchedLink with whatever the name is for the link field
             // once the branched link logic is completed in the JSON file
             if(foundLink.get("type").equals(">")) {
                 if (numberInputted > diagnosisCutoff) {
-                    NextPage = foundLink.getString("satisfiedLink");
+                    NextPage = foundLink.getString(SATISFIED_LINK);
                 } else {
-                    NextPage = foundLink.getString("notSatisfiedLink");
+                    NextPage = foundLink.getString(NOT_SATISFIED_LINK);
                 }
             } else if(foundLink.get("type").equals("<")) {
                 if (numberInputted < diagnosisCutoff) {
-                    NextPage = foundLink.getString("satisfiedLink");
+                    NextPage = foundLink.getString(SATISFIED_LINK);
                 } else {
-                    NextPage = foundLink.getString("notSatisfiedLink");
+                    NextPage = foundLink.getString(NOT_SATISFIED_LINK);
                 }
             } else {
                 if (numberInputted == diagnosisCutoff) {
-                    NextPage = foundLink.getString("satisfiedLink");
+                    NextPage = foundLink.getString(SATISFIED_LINK);
                 } else {
-                    NextPage = foundLink.getString("notSatisfiedLink");
+                    NextPage = foundLink.getString(NOT_SATISFIED_LINK);
                 }
             }
         }
         // Enter the diagnosis into the editor
-        editor.putString(question, diagnosis);
-        editor.apply();
+        enterSymptomIntoEditor(question, diagnosis);
         try {
             getNextPage(NextPage);
         } catch(JSONException e) {
@@ -614,16 +616,16 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         if(pageid != null) {
             try {
                 // Get the content from the JSONArray
-                contentVal = pageid.getJSONArray("content");
+                contentVal = pageid.getJSONArray(CONTENT);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
-            for(int i = 0; i < contentVal.length(); i++ ) {
+            for(int i = 0; i < contentVal.length(); i++) {
                 // Check to see if the ID's match up
                 // With the build in has method
                 JSONObject RetrievedTargetID = ((JSONObject)contentVal.get(i));
-                if ( RetrievedTargetID.has("targetValueID")) {
-                    if(RetrievedTargetID.get("targetValueID").equals(targetValueID)) {
+                if ( RetrievedTargetID.has(TARGET_VALUE_ID)) {
+                    if(RetrievedTargetID.get(TARGET_VALUE_ID).equals(targetValueID)) {
                         return RetrievedTargetID;
                     }
                 }
@@ -658,5 +660,11 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
             }
         }
         return -1;
+    }
+
+    public void enterSymptomIntoEditor(String question, String symptom) {
+        // Enter the diagnosis into the editor
+        editor.putString("?: " + question, symptom);
+        editor.apply();
     }
 }

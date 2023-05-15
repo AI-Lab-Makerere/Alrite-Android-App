@@ -67,6 +67,9 @@ public class SplashActivity extends AppCompatActivity {
     public static final String WHEEZING_COUNT = "wheezing_count";
     public static final String CHESTINDRWAING_COUNT = "chest_indrawing_count";
     public static final String ECZEMA_COUNT = "eczema_count";
+
+    // TODO: change this if you want to get from online
+    Boolean shouldGetNewAssessment = true;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
@@ -145,9 +148,9 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void getCurrentAssessmentIfConnectedToInternet() {
-        if (isNetworkAvailable()) {
+        if (isNetworkAvailable() && shouldGetNewAssessment) {
             DecisionTreeJSON dtJson = ApiClient.getClient(ApiClient.TEMP_SERV_URL).create(DecisionTreeJSON.class);
-            Call<String> call = dtJson.getJson();
+            Call<String> call = dtJson.getJson("Fever_Logic");
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
