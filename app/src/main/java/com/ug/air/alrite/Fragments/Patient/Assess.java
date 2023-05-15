@@ -250,77 +250,7 @@ public class Assess extends Fragment {
             fr.replace(R.id.fragment_container, new Cough());
             fr.addToBackStack(null);
             fr.commit();
-        }else{
-            displayDialog();
         }
-    }
-
-    private void displayDialog() {
-        dialog = new Dialog(getActivity());
-        dialog.setContentView(R.layout.assessment_layout);
-        dialog.setCancelable(true);
-        Window window = dialog.getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-
-        linearLayout_instruction = dialog.findViewById(R.id.diagnosis);
-        txtDiagnosis = dialog.findViewById(R.id.txtDiagnosis);
-        recyclerView = dialog.findViewById(R.id.recyclerView1);
-        btnExit = dialog.findViewById(R.id.btnSave);
-        btnContinue = dialog.findViewById(R.id.btnContinue);
-
-        linearLayout_instruction.setBackgroundColor(getResources().getColor(R.color.severeDiagnosisColor));
-        txtDiagnosis.setText(R.string.severe);
-        diagnosis = txtDiagnosis.getText().toString();
-        diagnosis = diagnosis.replace("Diagnosis: ", "");
-
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-
-        assessments = new ArrayList<>();
-        assessmentAdapter = new AssessmentAdapter(assessments);
-
-        String age = sharedPreferences.getString(AGE_IN_MONTHS, "");
-        String weight = sharedPreferences.getString(KILO, "");
-        int ag = Integer.parseInt(age);
-
-        Instructions instructions = new Instructions();
-        messages = instructions.GetInstructions(ag, weight, s);
-
-        for (int i = 0; i < messages.size(); i++){
-            Assessment assessment = new Assessment((Integer) messages.get(i));
-            assessments.add(assessment);
-        }
-        recyclerView.setAdapter(assessmentAdapter);
-        
-        btnExit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finalDiagnosis();
-                editor.putString(DIAGNOSIS, diagnosis);
-                editor.apply();
-                dialog.dismiss();
-//                Toast.makeText(getActivity(), diagnosis, Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getActivity(), DiagnosisActivity.class));
-            }
-        });
-
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finalDiagnosis();
-                editor.putString(DIAGNOSIS, diagnosis);
-                editor.apply();
-                dialog.dismiss();
-                FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-                fr.replace(R.id.fragment_container, new Cough());
-                fr.addToBackStack(null);
-                fr.commit();
-            }
-        });
-
-//        dialog.getWindow().setLayout(650, WindowManager.LayoutParams.MATCH_PARENT);
-        dialog.getWindow().setGravity(Gravity.CENTER);
-        dialog.show();
     }
 
     private void finalDiagnosis() {
