@@ -551,10 +551,10 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         JSONObject foundLink = getContentFromPageID(pageID, targetValueID);
         String NextPage;
         if (foundLink == null) {
-            NextPage =  pageID.getString("defaultLink");
+            NextPage =  pageID.getString(DEFAULT_LINK);
         }
         else {
-            NextPage = foundLink.getString("satisfiedLink");
+            NextPage = foundLink.getString(SATISFIED_LINK);
         }
 
         // Decide on the next page based on the result
