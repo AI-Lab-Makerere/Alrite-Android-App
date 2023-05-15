@@ -6,6 +6,6 @@ import retrofit2.http.GET;
 
 public interface DecisionTreeJSON {
 
-    @GET("/alrite/apis/workflows/test/")
+    @GET("/alrite/apis/workflows/IMCI/")
     Call<String> getJson();
 }

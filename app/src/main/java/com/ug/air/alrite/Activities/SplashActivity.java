@@ -2,12 +2,15 @@ package com.ug.air.alrite.Activities;
 
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.REASSESS;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -16,6 +19,8 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
 
+import com.ug.air.alrite.APIs.ApiClient;
+import com.ug.air.alrite.APIs.DecisionTreeJSON;
 import com.ug.air.alrite.BuildConfig;
 import com.ug.air.alrite.Database.DatabaseHelper;
 import com.ug.air.alrite.Fragments.navigation.AccountFragment;
@@ -23,10 +28,14 @@ import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Counter;
 import com.ug.air.alrite.Utils.Credentials;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,8 +43,9 @@ import java.util.Locale;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.http.GET;
 
@@ -113,6 +123,7 @@ public class SplashActivity extends AppCompatActivity {
             editor.apply();
         }
         checkDatabase();
+        getCurrentAssessmentIfConnectedToInternet();
     }
 
     private void checkDatabase() {
@@ -131,5 +142,54 @@ public class SplashActivity extends AppCompatActivity {
         i = new Intent(SplashActivity.this, Dashboard.class);
         startActivity(i);
         finish();
+    }
+
+    private void getCurrentAssessmentIfConnectedToInternet() {
+        if (isNetworkAvailable()) {
+            DecisionTreeJSON dtJson = ApiClient.getClient(ApiClient.TEMP_SERV_URL).create(DecisionTreeJSON.class);
+            Call<String> call = dtJson.getJson();
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                    if (!response.isSuccessful()) {
+                        System.out.println("no site, plase try again");
+                        return;
+                    }
+
+                    // We've received a response! We can turn this into a JSONObject
+                    // and store the result locally
+                    try {
+                        assert response.body() != null;
+                        JSONObject json = new JSONObject(response.body());
+
+                        File directory = getFilesDir();
+                        File assessment = new File(directory, "assessment.json");
+                        if (assessment.exists()) {
+                            assessment.delete();
+                            assessment = new File(directory, "assessment.json");
+                        }
+                        Writer output = null;
+                        output = new BufferedWriter(new FileWriter(assessment));
+                        output.write(json.toString());
+                        output.close();
+
+                    } catch (JSONException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    throw new RuntimeException(t);
+                }
+            });
+        }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

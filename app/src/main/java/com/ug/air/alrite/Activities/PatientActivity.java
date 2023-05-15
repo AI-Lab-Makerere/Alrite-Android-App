@@ -15,6 +15,7 @@ import static com.ug.air.alrite.Fragments.Patient.RRCounter.INITIAL_DATE_2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -23,6 +24,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -50,6 +52,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,7 +72,7 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.Response;
 
-public class PatientActivity extends AppCompatActivity implements MultipleChoiceFragment.onGetResultListener {
+public class PatientActivity extends AppCompatActivity implements MultipleChoiceFragment.onGetResultListener, MultipleSelectionFragment.onGetResultListener, TextInputFragment.onGetResultListener {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String INCOMPLETE = "incomplete";
@@ -94,7 +97,11 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             if (frag == 1){
                 // fragmentTransaction.add(R.id.fragment_container, new Initials());
-                getJSONFromBackend();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    getJSONFromBackend();
+                } else {
+                    System.out.println("Cant read from file because it's too old of an SDK build version");
+                }
             }else if (frag == 2){
                 fragmentTransaction.add(R.id.fragment_container, new ActivePatients());
             }else {
@@ -276,6 +283,11 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     public static final String TEXT_INPUT = "TextInput";
     public static final String DIAGNOSIS_PAGE = "Diagnosis Page";
     public static final String TITLE = "title";
+    public static final String IS_DIAGNOSIS_PAGE = "isDiagnosisPage";
+    public static final String NULL = "null";
+    public static final String DEFAULT_LINK = "defaultLink";
+    public static final String TARGET_VALUE_ID = "targetValueID";
+    public static final String VALUE_ID = "valueID";
 
      // Full JSON infos to call getNextPage
      JSONArray pages;
@@ -293,7 +305,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     int MinValue; //The minimum value allowed to be inputted
     int MaxValue; //The maximum value allowed to be inputted
     int diagnosisCutoff; //The minimum value to be inputted in order to get the diagnosis
-     JSONObject pageID;
+    JSONObject pageID;
     String targetValue_id; // for text input
     String targetValueID; // for multiple selection
 
@@ -313,7 +325,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         pages = json.getJSONArray(PAGES);
         // This is just an array because it needs to be mutable: think of it as
         // its own element
-        String nextPage = pages.getJSONObject(0).getString(PAGE_ID);
+        String nextPage = pages.getJSONObject(2).getString(PAGE_ID);
 
         // Handling the intent
 
@@ -373,7 +385,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
 
         // If the next page would be the final page, then the assessment is over!
         // So, start up the diagnosis activity
-        if (nextPageJSON.get(TITLE).equals(DIAGNOSIS_PAGE)) {
+        if ((Boolean) nextPageJSON.get(IS_DIAGNOSIS_PAGE)) {
             exitActivity();
             return;
         }
@@ -381,60 +393,51 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
 
         // Then, for each component that we're given within the page, display a
         // fragment for that component.
-        for (int i = 0; i < nextPageContent.length(); i++) {
-            JSONObject nextPageComponent = nextPageContent.getJSONObject(i);
-            String nextPageComponentType = nextPageComponent.getString(COMPONENT);
+        JSONObject nextPageComponent = nextPageContent.getJSONObject(0);
+        String nextPageComponentType = nextPageComponent.getString(COMPONENT);
 
-            // Multiple choice option(s):
-            if (nextPageComponentType.equals(MULTIPLE_CHOICE)) {
-                Boolean isMultiSelect = nextPageComponent.getBoolean(MULTISELECT);
-                if (isMultiSelect) {
-                    createMultiSelectFragment(nextPageComponent);
-                } else {
-                    createMultipleChoiceFragment(nextPageComponent);
-                }
-
-            // Text input option:
-            } else if (nextPageComponentType.equals(TEXT_INPUT)) {
-                createTextInputFragment(nextPageComponent);
-
-            // There was an issue with identifying the page...
+        // Multiple choice option(s):
+        if (nextPageComponentType.equals(MULTIPLE_CHOICE)) {
+            Boolean isMultiSelect = nextPageComponent.getBoolean(MULTISELECT);
+            if (isMultiSelect) {
+                createMultiSelectFragment(nextPageComponent);
             } else {
-                throw new IllegalStateException("should never get here lol");
+                createMultipleChoiceFragment(nextPageComponent);
             }
+
+        // Text input option:
+        } else if (nextPageComponentType.equals(TEXT_INPUT)) {
+            createTextInputFragment(nextPageComponent);
+
+        // There was an issue with identifying the page...
+        } else {
+            throw new IllegalStateException("should never get here lol");
         }
     }
 
     /**
      * Essentially, make an asynchronous API call to get the HTTP
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void getJSONFromBackend() {
-        DecisionTreeJSON dtJson = ApiClient.getClient(ApiClient.TEMP_SERV_URL).create(DecisionTreeJSON.class);
-        Call<String> call = dtJson.getJson();
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                if (!response.isSuccessful()) {
-                    System.out.println("no site, plase try again");
-                    return;
-                }
+        File assessment = new File(getFilesDir(), "assessment.json");
 
-                // We've received a response! We can turn this into a JSONObject
-                // and store the result locally
-                try {
-                    assert response.body() != null;
-                    JSONObject json = new JSONObject(response.body());
-                    implementEditableDecisionTree(json);
-                } catch (JSONException | IOException e) {
-                    throw new RuntimeException(e);
-                }
+        try {
+            BufferedReader br = Files.newBufferedReader(assessment.toPath());
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
             }
 
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                throw new RuntimeException(t);
-            }
-        });
+            String json = sb.toString();
+
+            br.close();
+
+            implementEditableDecisionTree(new JSONObject(json));
+        } catch (Exception e) {
+            System.out.println("did a bad: " + e);
+        }
     }
 
     /**
@@ -465,14 +468,14 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
      */
     private void createTextInputFragment(JSONObject page) throws JSONException {
         // Collect the important arguments from the component
-        question = page.getString("text");
-        InputHint = page.getString("text");
-        InputInformation = page.getString("");
-        SkipInformation = page.getString("");
-        MinValue = page.getInt("");
-        MaxValue = page.getInt("");
-        diagnosisCutoff = page.getInt("");
-        targetValue_id = page.getString("valueID");
+        question = page.getString(LABEL);
+        InputHint = "none right now";
+        InputInformation = "none right now";
+        SkipInformation = "none right now";
+        MinValue = 0;
+        MaxValue = 100;
+        diagnosisCutoff = 50;
+        targetValue_id = page.getString(VALUE_ID);
 
         // Get the new page's fragment, and set a listener for when the next button
         // is clicked
@@ -491,7 +494,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     private void createMultiSelectFragment(JSONObject page) throws JSONException {
         question = page.getString(LABEL);
         choices = JSONArrayToListOfJSONObjects(page.getJSONArray(CHOICES));
-        targetValueID = page.getString("targetValueID");
+        targetValueID = page.getString(VALUE_ID);
 
         // Get the new page's fragment
         // set a listener for when the next button is clicked
@@ -513,6 +516,11 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
     public void getResultFromMultipleChoiceFragment(int choiceIndex) throws JSONException {
         String diagnosis = choices.get(choiceIndex - 1).getString(TEXT);
         String nextPageName = choices.get(choiceIndex - 1).getString(LINK);
+
+        // If the link is null, then we should go to the default page
+        if (nextPageName.equals(NULL)) {
+            nextPageName = pageID.getString(DEFAULT_LINK);
+        }
         System.out.println("NEXT PAGE NAME:" + nextPageName);
 
         // Enter the diagnosis into the editor
@@ -527,6 +535,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         }
     }
 
+    @Override
     public void getResultFromMultipleSelectionFragment(ArrayList<Integer> chosenOptionIds) throws JSONException {
         // add the selected choices to the diagnosis
         for (int choiceIndex : chosenOptionIds) {
@@ -553,6 +562,7 @@ public class PatientActivity extends AppCompatActivity implements MultipleChoice
         }
     }
 
+    @Override
     public void getResultFromTextInputFragment(int numberInputted) throws JSONException {
         String diagnosis = String.valueOf(numberInputted);
         JSONObject foundLink = getContentFromPageID(pageID, targetValue_id);;

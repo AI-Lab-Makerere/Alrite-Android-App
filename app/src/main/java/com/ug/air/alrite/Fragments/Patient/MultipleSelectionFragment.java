@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class MultipleSelectionFragment extends Fragment {
 
     public interface onGetResultListener {
-        public void getResultFromMultipleSelectionFragment(ArrayList<Integer> chosenOptions) throws JSONException;
+        void getResultFromMultipleSelectionFragment(ArrayList<Integer> chosenOptions) throws JSONException;
         void getLastPage() throws JSONException;
     }
     onGetResultListener getResultListener;
@@ -109,6 +109,7 @@ public class MultipleSelectionFragment extends Fragment {
         CheckBox choice5 = view.findViewById(R.id.choice5);
         choice5.setText(choices.get(4));
 
+        choiceGroup = new ArrayList<>();
         choiceGroup.add(choice1);
         choiceGroup.add(choice2);
         choiceGroup.add(choice3);
@@ -156,8 +157,8 @@ public class MultipleSelectionFragment extends Fragment {
                 // Send the result back up to main: a listener there will trigger
                 // and start the next fragment sequence up
                 try {
-                        getResultListener.getResultFromMultipleSelectionFragment(chosenOptionIds);  // adding to the diagnosis
-                    } catch (JSONException ex) {
+                    getResultListener.getResultFromMultipleSelectionFragment(chosenOptionIds);  // adding to the diagnosis
+                } catch (JSONException ex) {
                     throw new RuntimeException(ex);
                 }
             }

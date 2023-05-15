@@ -112,7 +112,7 @@ public class MultipleChoiceFragment extends Fragment {
         choiceGroup = view.findViewById(R.id.mc_options);
 
         // If we've already seen this page, reload our past choices
-        loadSelectedChoiceIfAlreadySelected();
+        // loadSelectedChoiceIfAlreadySelected();
 
         // This is a listener for, if the next button is pressed, whether we can go
         // on or not, and what information should be sent up
