@@ -39,6 +39,7 @@ import com.ug.air.alrite.Fragments.Patient.InitialsModified;
 import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
 import com.ug.air.alrite.Fragments.Patient.MultipleSelectionFragment;
 import com.ug.air.alrite.Fragments.Patient.OtherPatients;
+import com.ug.air.alrite.Fragments.Patient.ParagraphFragment;
 import com.ug.air.alrite.Fragments.Patient.TextInputFragment;
 import com.ug.air.alrite.Fragments.Patient.TextInputTextFragment;
 import com.ug.air.alrite.R;
@@ -81,7 +82,6 @@ public class PatientActivity extends AppCompatActivity implements
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String INCOMPLETE = "incomplete";
-
 
     public static final String ASSESS_INCOMPLETE = "incomplete";
     SharedPreferences sharedPreferences, sharedPreferences1;
@@ -321,6 +321,7 @@ public class PatientActivity extends AppCompatActivity implements
     JSONObject pageID;
     String targetValue_id; // for text input
     String targetValueID; // for multiple selection
+    String paragraph; //Content for paragraph fragment
 
     /**
      *
@@ -541,6 +542,24 @@ public class PatientActivity extends AppCompatActivity implements
         // Replace and commit the fragment
         completeFragmentTransaction(ms_fragment);
     }
+    /**
+     * Create the ParagraphFragment
+     *
+     * @param nextPageComponent the component to be displayed on screen
+     * @throws JSONException because json
+     */
+    private void createParagraphFragment(JSONObject nextPageComponent) throws JSONException {
+        question = nextPageComponent.getString(LABEL);
+        paragraph = "nothing at the moment, but content goes here";
+        targetValue_id = nextPageComponent.getString(VALUE_ID);
+
+        // Get the new page's fragment, and set a listener for when the next button
+        // is clicked
+        ParagraphFragment p_fragment = ParagraphFragment.newInstance(question, paragraph);
+
+        // Replace and commit the fragment
+        completeFragmentTransaction(p_fragment);
+    }
 
     /**
      * Listener for clicking the next button: we can move to the correct next
@@ -655,7 +674,15 @@ public class PatientActivity extends AppCompatActivity implements
             throw new RuntimeException();
         }
     }
-
+    @Override
+    public void getResultFromParagraphFragment() throws JSONException {
+        String nextPage = pageID.getString(DEFAULT_LINK);
+        try {
+            getNextPage(nextPage);
+        } catch(JSONException e) {
+            throw new RuntimeException();
+        }
+    }
     /**
      * Takes the page id and returns where we wish to go
      *

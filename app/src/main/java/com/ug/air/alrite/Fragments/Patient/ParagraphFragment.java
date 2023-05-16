@@ -1,100 +1,122 @@
-//package com.ug.air.alrite.Fragments.Patient;
-//
-//import static com.ug.air.alrite.Fragments.Patient.FTouch.TOUCH;
-//
-//import android.app.Activity;
-//import android.app.Dialog;
-//import android.content.Context;
-//import android.content.SharedPreferences;
-//import android.graphics.Color;
-//import android.graphics.Typeface;
-//import android.os.Bundle;
-//import android.text.Editable;
-//import android.text.TextWatcher;
-//import android.view.Gravity;
-//import android.view.LayoutInflater;
-//import android.view.View;
-//import android.view.ViewGroup;
-//import android.view.WindowManager;
-//import android.widget.Button;
-//import android.widget.EditText;
-//import android.widget.TextView;
-//import android.widget.Toast;
-//
-//import androidx.fragment.app.Fragment;
-//import androidx.fragment.app.FragmentTransaction;
-//
-//import com.ug.air.alrite.R;
-//
-//import org.json.JSONException;
-//
-//
-//public class ParagraphFragment extends Fragment {
-//    //Fragment wise should be done may need listener for skip
-//    public interface onGetResultListener {
-//        void getResultFromTextInputFragment(int choiceIndex) throws JSONException;
-//
-//        void getLastPage() throws JSONException;
-//    }
-//
-//    onGetResultListener getResultListener;
-//    View view;
-//    EditText etDay;
-//    Button back, next, btnSkip, btnSave;
-//    String userInput, diagnosis;
-//    public static final String Question = "What is the childs temperature";
-//    public static final String TDIAGNOSIS = "diagnosis_fever";
-//    public static final String SHARED_PREFS = "sharedPrefs";
-//    SharedPreferences sharedPreferences;
-//    SharedPreferences.Editor editor;
-//    Dialog dialog;
-//    TextView txtMessage;
-//    public static final String text = "";
-//    String text;
-//    String question;
-//
-//    public static ParagraphFragment newInstance(String question, String content) throws JSONException {
-//        ParagraphFragment pf = new ParagraphFragment();
-//        Bundle args = new Bundle();
-//        args.putString(Question, question);
-//        args.putString(text, content);
-//        pf.setArguments(args);
-//        return pf;
-//    }
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//
-//        next.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//            }
-//        });
-//
-//        back.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                back.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        try {
-//                            getResultListener.getLastPage();
-//                        } catch (JSONException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    }
-//                });
-//            }
-//        });
-//
-//        btnSkip.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-//                fr.replace(R.id.fragment_container, new FTouch());
-//                fr.addToBackStack(null);
-//                fr.commit();
-//            }
-//        });
-//
-//        return view;
-//    }
+package com.ug.air.alrite.Fragments.Patient;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+
+import com.ug.air.alrite.Activities.PatientActivity;
+import com.ug.air.alrite.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+public class ParagraphFragment extends Fragment {
+
+    public interface onGetResultListener {
+        void getResultFromParagraphFragment() throws JSONException;
+        void getLastPage() throws JSONException;
+    }
+    onGetResultListener getResultListener;
+
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String QUESTION = "question";
+    public static final String PARAGRAPH = "paragraph";
+    public static final String DEFAULT = "**default string**";
+    String previousResponse;
+    String question;
+    String paragraph;
+    View view;
+    Button backButton, nextButton;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+
+    /**
+     * This is where we do what we usually do in the onAttach section, except that
+     * we also add a listener for sending the result of the Multiple Choice up to
+     * the activity
+     *
+     * @param activity the PatientActivity that we're running this fragment on
+     */
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            getResultListener = (onGetResultListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement onSomeEventListener");
+        }
+    }
+
+    /**
+     * This creates a new MultipleChoiceFragment with a separate constructor, so
+     * that we can retain the given information and return the fragment
+     *
+     * @param question the question at the top of the page
+     * @return the fragment to be used in the future
+     */
+    public static ParagraphFragment newInstance(String question, String paragraph) throws JSONException {
+        ParagraphFragment pf = new ParagraphFragment();
+        Bundle args = new Bundle();
+        args.putString(QUESTION, question);
+        args.putString(PARAGRAPH, paragraph);
+        pf.setArguments(args);
+        return pf;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.paragraph, container, false);
+        sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        assert getArguments() != null;
+        question = getArguments().getString(QUESTION);
+        paragraph = getArguments().getString(PARAGRAPH);
+
+        TextView questionDisplay = view.findViewById(R.id.p_question);
+        questionDisplay.setText(question);
+        TextView paragraphDisplay = view.findViewById(R.id.p_information);
+        paragraphDisplay.setText(paragraph);
+
+        nextButton = view.findViewById(R.id.next);
+        backButton = view.findViewById(R.id.back);
+
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    getResultListener.getResultFromParagraphFragment();
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    getResultListener.getLastPage();
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        return view;
+    }
+}

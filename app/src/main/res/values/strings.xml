@@ -281,4 +281,7 @@
     <string name="ti_maxval">%s</string>
     <string name="ti_minvalforDiagnosis">%s</string>
 
+    <!--   New Strings for the paragraph input -->
+    <string name="p_question">%s</string>
+    <string name="p_paragraph">%s</string>
 </resources>
