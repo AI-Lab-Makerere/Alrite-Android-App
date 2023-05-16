@@ -650,7 +650,7 @@ public class PatientActivity extends AppCompatActivity implements
                         break;
                     }
                 } else {
-                    if (numberInputted == Integer.parseInt(foundLink.getString(THRESHOLD))) {
+                    if (numberInputted == Float.parseFloat(foundLink.getString(THRESHOLD))) {
                         NextPage = foundLink.getString(SATISFIED_LINK);
                         break;
                     }
