@@ -135,7 +135,7 @@ public class SexModified extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-                fr.replace(R.id.fragment_container, new Initials());
+                fr.replace(R.id.fragment_container, new InitialsModified());
                 fr.commit();
             }
         });
@@ -271,9 +271,7 @@ public class SexModified extends Fragment {
                 }
                 makeDecisions();
 
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (XmlPullParserException | IOException e) {
                 e.printStackTrace();
             }
         }else{

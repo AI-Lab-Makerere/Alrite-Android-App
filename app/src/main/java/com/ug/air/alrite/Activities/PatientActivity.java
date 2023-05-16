@@ -40,6 +40,7 @@ import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
 import com.ug.air.alrite.Fragments.Patient.MultipleSelectionFragment;
 import com.ug.air.alrite.Fragments.Patient.OtherPatients;
 import com.ug.air.alrite.Fragments.Patient.ParagraphFragment;
+import com.ug.air.alrite.Fragments.Patient.SexModified;
 import com.ug.air.alrite.Fragments.Patient.TextInputFragment;
 import com.ug.air.alrite.Fragments.Patient.TextInputTextFragment;
 import com.ug.air.alrite.R;
@@ -764,10 +765,15 @@ public class PatientActivity extends AppCompatActivity implements
      */
     @Override
     public void getLastPage() throws JSONException {
-        // TODO: exit to main activity, if it's the first page
-
         // Get the last page JSON object that we put on to the backstack
         backstack.remove(backstack.size() - 1);
+
+        // go to the SexModified , if it's the first page
+        if (backstack.isEmpty()) {
+            completeFragmentTransaction(new SexModified());
+            return;
+        }
+
         String backPageName = backstack.get(backstack.size() - 1);
 
         getNextPage(backPageName);
