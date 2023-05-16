@@ -149,8 +149,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private void getCurrentAssessmentIfConnectedToInternet() {
         if (isNetworkAvailable() && shouldGetNewAssessment) {
-            DecisionTreeJSON dtJson = ApiClient.getClient(ApiClient.TEMP_SERV_URL).create(DecisionTreeJSON.class);
-            Call<String> call = dtJson.getJson("IMCI");
+            DecisionTreeJSON dtJson = ApiClient.getClient(ApiClient.REMOTE_URL_TEMP).create(DecisionTreeJSON.class);
+            Call<String> call = dtJson.getJson("Demo_Workflow");
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {

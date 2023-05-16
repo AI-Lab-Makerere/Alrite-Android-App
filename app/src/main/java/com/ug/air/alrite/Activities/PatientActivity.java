@@ -557,7 +557,6 @@ public class PatientActivity extends AppCompatActivity implements
      */
     private void createParagraphFragment(JSONObject nextPageComponent) throws JSONException {
         paragraph = nextPageComponent.getString(TEXT);
-        targetValue_id = nextPageComponent.getString(VALUE_ID);
 
         // Get the new page's fragment, and set a listener for when the next button
         // is clicked
