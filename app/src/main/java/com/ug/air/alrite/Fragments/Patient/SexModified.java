@@ -120,7 +120,7 @@ public class SexModified extends Fragment {
                 }else{
                     int year = Integer.parseInt(years);
                     int ageInMos = (year*12) + Integer.parseInt(months);
-                    ageInMonths = String.valueOf(ageInMonths);
+                    ageInMonths = String.valueOf(ageInMos);
                     ageInYearsAndMonths = years + "." + months;
                     weight = kg;
                     saveData();

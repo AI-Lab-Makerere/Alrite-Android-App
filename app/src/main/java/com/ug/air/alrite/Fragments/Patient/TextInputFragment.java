@@ -32,7 +32,7 @@ import org.json.JSONException;
 public class TextInputFragment extends Fragment {
     //Fragment wise should be done may need listener for skip
     public interface onGetResultListener {
-        void getResultFromTextInputFragment(int choiceIndex) throws JSONException;
+        void getResultFromTextInputFragment(Float choiceIndex) throws JSONException;
         void getLastPage() throws JSONException;
     }
     onGetResultListener getResultListener;
@@ -218,7 +218,7 @@ public class TextInputFragment extends Fragment {
     private void saveData() {
         deleteSharedPreferences();
 
-        int tp = Integer.parseInt(userInput);
+        Float tp = Float.parseFloat(userInput);
         try {
             getResultListener.getResultFromTextInputFragment(tp);
         } catch (JSONException e) {

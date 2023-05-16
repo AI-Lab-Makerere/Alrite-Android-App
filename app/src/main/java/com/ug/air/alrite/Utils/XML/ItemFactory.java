@@ -1,8 +1,6 @@
 package com.ug.air.alrite.Utils.XML;
 
 import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -21,7 +19,7 @@ public class ItemFactory {
 
     public String GetMaleItem(Context context, String age, float weight) throws XmlPullParserException, IOException {
 
-        List<String> elements = new ArrayList<>();
+        List<String> elements;
         String diagnosis;
 
         XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
@@ -30,7 +28,7 @@ public class ItemFactory {
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         parser.setInput(inputStream, null);
         parser.nextTag();
-        elements = readFeed(context, parser, age);
+        elements = readFeed(parser, age);
         String negative3 = elements.get(0);
         String negative2 = elements.get(1);
         String positive2 = elements.get(2);
@@ -44,7 +42,7 @@ public class ItemFactory {
         }else if (weight > p2){
 //            greater than 2 SD above average
             diagnosis = "above 2";
-        }else if (weight < n2 && weight >= n3){
+        }else if (weight >= n3){
 //            less than 2 SD below average, moderate malnutrition
             diagnosis = "below 2";
         }else{
@@ -58,7 +56,7 @@ public class ItemFactory {
 
     public String GetFemaleItem(Context context, String age, float weight) throws XmlPullParserException, IOException {
 
-        List<String> elements = new ArrayList<>();
+        List<String> elements;
         String diagnosis;
 
         XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
@@ -67,7 +65,8 @@ public class ItemFactory {
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         parser.setInput(inputStream, null);
         parser.nextTag();
-        elements = readFeed(context, parser, age);
+        elements = readFeed(parser, age);
+        System.out.println(elements);
         String negative3 = elements.get(0);
         String negative2 = elements.get(1);
         String positive2 = elements.get(2);
@@ -81,7 +80,7 @@ public class ItemFactory {
         }else if (weight > p2){
 //            greater than 2 SD above average
             diagnosis = "above 2";
-        }else if (weight < n2 && weight >= n3){
+        }else if (weight >= n3){
 //            less than 2 SD below average, moderate malnutrition
             diagnosis = "below 2";
         }else{
@@ -93,7 +92,7 @@ public class ItemFactory {
 
     }
 
-    private List readFeed(Context context, XmlPullParser parser, String year) throws IOException, XmlPullParserException {
+    private List<String> readFeed(XmlPullParser parser, String year) throws IOException, XmlPullParserException {
         ArrayList<Item> items = new ArrayList<>();
 
         parser.require(XmlPullParser.START_TAG, ns, "root");
@@ -137,16 +136,22 @@ public class ItemFactory {
                 continue;
             }
             String name = parser.getName();
-            if (name.equals("age")) {
-                age = readAge(parser);
-            } else if (name.equals("negative3")) {
-                negative3 = readNegative3(parser);
-            } else if (name.equals("negative2")) {
-                negative2 = readNegative2(parser);
-            } else if (name.equals("positive2")) {
-                positive2 = readPositive2(parser);
-            } else {
-                skip(parser);
+            switch (name) {
+                case "age":
+                    age = readAge(parser);
+                    break;
+                case "negative3":
+                    negative3 = readNegative3(parser);
+                    break;
+                case "negative2":
+                    negative2 = readNegative2(parser);
+                    break;
+                case "positive2":
+                    positive2 = readPositive2(parser);
+                    break;
+                default:
+                    skip(parser);
+                    break;
             }
         }
         return new Item(age, negative3, negative2, positive2);

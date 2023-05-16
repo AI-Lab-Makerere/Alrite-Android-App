@@ -78,7 +78,8 @@ import retrofit2.Response;
 
 public class PatientActivity extends AppCompatActivity implements
         MultipleChoiceFragment.onGetResultListener, MultipleSelectionFragment.onGetResultListener,
-        TextInputFragment.onGetResultListener, TextInputTextFragment.onGetResultListener {
+        TextInputFragment.onGetResultListener, TextInputTextFragment.onGetResultListener,
+        ParagraphFragment.onGetResultListener {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String INCOMPLETE = "incomplete";
@@ -301,6 +302,7 @@ public class PatientActivity extends AppCompatActivity implements
     public static final String ALPHANUMERIC_TYPE = "alphanumeric";
     public static final String TEXT_TYPE = "text";
     public static final String ANY_TYPE = "any";
+    public static final String PARAGRAPH = "Paragraph";
 
      // Full JSON infos to call getNextPage
      JSONArray pages;
@@ -420,11 +422,15 @@ public class PatientActivity extends AppCompatActivity implements
 
         // Text input option:
         } else if (nextPageComponentType.equals(TEXT_INPUT)) {
-            if (nextPageJSON.getString(TYPE).equals(NUMERIC_TYPE)) {
+            if (nextPageComponent.getString(TYPE).equals(NUMERIC_TYPE)) {
                 createTextInputFragment(nextPageComponent);
             } else {
                 createTextInputTextFragment(nextPageComponent);
             }
+
+        // Paragraph option:
+        } else if (nextPageComponentType.equals(PARAGRAPH)) {
+            createParagraphFragment(nextPageComponent);
 
         // There was an issue with identifying the page...
         } else {
@@ -550,7 +556,7 @@ public class PatientActivity extends AppCompatActivity implements
      */
     private void createParagraphFragment(JSONObject nextPageComponent) throws JSONException {
         question = nextPageComponent.getString(LABEL);
-        paragraph = "nothing at the moment, but content goes here";
+        paragraph = nextPageComponent.getString(TEXT);
         targetValue_id = nextPageComponent.getString(VALUE_ID);
 
         // Get the new page's fragment, and set a listener for when the next button
@@ -581,7 +587,7 @@ public class PatientActivity extends AppCompatActivity implements
         System.out.println("NEXT PAGE NAME:" + nextPageName);
 
         // Enter the diagnosis into the editor
-        enterSymptomIntoEditor(question, diagnosis);
+        enterSymptomIntoEditor(pageID, diagnosis);
 
         // Decide on the next page based on the result
         try {
@@ -599,7 +605,7 @@ public class PatientActivity extends AppCompatActivity implements
             allDiagnoses += "\n" + choices.get(i).getString(TEXT);
             // Enter the diagnosis into the editor
         }
-        enterSymptomIntoEditor(question, allDiagnoses);
+        enterSymptomIntoEditor(pageID, allDiagnoses);
 
         JSONObject foundLink = getContentFromPageID(pageID, targetValueID);
         String NextPage;
@@ -619,7 +625,7 @@ public class PatientActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void getResultFromTextInputFragment(int numberInputted) throws JSONException {
+    public void getResultFromTextInputFragment(Float numberInputted) throws JSONException {
         String diagnosis = String.valueOf(numberInputted);
         ArrayList<JSONObject> foundLinks = getContentFromPageIDArray(pageID, targetValue_id);
         String NextPage = pageID.getString(DEFAULT_LINK);
@@ -628,12 +634,17 @@ public class PatientActivity extends AppCompatActivity implements
             // once the branched link logic is completed in the JSON file
             for (JSONObject foundLink : foundLinks) {
                 if (foundLink.get("type").equals(">")) {
-                    if (numberInputted > Integer.parseInt(foundLink.getString(THRESHOLD))) {
+                    if (numberInputted > Float.parseFloat(foundLink.getString(THRESHOLD))) {
                         NextPage = foundLink.getString(SATISFIED_LINK);
                         break;
                     }
                 } else if (foundLink.get("type").equals("<")) {
-                    if (numberInputted < Integer.parseInt(foundLink.getString(THRESHOLD))) {
+                    if (numberInputted < Float.parseFloat(foundLink.getString(THRESHOLD))) {
+                        NextPage = foundLink.getString(SATISFIED_LINK);
+                        break;
+                    }
+                } else if (foundLink.get("type").equals("<")) {
+                    if (numberInputted < Float.parseFloat(foundLink.getString(THRESHOLD))) {
                         NextPage = foundLink.getString(SATISFIED_LINK);
                         break;
                     }
@@ -646,7 +657,7 @@ public class PatientActivity extends AppCompatActivity implements
             }
         }
         // Enter the diagnosis into the editor
-        enterSymptomIntoEditor(question, diagnosis);
+        enterSymptomIntoEditor(pageID, diagnosis);
         try {
             getNextPage(NextPage);
         } catch(JSONException e) {
@@ -667,13 +678,14 @@ public class PatientActivity extends AppCompatActivity implements
             }
         }
 
-        enterSymptomIntoEditor(question, recordedSymptom);
+        enterSymptomIntoEditor(pageID, recordedSymptom);
         try {
             getNextPage(nextPage);
         } catch(JSONException e) {
             throw new RuntimeException();
         }
     }
+
     @Override
     public void getResultFromParagraphFragment() throws JSONException {
         String nextPage = pageID.getString(DEFAULT_LINK);
@@ -772,9 +784,9 @@ public class PatientActivity extends AppCompatActivity implements
         return -1;
     }
 
-    public void enterSymptomIntoEditor(String question, String symptom) {
+    public void enterSymptomIntoEditor(JSONObject page, String symptom) throws JSONException {
         // Enter the diagnosis into the editor
-        editor.putString("?: " + question, symptom);
+        editor.putString("?: " + page.getString(TITLE), symptom);
         editor.apply();
     }
 }
