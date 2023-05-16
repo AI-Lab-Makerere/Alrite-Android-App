@@ -601,20 +601,26 @@ public class PatientActivity extends AppCompatActivity implements
     @Override
     public void getResultFromMultipleSelectionFragment(ArrayList<Integer> chosenOptionIds) throws JSONException {
         // add the selected choices to the diagnosis
-        String allDiagnoses = choices.get(chosenOptionIds.get(0)).getString(TEXT);
-        for (int i = 1; i < chosenOptionIds.size(); i++) {
-            allDiagnoses += "\n" + choices.get(i).getString(TEXT);
-            // Enter the diagnosis into the editor
-        }
-        enterSymptomIntoEditor(pageID, allDiagnoses);
 
-        JSONObject foundLink = getContentFromPageID(pageID, targetValueID);
         String NextPage;
-        if (foundLink == null) {
+
+        if (chosenOptionIds.isEmpty()) {
             NextPage =  pageID.getString(DEFAULT_LINK);
         }
         else {
-            NextPage = foundLink.getString(SATISFIED_LINK);
+            String allDiagnoses = choices.get(chosenOptionIds.get(0)).getString(TEXT);
+            for (int i = 1; i < chosenOptionIds.size(); i++) {
+                allDiagnoses += "\n" + choices.get(i).getString(TEXT);
+                // Enter the diagnosis into the editor
+            }
+            enterSymptomIntoEditor(pageID, allDiagnoses);
+
+            JSONObject foundLink = getContentFromPageID(pageID, targetValueID);
+            if (foundLink == null) {
+                NextPage = pageID.getString(DEFAULT_LINK);
+            } else {
+                NextPage = foundLink.getString(SATISFIED_LINK);
+            }
         }
 
         // Decide on the next page based on the result

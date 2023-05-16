@@ -140,10 +140,10 @@ public class MultipleSelectionFragment extends Fragment {
                         chosenOptions.add(id);
                     }
                 }
-                if (chosenOptions.size() < 1) {
-                    Toast.makeText(getActivity(), "Please select at least one of the options", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+//                if (chosenOptions.size() < 1) {
+//                    Toast.makeText(getActivity(), "Please select at least one of the options", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
 
                 // Get the indices of the choices in the set of buttons: relies on the
                 // buttons having names with their index at the end
