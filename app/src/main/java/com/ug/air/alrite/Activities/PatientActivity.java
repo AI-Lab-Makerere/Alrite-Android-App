@@ -556,13 +556,12 @@ public class PatientActivity extends AppCompatActivity implements
      * @throws JSONException because json
      */
     private void createParagraphFragment(JSONObject nextPageComponent) throws JSONException {
-        question = nextPageComponent.getString(LABEL);
         paragraph = nextPageComponent.getString(TEXT);
         targetValue_id = nextPageComponent.getString(VALUE_ID);
 
         // Get the new page's fragment, and set a listener for when the next button
         // is clicked
-        ParagraphFragment p_fragment = ParagraphFragment.newInstance(question, paragraph);
+        ParagraphFragment p_fragment = ParagraphFragment.newInstance(paragraph);
 
         // Replace and commit the fragment
         completeFragmentTransaction(p_fragment);
@@ -656,7 +655,7 @@ public class PatientActivity extends AppCompatActivity implements
                         break;
                     }
                 } else {
-                    if (numberInputted == Integer.parseInt(foundLink.getString(THRESHOLD))) {
+                    if (numberInputted == Float.parseFloat(foundLink.getString(THRESHOLD))) {
                         NextPage = foundLink.getString(SATISFIED_LINK);
                         break;
                     }
