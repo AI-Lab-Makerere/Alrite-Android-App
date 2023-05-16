@@ -36,7 +36,6 @@ public class ParagraphFragment extends Fragment {
     public static final String PARAGRAPH = "paragraph";
     public static final String DEFAULT = "**default string**";
     String previousResponse;
-    String question;
     String paragraph;
     View view;
     Button backButton, nextButton;
@@ -64,13 +63,12 @@ public class ParagraphFragment extends Fragment {
      * This creates a new MultipleChoiceFragment with a separate constructor, so
      * that we can retain the given information and return the fragment
      *
-     * @param question the question at the top of the page
+     * @param paragraph the text at the top of the page
      * @return the fragment to be used in the future
      */
-    public static ParagraphFragment newInstance(String question, String paragraph) throws JSONException {
+    public static ParagraphFragment newInstance(String paragraph) throws JSONException {
         ParagraphFragment pf = new ParagraphFragment();
         Bundle args = new Bundle();
-        args.putString(QUESTION, question);
         args.putString(PARAGRAPH, paragraph);
         pf.setArguments(args);
         return pf;
@@ -84,11 +82,8 @@ public class ParagraphFragment extends Fragment {
         editor = sharedPreferences.edit();
 
         assert getArguments() != null;
-        question = getArguments().getString(QUESTION);
         paragraph = getArguments().getString(PARAGRAPH);
 
-        TextView questionDisplay = view.findViewById(R.id.p_question);
-        questionDisplay.setText(question);
         TextView paragraphDisplay = view.findViewById(R.id.p_information);
         paragraphDisplay.setText(paragraph);
 
