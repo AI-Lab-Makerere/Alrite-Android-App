@@ -2,15 +2,14 @@ package com.ug.air.alrite.Fragments.Patient;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.ug.air.alrite.Activities.DiagnosisActivity.PENDING;
-import static com.ug.air.alrite.Activities.PatientActivity.INCOMPLETE;
+import static com.ug.air.alrite.Activities.PatientActivity.ASSESS_INCOMPLETE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.BRONCHODILATOR;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.BRONC;
-import static com.ug.air.alrite.Fragments.Patient.Initials.CIN;
-import static com.ug.air.alrite.Fragments.Patient.Initials.PIN;
-import static com.ug.air.alrite.Fragments.Patient.Initials.STUDY_ID;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE2;
-import static com.ug.air.alrite.Fragments.Patient.Sex.CHOICE;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USED_BRONCHODILATOR;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.AFTER_BRONCHODILATOR;
+import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.Initials.PARENT_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_YEARS;
+import static com.ug.air.alrite.Fragments.Patient.Sex.SEX;
 
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +34,6 @@ import android.widget.Toast;
 
 import com.ug.air.alrite.APIs.ApiClient;
 import com.ug.air.alrite.APIs.JsonPlaceHolder;
-import com.ug.air.alrite.Activities.Dashboard;
 import com.ug.air.alrite.Activities.DiagnosisActivity;
 import com.ug.air.alrite.Activities.PatientActivity;
 import com.ug.air.alrite.Adapters.PatientAdapter;
@@ -43,7 +41,6 @@ import com.ug.air.alrite.BuildConfig;
 import com.ug.air.alrite.Database.DatabaseHelper;
 import com.ug.air.alrite.Models.History;
 import com.ug.air.alrite.Models.Item;
-import com.ug.air.alrite.Models.Patient;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Credentials;
 
@@ -53,7 +50,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Objects;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -89,7 +85,7 @@ public class OtherPatients extends Fragment {
         view = inflater.inflate(R.layout.fragment_other_patients, container, false);
 
         databaseHelper = new DatabaseHelper(getActivity());
-        jsonPlaceHolder = ApiClient.getClient().create(JsonPlaceHolder.class);
+        jsonPlaceHolder = ApiClient.getClient(ApiClient.BASE_URL).create(JsonPlaceHolder.class);
 
         recyclerView = view.findViewById(R.id.recyclerView3);
         etSearch = view.findViewById(R.id.search);
@@ -167,15 +163,15 @@ public class OtherPatients extends Fragment {
                     if (!name.equals("sharedPrefs.xml") && !name.equals("counter_file.xml")){
                         String names = name.replace(".xml", "");
                         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(names, Context.MODE_PRIVATE);
-                        String bron = sharedPreferences.getString(BRONCHODILATOR, "");
-                        String incomplete = sharedPreferences.getString(INCOMPLETE, "");
+                        String bron = sharedPreferences.getString(USED_BRONCHODILATOR, "");
+                        String incomplete = sharedPreferences.getString(ASSESS_INCOMPLETE, "");
                         String pending = sharedPreferences.getString(PENDING, "");
-                        String fin = sharedPreferences.getString(BRONC, "");
+                        String fin = sharedPreferences.getString(AFTER_BRONCHODILATOR, "");
                         if (bron.isEmpty() || bron.equals("Bronchodialtor Not Given") || !fin.isEmpty()){
-                            cin = sharedPreferences.getString(CIN, "");
-                            pin = sharedPreferences.getString(PIN, "");
-                            age = sharedPreferences.getString(AGE2, "");
-                            gender = sharedPreferences.getString(CHOICE, "");
+                            cin = sharedPreferences.getString(CHILD_INITIALS, "");
+                            pin = sharedPreferences.getString(PARENT_INITIALS, "");
+                            age = sharedPreferences.getString(AGE_IN_YEARS, "");
+                            gender = sharedPreferences.getString(SEX, "");
                             dat = sharedPreferences.getString(DATE, "");
                             if (age.isEmpty()){
                                ag = "0 years 0 months";
@@ -223,10 +219,10 @@ public class OtherPatients extends Fragment {
                             String names = name.replace(".xml", "");
                             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(names, MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            String bron = sharedPreferences.getString(BRONCHODILATOR, "");
-                            String fin = sharedPreferences.getString(BRONC, "");
+                            String bron = sharedPreferences.getString(USED_BRONCHODILATOR, "");
+                            String fin = sharedPreferences.getString(AFTER_BRONCHODILATOR, "");
                             String pending = sharedPreferences.getString(PENDING, "");
-                            String incomplete = sharedPreferences.getString(INCOMPLETE, "");
+                            String incomplete = sharedPreferences.getString(ASSESS_INCOMPLETE, "");
 
                             if (!pending.equals("pending") && (bron.isEmpty() || bron.equals("Bronchodialtor Not Given") || !fin.isEmpty())){
                                 File patient = new File("/data/data/" + BuildConfig.APPLICATION_ID + "/shared_prefs/" + name);

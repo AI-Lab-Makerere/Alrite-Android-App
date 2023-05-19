@@ -6,16 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.ug.air.alrite.Activities.Dashboard;
 import com.ug.air.alrite.R;
@@ -27,7 +26,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-public class Initials extends Fragment {
+public class InitialsModified extends Fragment {
 
    View view;
    EditText etChildInitials, etParentInitials, etStudy, etCode;
@@ -73,7 +72,7 @@ public class Initials extends Fragment {
             editor.putString(SECOND, filename);
             editor.apply();
 
-        }else {
+        } else {
             sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         }
 
@@ -145,7 +144,7 @@ public class Initials extends Fragment {
         }
 
         FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-        fr.replace(R.id.fragment_container, new Sex());
+        fr.replace(R.id.fragment_container, new SexModified());
         fr.addToBackStack(null);
         fr.commit();
     }

@@ -1,10 +1,8 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
 import static com.ug.air.alrite.Fragments.Patient.FTouch.TOUCH;
-import static com.ug.air.alrite.Fragments.Patient.Fragment7v4.CHOICE3Y2;
 import static com.ug.air.alrite.Fragments.Patient.HIVCare.CHOICEHC;
-import static com.ug.air.alrite.Fragments.Patient.HIVStatus.CHOICE3;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -30,8 +28,6 @@ import android.widget.Toast;
 
 import com.ug.air.alrite.R;
 
-import java.util.Objects;
-
 
 public class Temperature extends Fragment {
 
@@ -40,7 +36,7 @@ public class Temperature extends Fragment {
     Button back, next, btnSkip, btnSave;
     String temp, diagnosis;
     public static final String TEMP = "temperature";
-    public static final String TDIAGNOSIS = "diagnosis_4";
+    public static final String TDIAGNOSIS = "diagnosis_fever";
     public static final String SHARED_PREFS = "sharedPrefs";
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -85,7 +81,7 @@ public class Temperature extends Fragment {
             @Override
             public void onClick(View v) {
 
-                String assess = sharedPreferences.getString(S4, "");
+                String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
                 String care = sharedPreferences.getString(CHOICEHC, "");
 
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
@@ -150,7 +146,7 @@ public class Temperature extends Fragment {
     private void saveData() {
         deleteSharedPreferences();
 
-        String assess = sharedPreferences.getString(S4, "");
+        String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
         editor.putString(TEMP, temp);
         editor.apply();
         float tp = Float.parseFloat(temp);

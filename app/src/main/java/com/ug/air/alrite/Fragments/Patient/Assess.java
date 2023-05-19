@@ -1,6 +1,6 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
 import static com.ug.air.alrite.Fragments.Patient.Sex.KILO;
 
 import android.app.Dialog;
@@ -40,7 +40,7 @@ import java.util.List;
 public class Assess extends Fragment {
 
     View view;
-    Button back, next, btnExit, btnContinue;
+    Button buttonBack, buttonNext, btnExit, btnContinue;
     CheckBox drink, vomit, resp, convu, none;
     String s = "";
     Boolean check1, check2, check3, check4, check5;
@@ -54,14 +54,14 @@ public class Assess extends Fragment {
     String diagnosis;
 
     public static final String SHARED_PREFS = "sharedPrefs";
-    public static final String CHECK1 = "check1";
-    public static final String CHECK2 = "check2";
-    public static final String CHECK3 = "check3";
-    public static final String CHECK4 = "check4";
-    public static final String CHECK5 = "check5";
+    public static final String CANT_DRINK = "check1";
+    public static final String VOMITING = "check2";
+    public static final String UNRESPONSIVE = "check3";
+    public static final String CONVULSIONS = "check4";
+    public static final String NONE = "check5";
     public static final String DATE = "date";
-    public static final String S4 = "symptoms";
-    public static final String FINAL_DIAGNOSIS= "diagnosis_1";
+    public static final String SEVERE_SYMPTOMS = "symptoms";
+    public static final String FINAL_DIAGNOSIS= "diagnosis_severe_pneumonia_disease";
     public static final String DIAGNOSIS = "diagnosis";
     SharedPreferences sharedPreferences, sharedPreferences1;
     SharedPreferences.Editor editor, editor1;
@@ -72,8 +72,8 @@ public class Assess extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_assess, container, false);
 
-        back = view.findViewById(R.id.back);
-        next = view.findViewById(R.id.next);
+        buttonBack = view.findViewById(R.id.back);
+        buttonNext = view.findViewById(R.id.next);
         drink = view.findViewById(R.id.drink);
         vomit = view.findViewById(R.id.vomit);
         none = view.findViewById(R.id.none);
@@ -159,14 +159,14 @@ public class Assess extends Fragment {
             }
         });
 
-        next.setOnClickListener(new View.OnClickListener() {
+        buttonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkedList();
             }
         });
 
-        back.setOnClickListener(new View.OnClickListener() {
+        buttonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
@@ -213,12 +213,12 @@ public class Assess extends Fragment {
 
     private void saveData() {
 
-        editor.putBoolean(CHECK1, drink.isChecked());
-        editor.putBoolean(CHECK2, vomit.isChecked());
-        editor.putBoolean(CHECK3, resp.isChecked());
-        editor.putBoolean(CHECK4, convu.isChecked());
-        editor.putBoolean(CHECK5, none.isChecked());
-        editor.putString(S4, s);
+        editor.putBoolean(CANT_DRINK, drink.isChecked());
+        editor.putBoolean(VOMITING, vomit.isChecked());
+        editor.putBoolean(UNRESPONSIVE, resp.isChecked());
+        editor.putBoolean(CONVULSIONS, convu.isChecked());
+        editor.putBoolean(NONE, none.isChecked());
+        editor.putString(SEVERE_SYMPTOMS, s);
 
         editor.apply();
 
@@ -226,11 +226,11 @@ public class Assess extends Fragment {
     }
 
     private void loadData() {
-        check1 = sharedPreferences.getBoolean(CHECK1, false);
-        check2 = sharedPreferences.getBoolean(CHECK2, false);
-        check3 = sharedPreferences.getBoolean(CHECK3, false);
-        check4 = sharedPreferences.getBoolean(CHECK4, false);
-        check5 = sharedPreferences.getBoolean(CHECK5, false);
+        check1 = sharedPreferences.getBoolean(CANT_DRINK, false);
+        check2 = sharedPreferences.getBoolean(VOMITING, false);
+        check3 = sharedPreferences.getBoolean(UNRESPONSIVE, false);
+        check4 = sharedPreferences.getBoolean(CONVULSIONS, false);
+        check5 = sharedPreferences.getBoolean(NONE, false);
     }
 
     private void updateViews() {
@@ -250,77 +250,7 @@ public class Assess extends Fragment {
             fr.replace(R.id.fragment_container, new Cough());
             fr.addToBackStack(null);
             fr.commit();
-        }else{
-            displayDialog();
         }
-    }
-
-    private void displayDialog() {
-        dialog = new Dialog(getActivity());
-        dialog.setContentView(R.layout.assessment_layout);
-        dialog.setCancelable(true);
-        Window window = dialog.getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-
-        linearLayout_instruction = dialog.findViewById(R.id.diagnosis);
-        txtDiagnosis = dialog.findViewById(R.id.txtDiagnosis);
-        recyclerView = dialog.findViewById(R.id.recyclerView1);
-        btnExit = dialog.findViewById(R.id.btnSave);
-        btnContinue = dialog.findViewById(R.id.btnContinue);
-
-        linearLayout_instruction.setBackgroundColor(getResources().getColor(R.color.severeDiagnosisColor));
-        txtDiagnosis.setText(R.string.severe);
-        diagnosis = txtDiagnosis.getText().toString();
-        diagnosis = diagnosis.replace("Diagnosis: ", "");
-
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-
-        assessments = new ArrayList<>();
-        assessmentAdapter = new AssessmentAdapter(assessments);
-
-        String age = sharedPreferences.getString(AGE, "");
-        String weight = sharedPreferences.getString(KILO, "");
-        int ag = Integer.parseInt(age);
-
-        Instructions instructions = new Instructions();
-        messages = instructions.GetInstructions(ag, weight, s);
-
-        for (int i = 0; i < messages.size(); i++){
-            Assessment assessment = new Assessment((Integer) messages.get(i));
-            assessments.add(assessment);
-        }
-        recyclerView.setAdapter(assessmentAdapter);
-        
-        btnExit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finalDiagnosis();
-                editor.putString(DIAGNOSIS, diagnosis);
-                editor.apply();
-                dialog.dismiss();
-//                Toast.makeText(getActivity(), diagnosis, Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getActivity(), DiagnosisActivity.class));
-            }
-        });
-
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finalDiagnosis();
-                editor.putString(DIAGNOSIS, diagnosis);
-                editor.apply();
-                dialog.dismiss();
-                FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-                fr.replace(R.id.fragment_container, new Cough());
-                fr.addToBackStack(null);
-                fr.commit();
-            }
-        });
-
-//        dialog.getWindow().setLayout(650, WindowManager.LayoutParams.MATCH_PARENT);
-        dialog.getWindow().setGravity(Gravity.CENTER);
-        dialog.show();
     }
 
     private void finalDiagnosis() {

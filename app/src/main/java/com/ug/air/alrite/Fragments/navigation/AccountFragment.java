@@ -53,7 +53,7 @@ public class AccountFragment extends Fragment {
         etUsername = view.findViewById(R.id.username);
         etPassword = view.findViewById(R.id.password);
 
-        jsonPlaceHolder = ApiClient.getClient().create(JsonPlaceHolder.class);
+        jsonPlaceHolder = ApiClient.getClient(ApiClient.BASE_URL).create(JsonPlaceHolder.class);
         databaseHelper = new DatabaseHelper(getActivity());
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -90,6 +90,7 @@ public class AccountFragment extends Fragment {
 
                 loginBtn.setEnabled(true);
                 progressBar.setVisibility(View.INVISIBLE);
+                System.out.println(response.body());
 
                 token = response.body().getToken();
                 String code = response.body().getInformation().getCode();

@@ -1,6 +1,5 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
 import static com.ug.air.alrite.Fragments.Patient.WheezY.DAY2;
 
 import android.content.Context;
@@ -19,8 +18,6 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.ug.air.alrite.R;
-
-import java.util.Objects;
 
 
 public class Breathless extends Fragment {

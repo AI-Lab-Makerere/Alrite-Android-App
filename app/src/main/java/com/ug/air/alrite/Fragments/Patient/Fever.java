@@ -1,6 +1,6 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
 import static com.ug.air.alrite.Fragments.Patient.HIVCare.CHOICEHC;
 
 import android.content.Context;
@@ -19,8 +19,6 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ug.air.alrite.R;
-
-import java.util.Objects;
 
 
 public class Fever extends Fragment {
@@ -90,7 +88,7 @@ public class Fever extends Fragment {
             @Override
             public void onClick(View v) {
 
-                String assess = sharedPreferences.getString(S4, "");
+                String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
                 String care = sharedPreferences.getString(CHOICEHC, "");
 
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();

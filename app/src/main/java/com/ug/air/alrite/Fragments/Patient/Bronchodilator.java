@@ -1,7 +1,6 @@
 package com.ug.air.alrite.Fragments.Patient;
 
 import static com.ug.air.alrite.Activities.SplashActivity.BRONCHODILATOR_COUNT;
-import static com.ug.air.alrite.Activities.SplashActivity.STRIDOR_COUNT;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator2.BDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator2.REASON;
 import static com.ug.air.alrite.Fragments.Patient.Initials.INITIAL_DATE;
@@ -19,10 +18,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
-import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
@@ -36,11 +33,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.ug.air.alrite.Activities.DiagnosisActivity;
-import com.ug.air.alrite.Activities.PatientActivity;
 import com.ug.air.alrite.Adapters.AssessmentAdapter;
 import com.ug.air.alrite.Models.Assessment;
 import com.ug.air.alrite.R;
@@ -66,7 +61,9 @@ public class Bronchodilator extends Fragment {
     Dialog dialog;
     String bronchodilator, uniqueID, filename;
     TextView txtMessage;
-    public static final String BRONCHODILATOR = "bronchodilator";
+    public static final String BRONCHODILATOR_WAS_GIVEN = "Bronchodialtor Given";
+    public static final String BRONCHODILATOR_NOT_GIVEN = "Bronchodialtor Not Given";
+    public static final String USED_BRONCHODILATOR = "bronchodilator";
     public static final String REASSESS = "reassess";
 //    public static final String BACKGROUND = "background";
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -112,23 +109,25 @@ public class Bronchodilator extends Fragment {
             }
         });
 
+        // The patient was given a bronchodilator
         btnGiven.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 editor.remove(BDIAGNOSIS);
                 editor.remove(REASON);
-                bronchodilator = "Bronchodialtor Given";
-                editor.putString(BRONCHODILATOR, bronchodilator);
+                bronchodilator = BRONCHODILATOR_WAS_GIVEN;
+                editor.putString(USED_BRONCHODILATOR, bronchodilator);
                 editor.apply();
                 showDialog();
             }
         });
 
+        // The patient was not given a bronchodilator
         btnNot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bronchodilator = "Bronchodialtor Not Given";
-                editor.putString(BRONCHODILATOR, bronchodilator);
+                bronchodilator = BRONCHODILATOR_NOT_GIVEN;
+                editor.putString(USED_BRONCHODILATOR, bronchodilator);
                 editor.apply();
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
                 fr.replace(R.id.fragment_container, new Bronchodilator2());

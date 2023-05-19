@@ -2,10 +2,9 @@ package com.ug.air.alrite.Fragments.Patient;
 
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT2;
-import static com.ug.air.alrite.Fragments.Patient.Cough.CHOICE2;
+import static com.ug.air.alrite.Fragments.Patient.Cough.DIFFICULTY_BREATHING;
 import static com.ug.air.alrite.Fragments.Patient.CoughD.DAY1;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
-import static com.ug.air.alrite.Fragments.Patient.Wheezing.CHOICE8;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
 import static com.ug.air.alrite.Fragments.Patient.Wheezing.CHOICE82;
 
 import android.app.Dialog;
@@ -65,7 +64,7 @@ public class Bronchodilator3 extends Fragment {
     private static final int YES = 0;
     private static final int NO = 1;
     private static final int NOT = 2;
-    public static final String BRONC = "after_bronchodilator";
+    public static final String AFTER_BRONCHODILATOR = "after_bronchodilator";
     public static final String FINAL = "final";
     public static final String B3DIAGNOSIS = "diagnosis_9";
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -135,10 +134,10 @@ public class Bronchodilator3 extends Fragment {
     }
 
     private void saveData() {
-        editor.putString(BRONC, value9);
+        editor.putString(AFTER_BRONCHODILATOR, value9);
         editor.apply();
 
-        String cough = sharedPreferences.getString(CHOICE2, "");
+        String cough = sharedPreferences.getString(DIFFICULTY_BREATHING, "");
         String wheezing = sharedPreferences.getString(CHOICE82, "");
         String days = sharedPreferences.getString(DAY1, "");
         String point1 = sharedPreferences.getString(POINT, "");
@@ -221,7 +220,7 @@ public class Bronchodilator3 extends Fragment {
         }else if (value == 3){
             linearLayout_instruction.setBackgroundColor(getResources().getColor(R.color.mildDiagnosisColor));
             txtDiagnosis.setText(R.string.wheez_ill);
-            String age = sharedPreferences.getString(AGE, "");
+            String age = sharedPreferences.getString(AGE_IN_MONTHS, "");
             float ag = Float.parseFloat(age);
             if (ag < 2){
                 messages = Arrays.asList(R.string.wheez_ill1, R.string.wheez_ill2, R.string.wheez_ill3,

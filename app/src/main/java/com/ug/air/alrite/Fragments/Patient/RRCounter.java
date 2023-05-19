@@ -2,10 +2,10 @@ package com.ug.air.alrite.Fragments.Patient;
 
 import static com.ug.air.alrite.Activities.SplashActivity.MANUAL_COUNT;
 import static com.ug.air.alrite.Activities.SplashActivity.RR_COUNTER_COUNT;
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT2;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 
@@ -110,7 +108,7 @@ public class RRCounter extends Fragment {
         }
 
         editor = sharedPreferences.edit();
-        age = sharedPreferences.getString(AGE, "");
+        age = sharedPreferences.getString(AGE_IN_MONTHS, "");
         ag = Integer.parseInt(age);
 
         numBreaths = 5;
@@ -190,7 +188,7 @@ public class RRCounter extends Fragment {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String assess = sharedPreferences.getString(S4, "");
+                String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
                 if (!assess.equals("None of these")){
                     fr.replace(R.id.fragment_container, new Wheezing());
@@ -491,7 +489,7 @@ public class RRCounter extends Fragment {
             editor.putString(FASTBREATHING2, rating);
             editor.putString(RATE2, rate);
 
-            String age = sharedPreferences.getString(AGE, "");
+            String age = sharedPreferences.getString(AGE_IN_MONTHS, "");
             int ag = Integer.parseInt(age);
 
             Instructions instructions = new Instructions();
@@ -513,7 +511,7 @@ public class RRCounter extends Fragment {
             editor.putString(RATE, rate);
             editor.apply();
 
-            String age = sharedPreferences.getString(AGE, "");
+            String age = sharedPreferences.getString(AGE_IN_MONTHS, "");
             int ag = Integer.parseInt(age);
 
             Instructions instructions = new Instructions();
@@ -522,7 +520,7 @@ public class RRCounter extends Fragment {
             editor.putString(POINT, pot);
             editor.apply();
 
-            String assess = sharedPreferences.getString(S4, "");
+            String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
 
             FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
             if (!assess.equals("None of these")){
