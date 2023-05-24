@@ -1,6 +1,9 @@
 package com.ug.air.alrite.Fragments.Patient;
 
+import static com.ug.air.alrite.Activities.PatientActivity.SYMPTOM_TYPE;
 import static com.ug.air.alrite.Fragments.Patient.FTouch.TOUCH;
+import static com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment.DEFAULT;
+import static com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment.VALUE_ID;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -18,21 +21,23 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.ug.air.alrite.Activities.PatientActivity;
 import com.ug.air.alrite.R;
 
 import org.json.JSONException;
 
 
 public class TextInputFragment extends Fragment {
-    //Fragment wise should be done may need listener for skip
+
     public interface onGetResultListener {
-        void getResultFromTextInputFragment(Float choiceIndex) throws JSONException;
+        void getResultFromTextInputFragment(String inputted) throws JSONException;
         void getLastPage() throws JSONException;
     }
     onGetResultListener getResultListener;
@@ -40,23 +45,18 @@ public class TextInputFragment extends Fragment {
     EditText etDay;
     Button back, next, btnSkip, btnSave;
     String userInput, diagnosis;
-    public static final String Question = "What is the childs temperature";
-    public static final String TDIAGNOSIS = "diagnosis_fever";
+    public static final String QUESTION = "What is the childs temperature";
+    public static final String INPUT_TYPE = "waht is ths inmput type";
+    public static final String VALUEID = "what valid for this thing";
+
     public static final String SHARED_PREFS = "sharedPrefs";
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     Dialog dialog;
     TextView txtMessage;
-    public static final String IHint = "IHint";
-    public static final String IInformation = "IInformation";
-    public static final String SInformation = "SInformation";
-    public static final String min_value = "min_value";
-    public static final String max_value = "max_value";
-    public static final String minValueforDiagnosis = "minValueforDiagnosis";
     String question;
-    String InputHint;
-    String InputInformation;
-    String SkipInformation;
+    String inputType;
+    String valueID;
     int MinValue;
     int MaxValue;
     int diagnosisCutoff;
@@ -65,25 +65,13 @@ public class TextInputFragment extends Fragment {
      * that we can retain the given information and return the fragment
      *
      * @param question the question at the top of the page
-     * @param InputHint the input hint for the user
-     * @param InputInformation the input hint for the user
-     * @param SkipInformation the input hint for the user
-     * @param MinValue the input hint for the user
-     * @param MaxValue the input hint for the user
-     * @param diagnosisCutoff the input hint for the user
      * @return the fragment to be used in the future
      */
-    public static TextInputFragment newInstance(String question, String InputHint, String InputInformation, String SkipInformation,
-                                                int MinValue, int MaxValue, int diagnosisCutoff) throws JSONException {
+    public static TextInputFragment newInstance(String question, String inputType, String valueID) throws JSONException {
         TextInputFragment tif = new TextInputFragment();
         Bundle args = new Bundle();
-        args.putString(Question, question);
-        args.putString(IHint, InputHint);
-        args.putString(IInformation, InputInformation);
-        args.putString(SInformation, SkipInformation);
-        args.putInt(min_value ,MinValue);
-        args.putInt(max_value ,MaxValue);
-        args.putInt(minValueforDiagnosis , diagnosisCutoff);
+        args.putString(QUESTION, question);
+        args.putString(INPUT_TYPE, inputType);
         tif.setArguments(args);
         return tif;
 }
@@ -96,35 +84,27 @@ public class TextInputFragment extends Fragment {
         sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
+        // Get the arguments that were passed in upon creation
         assert getArguments() != null;
-        question = getArguments().getString(Question);
-        InputHint = getArguments().getString(IHint);
-        InputInformation = getArguments().getString(IInformation);
-        SkipInformation = getArguments().getString(SInformation);
-        MinValue = getArguments().getInt(min_value);
-        MaxValue = getArguments().getInt(max_value);
-        diagnosisCutoff = getArguments().getInt(minValueforDiagnosis);
+        question = getArguments().getString(QUESTION);
+        inputType = getArguments().getString(INPUT_TYPE);
+        valueID = getArguments().getString(VALUEID);
 
         TextView questionDisplay = view.findViewById(R.id.ti_question);
         questionDisplay.setText(question);
         etDay = view.findViewById(R.id.IHint);
-        etDay.setHint(InputHint);
-        TextView InputInformationDisplay = view.findViewById(R.id.ti_IInformation);
-        InputInformationDisplay.setText(InputInformation);
-        TextView SkipInformationDisplay = view.findViewById(R.id.ti_SInformation);
-        SkipInformationDisplay.setText(SkipInformation);
+        etDay.requestFocus();
+
+        // If there is any information for the skip button, display it: otherwise,
+        // make the text box invisible
 
         next = view.findViewById(R.id.next);
         back = view.findViewById(R.id.back);
-        btnSkip = view.findViewById(R.id.skip);
 
-        etDay.requestFocus();
+        loadSelectedChoiceIfAlreadySelected();
 
-        loadData();
-        updateViews();
-
-
-        etDay.addTextChangedListener(textWatcher);
+        // For now, don't worry about this
+        // etDay.addTextChangedListener(textWatcher);
 
         next.setOnClickListener(new View.OnClickListener() {
             //if there is nothing inputted
@@ -156,16 +136,6 @@ public class TextInputFragment extends Fragment {
             }
         });
 
-        btnSkip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-                fr.replace(R.id.fragment_container, new FTouch());
-                fr.addToBackStack(null);
-                fr.commit();
-            }
-        });
-
         return view;
     }
 
@@ -185,6 +155,7 @@ public class TextInputFragment extends Fragment {
             throw new ClassCastException(activity.toString() + " must implement onSomeEventListener");
         }
     }
+
     TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -194,85 +165,49 @@ public class TextInputFragment extends Fragment {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             userInput = etDay.getText().toString();
             if (!userInput.isEmpty()){
-                float dy = Float.parseFloat(userInput);
-                btnSkip.setEnabled(false);
-                if (dy < MinValue){
-                    etDay.setError("You have entered a value below the minimum");
-                    next.setEnabled(false);
-                }else if (dy > MaxValue) {
-                    etDay.setError("You have entered a value above the maximum");
-                    next.setEnabled(false);
+                if (userInput.equals(PatientActivity.INPUT_TYPES.numeric.name())) {
+                    //TODO: in the future, if we add a min and max value to be passed in,
+                    // we can update this
+//                    float dy = Float.parseFloat(userInput);
+//                    btnSkip.setEnabled(false);
+//                    if (dy < MinValue) {
+//                        etDay.setError("You have entered a value below the minimum");
+//                        next.setEnabled(false);
+//                    } else if (dy > MaxValue) {
+//                        etDay.setError("You have entered a value above the maximum");
+//                        next.setEnabled(false);
+//                    } else {
+//                        btnSkip.setEnabled(true);
+//                        next.setEnabled(true);
+//                    }
                 } else {
-                    btnSkip.setEnabled(true);
-                    next.setEnabled(true);
+                    //TODO: in the future, if we add a min and max value to be passed in,
+                    // we can update this
                 }
             }
         }
 
         @Override
-        public void afterTextChanged(Editable s) {
-
-        }
+        public void afterTextChanged(Editable s) {}
     };
 
     private void saveData() {
-        deleteSharedPreferences();
-
-        Float tp = Float.parseFloat(userInput);
         try {
-            getResultListener.getResultFromTextInputFragment(tp);
+            getResultListener.getResultFromTextInputFragment(userInput);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-
     }
 
-    private void loadData() {
-        userInput = sharedPreferences.getString(Question, "");
-    }
+    /**
+     * In the case that we're creating this view again after we've already stepped
+     * through this option, pre-select the choice that we already made, so that we
+     * don't get inconsistent answers from this
+     */
+    private void loadSelectedChoiceIfAlreadySelected() {
+        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        String previousResponse = sharedPreferences.getString(SYMPTOM_TYPE + valueID, DEFAULT);
 
-    private void updateViews() {
-        if (!userInput.isEmpty()){
-            etDay.setText(userInput);
-            btnSkip.setEnabled(false);
-        }else {
-            btnSkip.setEnabled(true);
-        }
-    }
-
-    private void deleteSharedPreferences() {
-        editor.remove(TOUCH);
-        editor.remove(TDIAGNOSIS);
-        editor.apply();
-    }
-
-    private void showDialog() {
-        dialog = new Dialog(getActivity());
-        dialog.setContentView(R.layout.assess);
-        dialog.setCancelable(true);
-
-        txtMessage = dialog.findViewById(R.id.message);
-        btnSave = dialog.findViewById(R.id.ContinueButton);
-
-        btnSave.setText("Continue");
-
-        txtMessage.setText("Popup text for the user indicating message");
-        txtMessage.setTextColor(Color.parseColor("#FF0000"));
-        txtMessage.setTypeface(Typeface.DEFAULT_BOLD);
-
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-                FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-                fr.replace(R.id.fragment_container, new Oxygen());
-                fr.addToBackStack(null);
-                fr.commit();
-            }
-        });
-
-        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        dialog.getWindow().setGravity(Gravity.CENTER);
-        dialog.show();
+        etDay.setText(previousResponse);
     }
 }
