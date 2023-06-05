@@ -408,7 +408,7 @@ public class PatientActivity extends AppCompatActivity implements
                 boolean isMultiSelect = nextPageComponent.getBoolean(MULTISELECT);
                 String valueID = getValueID(nextPageJSON, contentIndex);
                 if (isMultiSelect) {
-                    createMultiSelectFragment(nextPageComponent);
+                    createMultiSelectFragment(nextPageComponent, valueID);
                 } else {
                     createMultipleChoiceFragment(nextPageComponent, valueID);
                 }
@@ -520,14 +520,14 @@ public class PatientActivity extends AppCompatActivity implements
      *
      * @throws JSONException because we use json objects
      */
-    private void createMultiSelectFragment(JSONObject page) throws JSONException {
-        question = page.getString(LABEL);
-        choices = JSONArrayToListOfJSONObjects(page.getJSONArray(CHOICES));
-        targetValueID = page.getString(VALUE_ID);
+    private void createMultiSelectFragment(JSONObject nextPageComponent, String valueID) throws JSONException {
+        question = nextPageComponent.getString(LABEL);
+        choices = JSONArrayToListOfJSONObjects(nextPageComponent.getJSONArray(CHOICES));
+        targetValueID = nextPageComponent.getString(VALUE_ID);
 
         // Get the new page's fragment
         // set a listener for when the next button is clicked
-        MultipleSelectionFragment ms_fragment = MultipleSelectionFragment.newInstance(question, choices);
+        MultipleSelectionFragment ms_fragment = MultipleSelectionFragment.newInstance(question, choices, valueID);
 
         // Replace and commit the fragment
         completeFragmentTransaction(ms_fragment);

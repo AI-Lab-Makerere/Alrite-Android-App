@@ -55,49 +55,57 @@
                     android:textColor="@color/black"
                     android:textSize="18sp" />
 
-                <CheckBox
-                    android:id="@+id/choice1"
+                <LinearLayout
+                    android:id="@+id/multiple_select_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:buttonTint="@color/black"
-                    android:text="@string/choice1"
-                    android:textSize="18sp" />
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
+                </LinearLayout>
 
-                <CheckBox
-                    android:id="@+id/choice2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:buttonTint="@color/black"
-                    android:text="@string/choice2"
-                    android:textSize="18sp" />
+<!--                <CheckBox-->
+<!--                    android:id="@+id/choice1"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:buttonTint="@color/black"-->
+<!--                    android:text="@string/choice1"-->
+<!--                    android:textSize="18sp" />-->
 
-                <CheckBox
-                    android:id="@+id/choice3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:buttonTint="@color/black"
-                    android:text="%s"
-                    android:textSize="18sp" />
+<!--                <CheckBox-->
+<!--                    android:id="@+id/choice2"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:buttonTint="@color/black"-->
+<!--                    android:text="@string/choice2"-->
+<!--                    android:textSize="18sp" />-->
 
-                <CheckBox
-                    android:id="@+id/choice4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:buttonTint="@color/black"
-                    android:text="%s"
-                    android:textSize="18sp" />
+<!--                <CheckBox-->
+<!--                    android:id="@+id/choice3"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:buttonTint="@color/black"-->
+<!--                    android:text="%s"-->
+<!--                    android:textSize="18sp" />-->
 
-                <CheckBox
-                    android:id="@+id/choice5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:buttonTint="@color/black"
-                    android:text="%s"
-                    android:textSize="18sp" />
+<!--                <CheckBox-->
+<!--                    android:id="@+id/choice4"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:buttonTint="@color/black"-->
+<!--                    android:text="%s"-->
+<!--                    android:textSize="18sp" />-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/choice5"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:buttonTint="@color/black"-->
+<!--                    android:text="%s"-->
+<!--                    android:textSize="18sp" />-->
             </LinearLayout>
 
         </ScrollView>
