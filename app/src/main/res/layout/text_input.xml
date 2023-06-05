@@ -71,7 +71,6 @@
                         android:background="@drawable/text_input_bg"
                         android:gravity="center"
                         android:hint="@string/ti_IHint"
-                        android:inputType="numberDecimal"
                         android:maxLength="4" />
 
                 </LinearLayout>

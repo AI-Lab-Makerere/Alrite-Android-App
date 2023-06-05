@@ -1,6 +1,6 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Activities.PatientActivity.SYMPTOM_TYPE;
+import static com.ug.air.alrite.Activities.PatientActivity.SUMMARY_ID;
 import static com.ug.air.alrite.Activities.PatientActivity.VALUE_ID;
 
 import android.app.Activity;
@@ -41,6 +41,7 @@ public class MultipleSelectionFragment extends Fragment {
     public static final String DEFAULT = "**default string**";
     public static final String VALUE_ID = "valueID";
     String valueID;
+    String summaryPrefsID;
     String previousResponse;
     String question;
     ArrayList<String> choices; // list of the texts of the checkboxes
@@ -75,13 +76,14 @@ public class MultipleSelectionFragment extends Fragment {
      * @param choices the given choices for the user to choose from
      * @return the fragment to be used in the future
      */
-    public static MultipleSelectionFragment newInstance(String question, ArrayList<JSONObject> choices, String valueID) throws JSONException {
+    public static MultipleSelectionFragment newInstance(String question, ArrayList<JSONObject> choices, String valueID, String summaryPrefsID) throws JSONException {
         MultipleSelectionFragment msc = new MultipleSelectionFragment();
         Bundle args = new Bundle();
         args.putString(QUESTION, question);
         ArrayList<String> text_choices = getTextFromChoices(choices);
         args.putStringArrayList(CHOICES, text_choices);
         args.putString(VALUE_ID, valueID);
+        args.putString(SUMMARY_ID, summaryPrefsID);
         msc.setArguments(args);
         return msc;
     }
@@ -98,6 +100,7 @@ public class MultipleSelectionFragment extends Fragment {
         question = getArguments().getString(QUESTION);
         choices = getArguments().getStringArrayList(CHOICES); // list of strings
         valueID = getArguments().getString(VALUE_ID);
+        summaryPrefsID = getArguments().getString(SUMMARY_ID);
 
         // Then, set the information for each question/choice to line up with our givens
         TextView questionDisplay = view.findViewById(R.id.mc_question);
@@ -186,8 +189,8 @@ public class MultipleSelectionFragment extends Fragment {
      * don't get inconsistent answers from this.
      */
     private void loadSelectedChoicesIfAlreadySelected() {
-        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        previousResponse = sharedPreferences.getString(SYMPTOM_TYPE + valueID, DEFAULT);
+        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(summaryPrefsID, Context.MODE_PRIVATE);
+        previousResponse = sharedPreferences.getString(valueID, DEFAULT);
         String[] selectedOptionsHistory = previousResponse.split("\n"); // split by \n
 
 

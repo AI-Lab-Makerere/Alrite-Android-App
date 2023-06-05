@@ -1,6 +1,6 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Activities.PatientActivity.SYMPTOM_TYPE;
+import static com.ug.air.alrite.Activities.PatientActivity.SUMMARY_ID;
 import static com.ug.air.alrite.Fragments.Patient.FTouch.TOUCH;
 import static com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment.DEFAULT;
 import static com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment.VALUE_ID;
@@ -57,6 +57,7 @@ public class TextInputFragment extends Fragment {
     String question;
     String inputType;
     String valueID;
+    String summaryPrefsID;
     int MinValue;
     int MaxValue;
     int diagnosisCutoff;
@@ -67,11 +68,13 @@ public class TextInputFragment extends Fragment {
      * @param question the question at the top of the page
      * @return the fragment to be used in the future
      */
-    public static TextInputFragment newInstance(String question, String inputType, String valueID) throws JSONException {
+    public static TextInputFragment newInstance(String question, String inputType, String valueID, String summaryPrefsID) {
         TextInputFragment tif = new TextInputFragment();
         Bundle args = new Bundle();
         args.putString(QUESTION, question);
         args.putString(INPUT_TYPE, inputType);
+        args.putString(VALUEID, valueID);
+        args.putString(SUMMARY_ID, summaryPrefsID);
         tif.setArguments(args);
         return tif;
 }
@@ -89,6 +92,7 @@ public class TextInputFragment extends Fragment {
         question = getArguments().getString(QUESTION);
         inputType = getArguments().getString(INPUT_TYPE);
         valueID = getArguments().getString(VALUEID);
+        summaryPrefsID = getArguments().getString(SUMMARY_ID);
 
         TextView questionDisplay = view.findViewById(R.id.ti_question);
         questionDisplay.setText(question);
@@ -205,8 +209,8 @@ public class TextInputFragment extends Fragment {
      * don't get inconsistent answers from this
      */
     private void loadSelectedChoiceIfAlreadySelected() {
-        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        String previousResponse = sharedPreferences.getString(SYMPTOM_TYPE + valueID, DEFAULT);
+        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(summaryPrefsID, Context.MODE_PRIVATE);
+        String previousResponse = sharedPreferences.getString(valueID, "");
 
         etDay.setText(previousResponse);
     }

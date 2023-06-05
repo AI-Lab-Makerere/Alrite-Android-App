@@ -57,26 +57,7 @@ public class InitialsModified extends Fragment {
         back = view.findViewById(R.id.back);
 
         Intent intent = getActivity().getIntent();
-        // If ____, then we can combine the data for
-        // Otherwise, just get the current activity's shared preferences
-        if (intent.hasExtra("filename")) {
-            filename = intent.getExtras().getString("filename");
-            sharedPreferences1 = requireActivity().getSharedPreferences(filename, Context.MODE_PRIVATE);
-            sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-            editor = sharedPreferences.edit();
-            Map<String, ?> all = sharedPreferences1.getAll();
-            for (Map.Entry<String, ?> x : all.entrySet()) {
-                if (x.getValue().getClass().equals(String.class))  editor.putString(x.getKey(),  (String)x.getValue());
-            }
-            editor.commit();
-            editor.putString(SECOND, filename);
-            editor.apply();
-
-        } else {
-            sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        }
-
-        // Get an editor for the shared preferences
+        sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
         // Get the parent's initials and the child's initials and store them in

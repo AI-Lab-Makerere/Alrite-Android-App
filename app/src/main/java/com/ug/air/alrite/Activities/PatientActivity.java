@@ -4,8 +4,8 @@ import static com.ug.air.alrite.Activities.DiagnosisActivity.DATE_2;
 import static com.ug.air.alrite.Activities.DiagnosisActivity.DURATION_2;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DURATION;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.FILENAME;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USERNAME;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.PATIENT_ASSESSMENT_ID;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.CLINICIAN_USERNAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.UUIDS;
 import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
 import static com.ug.air.alrite.Fragments.Patient.Initials.INITIAL_DATE;
@@ -38,7 +38,6 @@ import com.ug.air.alrite.Fragments.Patient.OtherPatients;
 import com.ug.air.alrite.Fragments.Patient.ParagraphFragment;
 import com.ug.air.alrite.Fragments.Patient.SexModified;
 import com.ug.air.alrite.Fragments.Patient.TextInputFragment;
-import com.ug.air.alrite.Fragments.Patient.TextInputTextFragment;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Credentials;
 
@@ -48,7 +47,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -68,8 +66,8 @@ public class PatientActivity extends AppCompatActivity implements
     public static final String INCOMPLETE = "incomplete";
 
     public static final String ASSESS_INCOMPLETE = "incomplete";
-    SharedPreferences sharedPreferences, sharedPreferences1;
-    SharedPreferences.Editor editor, editor1;
+    SharedPreferences sharedPreferences, sharedPreferences1, patientSummaryPrefs, patientDiagnosesPrefs;
+    SharedPreferences.Editor editor, editor1, patientSummaryEditor, patientDiagnosesEditor;
     int frag = 0;
 
     @Override
@@ -137,7 +135,7 @@ public class PatientActivity extends AppCompatActivity implements
                         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
                         String formattedDate = df.format(currentTime);
 
-                        String file = sharedPreferences.getString(FILENAME, "");
+                        String file = sharedPreferences.getString(PATIENT_ASSESSMENT_ID, "");
 
                         Credentials credentials = new Credentials();
                         String username = credentials.creds(PatientActivity.this).getUsername();
@@ -149,7 +147,7 @@ public class PatientActivity extends AppCompatActivity implements
                             String uniqueID = UUID.randomUUID().toString();
 
                             editor.putString(DATE, formattedDate);
-                            editor.putString(USERNAME, username);
+                            editor.putString(CLINICIAN_USERNAME, username);
                             editor.putString(UUIDS, uniqueID);
                             editor.putString(INCOMPLETE, "incomplete");
                             editor.apply();
@@ -265,31 +263,29 @@ public class PatientActivity extends AppCompatActivity implements
     public static final String LABEL = "label";
     public static final String CHOICES = "choices";
     public static final String TEXT = "text";
-    public static final String VALUE = "value";
     public static final String LINK = "link";
     public static final String CONTENT = "content";
     public static final String MULTIPLE_CHOICE = "MultipleChoice";
     public static final String TEXT_INPUT = "TextInput";
-    public static final String DIAGNOSIS_PAGE = "Diagnosis Page";
-    public static final String TITLE = "title";
     public static final String IS_DIAGNOSIS_PAGE = "isDiagnosisPage";
     public static final String NULL = "null";
     public static final String DEFAULT_LINK = "defaultLink";
     public static final String TARGET_VALUE_ID = "targetValueID";
     public static final String VALUE_ID = "valueID";
     public static final String SATISFIED_LINK = "satisfiedLink";
-    public static final String NOT_SATISFIED_LINK = "notSatisfiedLink";
     public static final String TYPE = "type";
     public static final String THRESHOLD = "threshold";
-    public static final String NUMERIC_TYPE = "numeric";
-    public static final String ALPHANUMERIC_TYPE = "alphanumeric";
-    public static final String TEXT_TYPE = "text";
-    public static final String ANY_TYPE = "any";
     public static final String PARAGRAPH = "Paragraph";
-    public static final String SYMPTOM_TYPE = "?: ";
+    public static final String META = "meta";
+    public static final String APIPATH = "apipath";
+    public static final String SUMMARY_ID = "SUMMARY_ID";
+    public static final String DIAGNOSES_ID = "DIAGNOSES_ID";
+
 
     // Full JSON infos to call getNextPage
     JSONArray pages;
+    String summaryPrefsID;
+    String diagnosesPrefsID;
 
     // Information gotten from JSON for the current page
     // Information gotten from JSON
@@ -300,12 +296,6 @@ public class PatientActivity extends AppCompatActivity implements
     // Other than question there is more information needed
     // from the JSON for text input
     String inputType;
-    String inputHint; //The preview text shown in the input bubble (enter the value here)  *optional (prefer this not to be optional)
-    String inputInformation; //Extra stuff below the input bubble telling user more information (its in celcius) *optional
-    String skipInformation; //Text shown above the skip button telling user when to skip (no thermometer available) *optional
-    int minValue; //The minimum value allowed to be inputted
-    int maxValue; //The maximum value allowed to be inputted
-    int diagnosisCutoff; //The minimum value to be inputted in order to get the diagnosis
     public enum INPUT_TYPES {
         numeric,
         alphanumeric,
@@ -331,13 +321,38 @@ public class PatientActivity extends AppCompatActivity implements
     String paragraph; //Content for paragraph fragment
 
     /**
+     * Get the copy of the workflow that we have stored on the device and turn it
+     * into a JSONObject
+     */
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void getJSONFromBackend() {
+        File assessment = new File(getFilesDir(), "assessment.json");
+
+        try {
+            BufferedReader br = Files.newBufferedReader(assessment.toPath());
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            String json = sb.toString();
+
+            br.close();
+
+            implementEditableDecisionTree(new JSONObject(json));
+        } catch (Exception e) {
+            System.out.println("did a bad: " + e);
+        }
+    }
+
+    /**
      * This is the function that is called to set up the process of looping through
      * the pages until we get to the diagnosis page
      *
-     * @throws JSONException
-     * @throws IOException
+     * @throws JSONException for working with JSONObject
      */
-    private void implementEditableDecisionTree(JSONObject json) throws JSONException, IOException {
+    private void implementEditableDecisionTree(JSONObject json) throws JSONException {
         backstack = new ArrayList<>();
         pages = json.getJSONArray(PAGES);
 
@@ -345,7 +360,31 @@ public class PatientActivity extends AppCompatActivity implements
         // its own element
         String nextPage = pages.getJSONObject(0).getString(PAGE_ID);
 
-        // Handling the intent
+        // Create a shared preferences object for the current patient
+        // TODO: better security for the SharedPreferences
+        String patientInfoID = createUniquePatientInfoID();
+        summaryPrefsID = patientInfoID + "_Summary";
+        diagnosesPrefsID = patientInfoID + "_Diagnoses";
+
+        patientSummaryPrefs = getSharedPreferences(summaryPrefsID, Context.MODE_PRIVATE);
+        patientSummaryEditor = patientSummaryPrefs.edit();
+        patientSummaryEditor.putString(SUMMARY_ID, summaryPrefsID);
+        patientSummaryEditor.putString(APIPATH, json.getJSONObject(META).getString(APIPATH));
+        patientSummaryEditor.apply();
+
+        patientDiagnosesPrefs = getSharedPreferences(diagnosesPrefsID, Context.MODE_PRIVATE);
+        patientDiagnosesEditor = patientDiagnosesPrefs.edit();
+        patientDiagnosesEditor.putString(DIAGNOSES_ID, diagnosesPrefsID);
+        patientDiagnosesEditor.apply();
+
+        // Clear out the old editor so that it can be used again for a new patient
+        Map<String, ?> currPatientInfos = sharedPreferences.getAll();
+        for (String info : currPatientInfos.keySet()) {
+            patientSummaryEditor.putString(info, (String) currPatientInfos.get(info));
+        }
+        patientSummaryEditor.apply();
+        editor.clear();
+        editor.apply();
 
         // Continue looping through each page in sequence: depending on the component,
         // inflate a new fragment for that component type
@@ -402,60 +441,29 @@ public class PatientActivity extends AppCompatActivity implements
         JSONObject nextPageComponent = nextPageContent.getJSONObject(contentIndex);
         String nextPageComponentType = nextPageComponent.getString(COMPONENT);
 
-        switch (nextPageComponentType) {
+        if (nextPageComponentType.equals(MULTIPLE_CHOICE)) {
             // Multiselect and multiple choice options:
-            case MULTIPLE_CHOICE:
-                boolean isMultiSelect = nextPageComponent.getBoolean(MULTISELECT);
-                String valueID = getValueID(nextPageJSON, contentIndex);
-                if (isMultiSelect) {
-                    createMultiSelectFragment(nextPageComponent, valueID);
-                } else {
-                    createMultipleChoiceFragment(nextPageComponent, valueID);
-                }
-                break;
-
-            // Text input option:
-            case TEXT_INPUT:
-                valueID = getValueID(nextPageJSON, contentIndex);
-                createTextInputFragment(nextPageComponent, valueID);
-                break;
-
-            // Paragraph option:
-            case PARAGRAPH:
-                createParagraphFragment(nextPageComponent);
-                break;
-
-            // There was an issue with identifying the page... just go to the next page instead
-            default:
-                System.out.println("should never get here lol: just go to the next page");
-                getNextPage(nextPageJSON.getString(DEFAULT_LINK));
-                break;
-        }
-    }
-
-    /**
-     * Get the copy of the workflow that we have stored on the device and turn it
-     * into a JSONObject
-     */
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void getJSONFromBackend() {
-        File assessment = new File(getFilesDir(), "assessment.json");
-
-        try {
-            BufferedReader br = Files.newBufferedReader(assessment.toPath());
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
+            boolean isMultiSelect = nextPageComponent.getBoolean(MULTISELECT);
+            String valueID = getValueID(nextPageJSON, contentIndex);
+            if (isMultiSelect) {
+                createMultiSelectFragment(nextPageComponent, valueID);
+            } else {
+                createMultipleChoiceFragment(nextPageComponent, valueID);
             }
 
-            String json = sb.toString();
+        // Text input option:
+        } else if (nextPageComponentType.equals(TEXT_INPUT)) {
+            String valueID = getValueID(nextPageJSON, contentIndex);
+            createTextInputFragment(nextPageComponent, valueID);
 
-            br.close();
+        // Paragraph option:
+        } else if (nextPageComponentType.equals(PARAGRAPH)) {
+            createParagraphFragment(nextPageComponent);
 
-            implementEditableDecisionTree(new JSONObject(json));
-        } catch (Exception e) {
-            System.out.println("did a bad: " + e);
+        // There was an issue with identifying the page... just go to the next page instead
+        } else {
+            System.out.println("should never get here lol: just go to the next page");
+            getNextPage(nextPageJSON.getString(DEFAULT_LINK));
         }
     }
 
@@ -464,7 +472,11 @@ public class PatientActivity extends AppCompatActivity implements
      * the activity.
      */
     private void exitActivity() {
-        startActivity(new Intent(PatientActivity.this, DiagnosisActivityModified.class));
+        Intent intent = new Intent(PatientActivity.this, DiagnosisActivityModified.class);
+        intent.putExtra(SUMMARY_ID, summaryPrefsID);
+        intent.putExtra(DIAGNOSES_ID, diagnosesPrefsID);
+
+        startActivity(intent);
         this.finish();
     }
 
@@ -490,7 +502,8 @@ public class PatientActivity extends AppCompatActivity implements
 
         // Get the new page's fragment, and set a listener for when the next button
         // is clicked
-        MultipleChoiceFragment mc_fragment = MultipleChoiceFragment.newInstance(question, choices, valueID);
+        MultipleChoiceFragment mc_fragment =
+                MultipleChoiceFragment.newInstance(question, choices, valueID, summaryPrefsID);
 
         // Replace and commit the fragment
         completeFragmentTransaction(mc_fragment);
@@ -509,7 +522,8 @@ public class PatientActivity extends AppCompatActivity implements
 
         // Get the new page's fragment, and set a listener for when the next button
         // is clicked
-        TextInputFragment ti_fragment = TextInputFragment.newInstance(question, inputType, valueID);
+        TextInputFragment ti_fragment =
+                TextInputFragment.newInstance(question, inputType, valueID, summaryPrefsID);
 
         // Replace and commit the fragment
         completeFragmentTransaction(ti_fragment);
@@ -520,18 +534,20 @@ public class PatientActivity extends AppCompatActivity implements
      *
      * @throws JSONException because we use json objects
      */
-    private void createMultiSelectFragment(JSONObject page) throws JSONException {
+    private void createMultiSelectFragment(JSONObject page, String valueID) throws JSONException {
         question = page.getString(LABEL);
         choices = JSONArrayToListOfJSONObjects(page.getJSONArray(CHOICES));
         targetValueID = page.getString(VALUE_ID);
 
         // Get the new page's fragment
         // set a listener for when the next button is clicked
-        MultipleSelectionFragment ms_fragment = MultipleSelectionFragment.newInstance(question, choices);
+        MultipleSelectionFragment ms_fragment =
+                MultipleSelectionFragment.newInstance(question, choices, valueID, summaryPrefsID);
 
         // Replace and commit the fragment
         completeFragmentTransaction(ms_fragment);
     }
+
     /**
      * Create the ParagraphFragment
      *
@@ -621,10 +637,10 @@ public class PatientActivity extends AppCompatActivity implements
         // Next, we get the type of the object that was passed up from the TextInput:
         // was it a number, or a string?
         if (inputType.equals(INPUT_TYPES.numeric.name())) {
+            // If it was a number, we can then go through and run all of the comparison types for
+            // each comparison logic component
             Float diagnosis = Float.valueOf(inputted);
             if(!foundLinks.isEmpty()) {
-                // Replace BranchedLink with whatever the name is for the link field
-                // once the branched link logic is completed in the JSON file
                 for (JSONObject foundLink : foundLinks) {
                     String compType = foundLink.getString(TYPE);
                     float threshold = Float.parseFloat(foundLink.getString(THRESHOLD));
@@ -638,11 +654,30 @@ public class PatientActivity extends AppCompatActivity implements
                         break;
                     }
                 }
-                enterSymptomIntoEditor(nextPageJSON, String.valueOf(diagnosis));
             }
+            enterSymptomIntoEditor(nextPageJSON, String.valueOf(diagnosis));
         } else {
             // In the case that we're comparing strings, we'll compare equality with .equals,
-            // and everything else with strict < or >
+            // and the other ones it doesn't make sense to compare, so we'll just say that
+            // it doesn't work
+            if(!foundLinks.isEmpty()) {
+                for (JSONObject foundLink : foundLinks) {
+                    String compType = foundLink.getString(TYPE);
+                    String other = foundLink.getString(THRESHOLD);
+                    // all cases where equals is included
+                    if ((compType.equals(COMPARISON_TYPES.GE.symbol) ||
+                        compType.equals(COMPARISON_TYPES.LE.symbol) ||
+                        compType.equals(COMPARISON_TYPES.EQ.symbol)) &&
+                        inputted.equals(other)) {
+
+                        nextPage = foundLink.getString(SATISFIED_LINK);
+                        break;
+
+                    // If we don't have an equals, just go to the default page
+                    }
+                }
+            }
+            enterSymptomIntoEditor(nextPageJSON, inputted);
         }
 
         // Finally, we go to the decided next page
@@ -766,8 +801,8 @@ public class PatientActivity extends AppCompatActivity implements
      */
     public void enterSymptomIntoEditor(JSONObject page, String symptom) throws JSONException {
         // Enter the diagnosis into the editor
-        editor.putString(SYMPTOM_TYPE + getValueID(page, 0), symptom);
-        editor.apply();
+        patientSummaryEditor.putString(getValueID(page, 0), symptom);
+        patientSummaryEditor.apply();
     }
 
     /**
@@ -779,5 +814,20 @@ public class PatientActivity extends AppCompatActivity implements
      */
     public String getValueID(JSONObject page, int contentIndex) throws JSONException {
         return page.getJSONArray(CONTENT).getJSONObject(contentIndex).getString(VALUE_ID);
+    }
+
+    /**
+     * Create a unique ID which is used for uniquely storing patient data on the
+     * current device
+     *
+     * @return the unique ID
+     */
+    public String createUniquePatientInfoID() {
+        String patientInitials = sharedPreferences.getString(CHILD_INITIALS, "");
+        Date currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
+        String formattedDate = df.format(currentTime);
+
+        return patientInitials + "_" + formattedDate;
     }
 }

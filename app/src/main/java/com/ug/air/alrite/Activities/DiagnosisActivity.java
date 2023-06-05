@@ -11,8 +11,8 @@ import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.BRONCHODILATOR_
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USED_BRONCHODILATOR;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DURATION;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.FILENAME;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USERNAME;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.PATIENT_ASSESSMENT_ID;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.CLINICIAN_USERNAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.UUIDS;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator2.BDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator2.REASON;
@@ -567,7 +567,7 @@ public class DiagnosisActivity extends AppCompatActivity {
 
     private void saveForm() {
 
-        String file = sharedPreferences.getString(FILENAME, "");
+        String file = sharedPreferences.getString(PATIENT_ASSESSMENT_ID, "");
 
         Date currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
@@ -582,7 +582,7 @@ public class DiagnosisActivity extends AppCompatActivity {
 
             getDuration(currentTime);
 
-            editor.putString(USERNAME, username);
+            editor.putString(CLINICIAN_USERNAME, username);
             editor.putString(DATE, formattedDate);
             editor.putString(UUIDS, uniqueID);
             editor.putString(PENDING, isPending);
@@ -590,7 +590,7 @@ public class DiagnosisActivity extends AppCompatActivity {
             editor.apply();
 
             String filename = formattedDate + "_" + uniqueID;
-            editor.putString(FILENAME, filename);
+            editor.putString(PATIENT_ASSESSMENT_ID, filename);
             editor.apply();
 //            Toast.makeText(this, "empty", Toast.LENGTH_SHORT).show();
             doLogic(filename);
@@ -598,7 +598,7 @@ public class DiagnosisActivity extends AppCompatActivity {
             editor.putString(PENDING, isPending);
             editor.putString(ASSESS_INCOMPLETE, "complete");
             String filename = formattedDate + "_" + uniqueID;
-            editor.putString(FILENAME, filename);
+            editor.putString(PATIENT_ASSESSMENT_ID, filename);
             editor.putString(DATE, formattedDate);
             editor.apply();
 
