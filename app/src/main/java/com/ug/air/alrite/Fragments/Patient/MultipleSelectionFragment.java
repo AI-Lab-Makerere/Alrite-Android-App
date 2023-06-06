@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.ug.air.alrite.Activities.PatientActivity;
 import com.ug.air.alrite.R;
 
 import org.json.JSONException;
@@ -134,37 +135,22 @@ public class MultipleSelectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // we need to see which choices are selected
-                // store the ids
-                ArrayList<Integer> chosenOptions = new ArrayList<Integer>();
-                for (CheckBox choice : choiceGroup) {
-                    if (choice.isChecked()) {
-                        // get the id of this choice
-                        int id = choice.getId();
-                        chosenOptions.add(id);
+                // store the indices and the result back up to main:
+                // a listener there will trigger and start the next fragment sequence up
+                ArrayList<Integer> chosenOptionIds = new ArrayList<>();
+                for (int i = 0; i < choiceGroup.size(); i++) {
+                    if (choiceGroup.get(i).isChecked()) {
+                        // get the index of this choice
+                        chosenOptionIds.add(i);
                     }
                 }
-//                // do not allow selection number less than 1
-//                if (chosenOptions.size() < 1) {
-//                    Toast.makeText(getActivity(), "Please select at least one of the options", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
 
-                // Get the indices of the choices in the set of buttons: relies on the
-                // buttons having names with their index at the end
-                ArrayList<Integer> chosenOptionIds = new ArrayList<>();
-                for (int c : chosenOptions) {
-                    String chosenOptionId = v.getResources().getResourceName(c);
-                    int index = Integer.parseInt(chosenOptionId.substring(chosenOptionId.length() - 1));
-                    chosenOptionIds.add(index);
-                }
-
-                // Send the result back up to main: a listener there will trigger
-                // and start the next fragment sequence up
                 try {
-                    getResultListener.getResultFromMultipleSelectionFragment(chosenOptionIds);  // adding to the diagnosis
-                } catch (JSONException ex) {
-                    throw new RuntimeException(ex);
+                    getResultListener.getResultFromMultipleSelectionFragment(chosenOptionIds);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
                 }
+                return;
             }
         });
 
@@ -198,10 +184,11 @@ public class MultipleSelectionFragment extends Fragment {
             for (String temp : selectedOptionsHistory) {
                 if (temp.equals(choices.get(i))) {
                     ((CheckBox) choiceGroup.get(i)).setChecked(true);
-                    return;
                 }
             }
         }
+
+        return;
     }
 
     /**
@@ -215,7 +202,7 @@ public class MultipleSelectionFragment extends Fragment {
     private static ArrayList<String> getTextFromChoices(ArrayList<JSONObject> list) throws JSONException {
         ArrayList<String> ret = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
-            ret.add(list.get(i).getString("text"));
+            ret.add(list.get(i).getString(PatientActivity.TEXT));
         }
         return ret;
     }
