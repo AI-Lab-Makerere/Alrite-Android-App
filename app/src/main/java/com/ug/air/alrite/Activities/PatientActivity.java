@@ -277,7 +277,8 @@ public class PatientActivity extends AppCompatActivity implements
     public static final String THRESHOLD = "threshold";
     public static final String PARAGRAPH = "Paragraph";
     public static final String META = "meta";
-    public static final String APIPATH = "apipath";
+    public static final String VERSION = "version";
+    public static final String NAME = "name";
     public static final String SUMMARY_ID = "SUMMARY_ID";
     public static final String DIAGNOSES_ID = "DIAGNOSES_ID";
 
@@ -369,7 +370,8 @@ public class PatientActivity extends AppCompatActivity implements
         patientSummaryPrefs = getSharedPreferences(summaryPrefsID, Context.MODE_PRIVATE);
         patientSummaryEditor = patientSummaryPrefs.edit();
         patientSummaryEditor.putString(SUMMARY_ID, summaryPrefsID);
-        patientSummaryEditor.putString(APIPATH, json.getJSONObject(META).getString(APIPATH));
+        patientSummaryEditor.putString(VERSION, json.getJSONObject(META).getString(VERSION));
+        patientSummaryEditor.putString(NAME, json.getString(NAME));
         patientSummaryEditor.apply();
 
         patientDiagnosesPrefs = getSharedPreferences(diagnosesPrefsID, Context.MODE_PRIVATE);

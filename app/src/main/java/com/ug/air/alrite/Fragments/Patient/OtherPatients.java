@@ -2,8 +2,9 @@ package com.ug.air.alrite.Fragments.Patient;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.ug.air.alrite.Activities.DiagnosisActivity.PENDING;
-import static com.ug.air.alrite.Activities.PatientActivity.APIPATH;
 import static com.ug.air.alrite.Activities.PatientActivity.ASSESS_INCOMPLETE;
+import static com.ug.air.alrite.Activities.PatientActivity.NAME;
+import static com.ug.air.alrite.Activities.PatientActivity.VERSION;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USED_BRONCHODILATOR;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.AFTER_BRONCHODILATOR;
@@ -27,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +68,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
@@ -242,7 +245,7 @@ public class OtherPatients extends Fragment {
 
         // For every pair of patient info, turn them into proper JSONObjects and
         // put them in the array to be sent to the backend
-        HashMap<BackendPostRequest, String> requestToApipath = new HashMap<>();
+        HashMap<BackendPostRequest, Pair<String, String>> requestToApipath = new HashMap<>();
 
         // Create requests for each pair of patient info
         for (int i = 0; i < assessmentsToBeSent.size(); i+=2) {
@@ -254,23 +257,26 @@ public class OtherPatients extends Fragment {
             SharedPreferences summaryPrefs = getContext().getSharedPreferences(summaryID, MODE_PRIVATE);
 
             // TODO: implement diagnoses stuff later
-            diagnosesPrefs.edit().clear().apply();
+            // diagnosesPrefs.edit().clear().apply();
 
             // Get all items from the shared preferences object and create a request with them
-            String apipath = "";
+            String version = "";
+            String name = "";
             Map<String, ?> summaryPrefItems = summaryPrefs.getAll();
             HashMap<String, String> summaryPrefMap = new HashMap<>();
             for (String item : summaryPrefItems.keySet()) {
-                if (item.equals(APIPATH)) {
-                    apipath = item;
+                if (item.equals(VERSION)) {
+                    version = (String) summaryPrefItems.get(item);
+                } else if (item.equals(NAME)) {
+                    name = (String) summaryPrefItems.get(item);
                 } else {
                     summaryPrefMap.put(item, (String) summaryPrefItems.get(item));
                 }
             }
-            summaryPrefs.edit().clear().apply();
+            // summaryPrefs.edit().clear().apply();
 
             BackendPostRequest nextRequest = new BackendPostRequest(summaryPrefMap, "");
-            requestToApipath.put(nextRequest, apipath);
+            requestToApipath.put(nextRequest, new Pair<>(name, version));
         }
         System.out.println(requestToApipath);
 
@@ -281,8 +287,8 @@ public class OtherPatients extends Fragment {
                 .create(BackendRequests.class);
         List<Observable<?>> requests = new ArrayList<>();
         for (BackendPostRequest currRequest : requestToApipath.keySet()) {
-            String apipath = requestToApipath.get(currRequest);
-            requests.add(backendRequests.postToBackend(currRequest));
+            Pair<String, String> workflowInfo = Objects.requireNonNull(requestToApipath.get(currRequest));
+            requests.add(backendRequests.postToBackend(workflowInfo.first, workflowInfo.second, currRequest));
         }
 
         Observable.zip(
@@ -296,9 +302,6 @@ public class OtherPatients extends Fragment {
                     public void accept(Object o) throws Exception {
                         // On success tell the user we're ok
                         System.out.println(o);
-
-                        progressBar.setVisibility(View.GONE);
-                        btnSubmit.setEnabled(true);
                     }
                 },
 
@@ -307,11 +310,12 @@ public class OtherPatients extends Fragment {
                     @Override
                     public void accept(Throwable e) throws Exception {
                         System.out.println("there was an error getting requests: " + e);
-                        progressBar.setVisibility(View.GONE);
-                        btnSubmit.setEnabled(true);
                     }
                 }
             );
+
+        progressBar.setVisibility(View.GONE);
+        btnSubmit.setEnabled(true);
     }
 
     private ArrayList<String> getValidAssessments() {

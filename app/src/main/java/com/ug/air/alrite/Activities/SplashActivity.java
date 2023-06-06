@@ -56,7 +56,7 @@ public class SplashActivity extends AppCompatActivity {
     public static final String ECZEMA_COUNT = "eczema_count";
 
     // TODO: change this if you want to get from online
-    Boolean shouldGetNewAssessment = true;
+    Boolean shouldGetNewAssessmentOnStartup = true;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
@@ -135,9 +135,9 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void getCurrentAssessmentIfConnectedToInternet() {
-        if (isNetworkAvailable() && shouldGetNewAssessment) {
+        if (isNetworkAvailable() && shouldGetNewAssessmentOnStartup) {
             BackendRequests dtJson = ApiClient.getClient(ApiClient.REMOTE_URL_TEMP).create(BackendRequests.class);
-            Call<String> call = dtJson.getJson("test");
+            Call<String> call = dtJson.getJson("June_6_Demo");
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {

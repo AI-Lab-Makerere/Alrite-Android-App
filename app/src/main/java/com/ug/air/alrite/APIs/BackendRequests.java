@@ -14,6 +14,8 @@ public interface BackendRequests {
     @GET("/alrite/apis/workflows/{workflow_id}/")
     Call<String> getJson(@Path("workflow_id") String workflow_id);
 
-    @POST("/alrite/data/test/13/")
-    Observable<String> postToBackend(@Body BackendPostRequest body);
+    @POST("/apis/data/{workflow_id}/{workflow_version}/")
+    Observable<String> postToBackend(@Path("workflow_id") String workflow_id,
+                                    @Path("workflow_version") String workflow_version,
+                                    @Body BackendPostRequest body);
 }
