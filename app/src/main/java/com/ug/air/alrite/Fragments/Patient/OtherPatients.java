@@ -1,17 +1,13 @@
 package com.ug.air.alrite.Fragments.Patient;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.ug.air.alrite.Activities.DiagnosisActivity.PENDING;
-import static com.ug.air.alrite.Activities.PatientActivity.ASSESS_INCOMPLETE;
 import static com.ug.air.alrite.Activities.PatientActivity.NAME;
 import static com.ug.air.alrite.Activities.PatientActivity.VERSION;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USED_BRONCHODILATOR;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.AFTER_BRONCHODILATOR;
-import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
-import static com.ug.air.alrite.Fragments.Patient.Initials.PARENT_INITIALS;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_YEARS;
-import static com.ug.air.alrite.Fragments.Patient.Sex.SEX;
+import static com.ug.air.alrite.Fragments.Patient.InitialsModified.CHILD_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.InitialsModified.PARENT_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.AGE_IN_YEARS;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.SEX;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -71,6 +67,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.Scheduler;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -189,38 +186,36 @@ public class OtherPatients extends Fragment {
                 }
                 Collections.reverse(files);
                 for(String name : files){
-                    if (!name.equals("sharedPrefs.xml") && !name.equals("counter_file.xml")){
+                    if (!name.equals("sharedPrefs.xml") && !name.equals("counter_file.xml")
+                        && name.endsWith("_Summary.xml")){
+
                         String names = name.replace(".xml", "");
                         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(names, Context.MODE_PRIVATE);
-                        String bron = sharedPreferences.getString(USED_BRONCHODILATOR, "");
-                        String incomplete = sharedPreferences.getString(ASSESS_INCOMPLETE, "");
-                        String pending = sharedPreferences.getString(PENDING, "");
-                        String fin = sharedPreferences.getString(AFTER_BRONCHODILATOR, "");
-                        if (bron.isEmpty() || bron.equals("Bronchodialtor Not Given") || !fin.isEmpty()){
-                            cin = sharedPreferences.getString(CHILD_INITIALS, "");
-                            pin = sharedPreferences.getString(PARENT_INITIALS, "");
-                            age = sharedPreferences.getString(AGE_IN_YEARS, "");
-                            gender = sharedPreferences.getString(SEX, "");
-                            dat = sharedPreferences.getString(DATE, "");
-                            if (age.isEmpty()){
-                               ag = "0 years 0 months";
-                               gender = "";
-                            }else {
-                                String[] split = age.split("\\.");
-                                ag = split[0] + " years and " + split[1] + " months";
-                            }
+                        cin = sharedPreferences.getString(CHILD_INITIALS, "");
+                        pin = sharedPreferences.getString(PARENT_INITIALS, "");
+                        age = sharedPreferences.getString(AGE_IN_YEARS, "");
+                        gender = sharedPreferences.getString(SEX, "");
+                        dat = sharedPreferences.getString(DATE, "");
 
-                            try {
-                                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-                                Date date = df.parse(dat);
-                                SimpleDateFormat df1 = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
-                                String formattedDate = df1.format(date);
-                                History history = new History("Age: " + ag, "Gender: " + gender, cin, "Parent/Guardian: " + pin, formattedDate, names, pending, incomplete);
-                                items.add(new Item(1, history));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
+                        if (age.isEmpty()){
+                           ag = "0 years 0 months";
+                           gender = "";
+                        }else {
+                            String[] split = age.split("\\.");
+                            ag = split[0] + " years and " + split[1] + " months";
                         }
+
+                        try {
+                            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+                            Date date = df.parse(dat);
+                            SimpleDateFormat df1 = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
+                            String formattedDate = df1.format(date);
+                            History history = new History("Age: " + ag, "Gender: " + gender, cin, "Parent/Guardian: " + pin, formattedDate, "fname", "no", "no");
+                            items.add(new Item(1, history));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
                     }
                 }
             }else {
@@ -248,11 +243,15 @@ public class OtherPatients extends Fragment {
         HashMap<BackendPostRequest, Pair<String, String>> requestToApipath = new HashMap<>();
 
         // Create requests for each pair of patient info
-        for (int i = 0; i < assessmentsToBeSent.size(); i+=2) {
-            String diagnosesIDxml = assessmentsToBeSent.get(i);
+        for (int i = 0; i < assessmentsToBeSent.size(); i+=3) {
+            // Alphabetical order
+            String developerIDxml = assessmentsToBeSent.get(i);
+            String developerID = developerIDxml.substring(0, developerIDxml.length() - 4);
+            String diagnosesIDxml = assessmentsToBeSent.get(i+1);
             String diagnosesID = diagnosesIDxml.substring(0, diagnosesIDxml.length() - 4);
-            String summaryIDxml = assessmentsToBeSent.get(i+1);
+            String summaryIDxml = assessmentsToBeSent.get(i+2);
             String summaryID = summaryIDxml.substring(0, summaryIDxml.length() - 4);
+            SharedPreferences developerPrefs = getContext().getSharedPreferences(developerID, MODE_PRIVATE);
             SharedPreferences diagnosesPrefs = getContext().getSharedPreferences(diagnosesID, MODE_PRIVATE);
             SharedPreferences summaryPrefs = getContext().getSharedPreferences(summaryID, MODE_PRIVATE);
 
@@ -260,20 +259,27 @@ public class OtherPatients extends Fragment {
             // diagnosesPrefs.edit().clear().apply();
 
             // Get all items from the shared preferences object and create a request with them
-            String version = "";
-            String name = "";
             Map<String, ?> summaryPrefItems = summaryPrefs.getAll();
-            HashMap<String, String> summaryPrefMap = new HashMap<>();
+            HashMap<String, Object> summaryPrefMap = new HashMap<>();
             for (String item : summaryPrefItems.keySet()) {
-                if (item.equals(VERSION)) {
-                    version = (String) summaryPrefItems.get(item);
-                } else if (item.equals(NAME)) {
-                    name = (String) summaryPrefItems.get(item);
-                } else {
-                    summaryPrefMap.put(item, (String) summaryPrefItems.get(item));
-                }
+                summaryPrefMap.put(item, summaryPrefItems.get(item));
+
             }
             // summaryPrefs.edit().clear().apply();
+
+            // Add all items from developer preferences into the summary preferences
+            String version = "";
+            String name = "";
+            Map<String, ?> developerPrefItems = developerPrefs.getAll();
+            for (String item : developerPrefItems.keySet()) {
+                if (item.equals(VERSION)) {
+                    version = (String) developerPrefItems.get(item);
+                } else if (item.equals(NAME)) {
+                    name = (String) developerPrefItems.get(item);
+                } else {
+                    summaryPrefMap.put(item, developerPrefItems.get(item));
+                }
+            }
 
             BackendPostRequest nextRequest = new BackendPostRequest(summaryPrefMap, "");
             requestToApipath.put(nextRequest, new Pair<>(name, version));
@@ -294,6 +300,7 @@ public class OtherPatients extends Fragment {
         Observable.zip(
             requests,
             (s -> s))
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe(
                 // Will be triggered if all requests will end successfully (4xx and 5xx also are successful requests too)
@@ -301,7 +308,9 @@ public class OtherPatients extends Fragment {
                     @Override
                     public void accept(Object o) throws Exception {
                         // On success tell the user we're ok
+                        Toast.makeText(getActivity(), "Patient forms have been successfully submitted.", Toast.LENGTH_SHORT).show();
                         System.out.println(o);
+                        deleteLocalPatientFiles();
                     }
                 },
 
@@ -385,8 +394,8 @@ public class OtherPatients extends Fragment {
 
             // Otherwise, we're good to send it to the backend! Add the file to
             // the list of files to send to the backend
-            //assessment.delete();
-            System.out.println("fake delete file");
+            assessment.delete();
         }
+        getActivity().recreate();
     }
 }

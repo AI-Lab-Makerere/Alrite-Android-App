@@ -32,9 +32,9 @@ public class InitialsModified extends Fragment {
    EditText etChildInitials, etParentInitials, etStudy, etCode;
    Button back, next;
    String childInitials, parentInitials, formattedDate, studyId, code, h_code, counter, filename;
-   public static final String CHILD_INITIALS = "patient_initials";
+   public static final String CHILD_INITIALS = "Patient Initials";
     public static final String  VERSION = "app_version";
-   public static final String PARENT_INITIALS = "parent_initials";
+   public static final String PARENT_INITIALS = "Parent Initials";
    public static final String STUDY_ID = "study_id";
     public static final String STUDY_ID_2 = "study_id_2";
    public static final String INITIAL_DATE = "start_date";

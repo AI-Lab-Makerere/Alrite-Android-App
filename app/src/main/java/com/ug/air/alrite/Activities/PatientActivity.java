@@ -10,6 +10,8 @@ import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.UUIDS;
 import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
 import static com.ug.air.alrite.Fragments.Patient.Initials.INITIAL_DATE;
 import static com.ug.air.alrite.Fragments.Patient.Initials.PARENT_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.Initials.STUDY_ID;
+import static com.ug.air.alrite.Fragments.Patient.Initials.STUDY_ID_2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.INITIAL_DATE_2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
@@ -66,8 +68,8 @@ public class PatientActivity extends AppCompatActivity implements
     public static final String INCOMPLETE = "incomplete";
 
     public static final String ASSESS_INCOMPLETE = "incomplete";
-    SharedPreferences sharedPreferences, sharedPreferences1, patientSummaryPrefs, patientDiagnosesPrefs;
-    SharedPreferences.Editor editor, editor1, patientSummaryEditor, patientDiagnosesEditor;
+    SharedPreferences sharedPreferences, sharedPreferences1, patientSummaryPrefs, patientDiagnosesPrefs, developerPrefs;
+    SharedPreferences.Editor editor, editor1, patientSummaryEditor, patientDiagnosesEditor, developerEditor;
     int frag = 0;
 
     @Override
@@ -287,6 +289,7 @@ public class PatientActivity extends AppCompatActivity implements
     JSONArray pages;
     String summaryPrefsID;
     String diagnosesPrefsID;
+    String developerPrefsID;
 
     // Information gotten from JSON for the current page
     // Information gotten from JSON
@@ -362,31 +365,41 @@ public class PatientActivity extends AppCompatActivity implements
         String nextPage = pages.getJSONObject(0).getString(PAGE_ID);
 
         // Create a shared preferences object for the current patient
-        // TODO: better security for the SharedPreferences
+        // TODO: better security for the SharedPreferences (use EncryptedSharedPreferences)
         String patientInfoID = createUniquePatientInfoID();
         summaryPrefsID = patientInfoID + "_Summary";
         diagnosesPrefsID = patientInfoID + "_Diagnoses";
+        developerPrefsID = patientInfoID + "_DevInfo";
 
         patientSummaryPrefs = getSharedPreferences(summaryPrefsID, Context.MODE_PRIVATE);
         patientSummaryEditor = patientSummaryPrefs.edit();
-        patientSummaryEditor.putString(SUMMARY_ID, summaryPrefsID);
-        patientSummaryEditor.putString(VERSION, json.getJSONObject(META).getString(VERSION));
-        patientSummaryEditor.putString(NAME, json.getString(NAME));
-        patientSummaryEditor.apply();
 
         patientDiagnosesPrefs = getSharedPreferences(diagnosesPrefsID, Context.MODE_PRIVATE);
         patientDiagnosesEditor = patientDiagnosesPrefs.edit();
+        // MUST INCLUDE THIS: code in OtherPatients was written with the intent that there
+        // would be at least one diagnosis lol
         patientDiagnosesEditor.putString(DIAGNOSES_ID, diagnosesPrefsID);
         patientDiagnosesEditor.apply();
+
+        developerPrefs = getSharedPreferences(developerPrefsID, Context.MODE_PRIVATE);
+        developerEditor = developerPrefs.edit();
+        developerEditor.putString(VERSION, json.getJSONObject(META).getString(VERSION));
+        developerEditor.putString(NAME, json.getString(NAME));
+        developerEditor.apply();
 
         // Clear out the old editor so that it can be used again for a new patient
         Map<String, ?> currPatientInfos = sharedPreferences.getAll();
         for (String info : currPatientInfos.keySet()) {
-            patientSummaryEditor.putString(info, (String) currPatientInfos.get(info));
+            if (info.equals("app_version") || info.equals(STUDY_ID) || info.equals(STUDY_ID_2)
+                || info.equals("age") || info.equals("start_date")) {
+                developerEditor.putString(info, (String) currPatientInfos.get(info));
+            } else {
+                patientSummaryEditor.putString(info, (String) currPatientInfos.get(info));
+            }
         }
         patientSummaryEditor.apply();
-        editor.clear();
-        editor.apply();
+        developerEditor.apply();
+        editor.clear().apply();
 
         // Continue looping through each page in sequence: depending on the component,
         // inflate a new fragment for that component type
@@ -577,17 +590,15 @@ public class PatientActivity extends AppCompatActivity implements
      */
     @Override
     public void getResultFromMultipleChoiceFragment(int choiceIndex) throws JSONException {
+        // Enter the diagnosis into the editor
         String diagnosis = choices.get(choiceIndex).getString(TEXT);
-        String nextPageName = choices.get(choiceIndex).getString(LINK);
+        enterStringIntoSummaryEditor(nextPageJSON, diagnosis);
 
         // If the link is null, then we should go to the default page
+        String nextPageName = choices.get(choiceIndex).getString(LINK);
         if (nextPageName.equals(NULL)) {
             nextPageName = nextPageJSON.getString(DEFAULT_LINK);
         }
-        System.out.println("NEXT PAGE NAME:" + nextPageName);
-
-        // Enter the diagnosis into the editor
-        enterSymptomIntoEditor(nextPageJSON, diagnosis);
 
         // Decide on the next page based on the result
         try {
@@ -615,7 +626,7 @@ public class PatientActivity extends AppCompatActivity implements
                 }
                 // Enter the diagnosis into the editor
             }
-            enterSymptomIntoEditor(nextPageJSON, allDiagnoses);
+            enterStringIntoSummaryEditor(nextPageJSON, allDiagnoses);
 
             JSONObject foundLink = getContentFromPageID(nextPageJSON, targetValueID);
             if (foundLink == null) {
@@ -660,7 +671,7 @@ public class PatientActivity extends AppCompatActivity implements
                     }
                 }
             }
-            enterSymptomIntoEditor(nextPageJSON, String.valueOf(diagnosis));
+            enterFloatIntoSummaryEditor(nextPageJSON, diagnosis);
         } else {
             // In the case that we're comparing strings, we'll compare equality with .equals,
             // and the other ones it doesn't make sense to compare, so we'll just say that
@@ -682,7 +693,7 @@ public class PatientActivity extends AppCompatActivity implements
                     }
                 }
             }
-            enterSymptomIntoEditor(nextPageJSON, inputted);
+            enterStringIntoSummaryEditor(nextPageJSON, inputted);
         }
 
         // Finally, we go to the decided next page
@@ -801,12 +812,25 @@ public class PatientActivity extends AppCompatActivity implements
      * Abstracts away the process of adding a symptom to the sharedPreference object
      *
      * @param page is the page in the workflow that we're entering a symptom for
-     * @param symptom is the associated value to enter in given the page
+     * @param symptom is the associated string to enter in given the page
      * @throws JSONException because we look at JSON
      */
-    public void enterSymptomIntoEditor(JSONObject page, String symptom) throws JSONException {
+    public void enterStringIntoSummaryEditor(JSONObject page, String symptom) throws JSONException {
         // Enter the diagnosis into the editor
         patientSummaryEditor.putString(getValueID(page, 0), symptom);
+        patientSummaryEditor.apply();
+    }
+
+    /**
+     * Abstracts away the process of adding a symptom to the sharedPreference object
+     *
+     * @param page is the page in the workflow that we're entering a symptom for
+     * @param symptom is the associated float to enter in given the page
+     * @throws JSONException because we look at JSON
+     */
+    public void enterFloatIntoSummaryEditor(JSONObject page, Float symptom) throws JSONException {
+        // Enter the diagnosis into the editor
+        patientSummaryEditor.putFloat(getValueID(page, 0), symptom);
         patientSummaryEditor.apply();
     }
 
@@ -834,5 +858,9 @@ public class PatientActivity extends AppCompatActivity implements
         String formattedDate = df.format(currentTime);
 
         return patientInitials + "_" + formattedDate;
+    }
+
+    public Boolean isDiagnosisPage(JSONObject page) throws JSONException {
+        return (Boolean) page.get(IS_DIAGNOSIS_PAGE);
     }
 }

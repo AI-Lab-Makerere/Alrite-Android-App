@@ -7,14 +7,13 @@ import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DURATION;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.PATIENT_ASSESSMENT_ID;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.CLINICIAN_USERNAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.UUIDS;
-import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
-import static com.ug.air.alrite.Fragments.Patient.Initials.INITIAL_DATE;
-import static com.ug.air.alrite.Fragments.Patient.Initials.PARENT_INITIALS;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_YEARS;
-import static com.ug.air.alrite.Fragments.Patient.Sex.KILO;
-import static com.ug.air.alrite.Fragments.Patient.Sex.MUAC;
-import static com.ug.air.alrite.Fragments.Patient.Sex.SEX;
+import static com.ug.air.alrite.Fragments.Patient.InitialsModified.CHILD_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.InitialsModified.INITIAL_DATE;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.AGE_IN_MONTHS;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.AGE_IN_YEARS;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.KILO;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.MUAC;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.SEX;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -264,11 +263,9 @@ public class DiagnosisActivityModified extends AppCompatActivity {
 
     private List<Summary> buildSummaryList(){
         summaryList = new ArrayList<>();
-        String pin = summaryPrefs.getString(PARENT_INITIALS, "");
         String weight = summaryPrefs.getString(KILO, "");
         String muac = summaryPrefs.getString(MUAC, "");
 
-        addToSummaryList("Parent's initials", pin);
         addToSummaryList("Child's weight", weight);
         addToSummaryList("MUAC value", muac);
 
@@ -276,7 +273,7 @@ public class DiagnosisActivityModified extends AppCompatActivity {
         System.out.println(all);
         for (Map.Entry<String, ?> x : all.entrySet()) {
             // TODO: prevent non-summary results from showing
-            addToSummaryList(x.getKey(), (String) x.getValue());
+            addToSummaryList(x.getKey(), x.getValue().toString());
         }
 
         return summaryList;
@@ -318,7 +315,7 @@ public class DiagnosisActivityModified extends AppCompatActivity {
 
         // Go to the final activity, since we aren't using a bronchodilator and therefore
         // aren't revisiting this page (currently)
-        startFinalActivity(summaryPrefsID);
+        startFinalActivity();
     }
 
     private void enterDurationIntoSharedPrefs(Date currentTime) {
@@ -340,9 +337,10 @@ public class DiagnosisActivityModified extends AppCompatActivity {
         }
     }
 
-    private void startFinalActivity(String file) {
+    private void startFinalActivity() {
         Intent finalActivityIntent = new Intent(DiagnosisActivityModified.this, FinalActivity.class);
-        finalActivityIntent.putExtra("filename", file);
+        finalActivityIntent.putExtra(SUMMARY_ID, summaryPrefsID);
+        finalActivityIntent.putExtra(DIAGNOSES_ID, diagnosesPrefsID);
         startActivity(finalActivityIntent);
     }
 

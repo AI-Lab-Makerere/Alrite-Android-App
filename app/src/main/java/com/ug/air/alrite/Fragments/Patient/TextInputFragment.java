@@ -105,7 +105,7 @@ public class TextInputFragment extends Fragment {
         next = view.findViewById(R.id.next);
         back = view.findViewById(R.id.back);
 
-        loadSelectedChoiceIfAlreadySelected();
+        // loadSelectedChoiceIfAlreadySelected();
 
         // For now, don't worry about this
         // etDay.addTextChangedListener(textWatcher);
