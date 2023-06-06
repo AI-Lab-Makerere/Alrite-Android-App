@@ -141,7 +141,7 @@ public class MultipleSelectionFragment extends Fragment {
                 for (int i = 0; i < choiceGroup.size(); i++) {
                     if (choiceGroup.get(i).isChecked()) {
                         // get the index of this choice
-                        chosenOptionIds.add(i);
+                        chosenOptionIds.add(i+1);
                     }
                 }
 

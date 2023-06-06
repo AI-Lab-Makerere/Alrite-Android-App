@@ -607,9 +607,12 @@ public class PatientActivity extends AppCompatActivity implements
             NextPage =  nextPageJSON.getString(DEFAULT_LINK);
         }
         else {
-            String allDiagnoses = choices.get(chosenOptionIds.get(0) - 1).getString(TEXT);
-            for (int i = 1; i < chosenOptionIds.size(); i++) {
-                allDiagnoses += "\n" + choices.get(i).getString(TEXT);
+            String allDiagnoses = "";
+            for (int i = 0; i < chosenOptionIds.size(); i++) {
+                allDiagnoses += choices.get(chosenOptionIds.get(i) - 1).getString(TEXT);
+                if (i != chosenOptionIds.size() - 1) {
+                    allDiagnoses += "\n";
+                }
                 // Enter the diagnosis into the editor
             }
             enterSymptomIntoEditor(nextPageJSON, allDiagnoses);
