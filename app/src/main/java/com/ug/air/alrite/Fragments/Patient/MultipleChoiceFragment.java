@@ -1,5 +1,8 @@
 package com.ug.air.alrite.Fragments.Patient;
 
+import static com.ug.air.alrite.Activities.PatientActivity.SUMMARY_ID;
+import static com.ug.air.alrite.Activities.PatientActivity.VALUE_ID;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -34,12 +38,16 @@ public class MultipleChoiceFragment extends Fragment {
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String QUESTION = "question";
     public static final String CHOICES = "choices";
+    public static final String VALUE_ID = "valueID";
     public static final String DEFAULT = "**default string**";
     String previousResponse;
     String question;
     ArrayList<String> choices;
+    String valueID;
+    String summaryPrefsID;
     View view;
     RadioGroup choiceGroup;
+    ArrayList<RadioButton> choiceButtonList;
     Button backButton, nextButton;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -69,12 +77,14 @@ public class MultipleChoiceFragment extends Fragment {
      * @param choices the given choices for the user to choose from
      * @return the fragment to be used in the future
      */
-    public static MultipleChoiceFragment newInstance(String question, ArrayList<JSONObject> choices) throws JSONException {
+    public static MultipleChoiceFragment newInstance(String question, ArrayList<JSONObject> choices, String valueID, String summaryPrefsID) throws JSONException {
         MultipleChoiceFragment mfc = new MultipleChoiceFragment();
         Bundle args = new Bundle();
         args.putString(QUESTION, question);
         ArrayList<String> text_choices = getTextFromChoices(choices);
         args.putStringArrayList(CHOICES, text_choices);
+        args.putString(VALUE_ID, valueID);
+        args.putString(SUMMARY_ID, summaryPrefsID);
         mfc.setArguments(args);
         return mfc;
     }
@@ -91,25 +101,29 @@ public class MultipleChoiceFragment extends Fragment {
         assert getArguments() != null;
         question = getArguments().getString(QUESTION);
         choices = getArguments().getStringArrayList(CHOICES);
+        valueID = getArguments().getString(VALUE_ID);
+        summaryPrefsID = getArguments().getString(SUMMARY_ID);
 
         // Then, set the information for each question/choice to line up with our givens
         TextView questionDisplay = view.findViewById(R.id.mc_question);
         questionDisplay.setText(question);
 
-        // TODO: create buttons in here, and then choose their ids more easily
-        // Currently storing 3 radio buttons will update later
-        // Set for demo might add more or create optimized loop
-        RadioButton choice1 = view.findViewById(R.id.choice1);
-        choice1.setText(choices.get(0));
-        RadioButton choice2 = view.findViewById(R.id.choice2);
-        choice2.setText(choices.get(1));
-        RadioButton choice3 = view.findViewById(R.id.choice3);
-        choice3.setText(choices.get(2));
+        // Create the RadioGroup and RadioButtons that will be displayed on the page
+        // within the given multiple_choice_layout on the layout for the fragment
+        LinearLayout multipleChoiceLayout = view.findViewById(R.id.multiple_choice_layout);
+        choiceGroup = new RadioGroup(this.getContext());
+        multipleChoiceLayout.addView(choiceGroup);
+        choiceButtonList = new ArrayList<>();
+        for (String choiceText : choices) {
+            RadioButton but = new RadioButton(this.getContext());
+            choiceGroup.addView(but);
+            but.setText(choiceText);
+            choiceButtonList.add(but);
+        }
 
         // All of the buttons/things that we'll need to reference
         nextButton = view.findViewById(R.id.next);
         backButton = view.findViewById(R.id.back);
-        choiceGroup = view.findViewById(R.id.mc_options);
 
         // If we've already seen this page, reload our past choices
         // loadSelectedChoiceIfAlreadySelected();
@@ -128,17 +142,19 @@ public class MultipleChoiceFragment extends Fragment {
                     return;
                 }
 
-                // Get the index of the choice in the set of buttons: relies on the
-                // buttons having names with their index at the end
-                String chosenOptionId = v.getResources().getResourceName(chosenOption);
-                int index = Integer.parseInt(chosenOptionId.substring(chosenOptionId.length() - 1));
-
-                // Send the result back up to main: a listener there will trigger
-                // and start the next fragment sequence up
-                try {
-                    getResultListener.getResultFromMultipleChoiceFragment(index);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                // Get the index of the choice in the set of buttons, starting at index 0
+                for (int i = 0; i < choiceButtonList.size(); i++) {
+                    RadioButton choiceButton = choiceButtonList.get(i);
+                    if (choiceButton.getId() == chosenOption) {
+                        // Send the result back up to main: a listener there will trigger
+                        // and start the next fragment sequence up
+                        try {
+                            getResultListener.getResultFromMultipleChoiceFragment(i);
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return;
+                    }
                 }
             }
         });
@@ -163,13 +179,13 @@ public class MultipleChoiceFragment extends Fragment {
      * don't get inconsistent answers from this
      */
     private void loadSelectedChoiceIfAlreadySelected() {
-        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        previousResponse = sharedPreferences.getString(question, DEFAULT);
+        SharedPreferences sharedPreferences =
+                this.getActivity().getSharedPreferences(summaryPrefsID, Context.MODE_PRIVATE);
+        previousResponse = sharedPreferences.getString(valueID, DEFAULT);
 
         for (int i = 0; i < choices.size(); i++) {
             if (previousResponse.equals(choices.get(i))) {
-                RadioGroup allChoices = view.findViewById(R.id.mc_options);
-                allChoices.check(i);
+                ((RadioButton) choiceGroup.getChildAt(i)).setChecked(true);
                 return;
             }
         }

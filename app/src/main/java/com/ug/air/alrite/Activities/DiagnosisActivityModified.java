@@ -1,63 +1,19 @@
 package com.ug.air.alrite.Activities;
 
-import static com.ug.air.alrite.Activities.FinalActivity.S6;
-import static com.ug.air.alrite.Activities.FinalActivity.S7;
-import static com.ug.air.alrite.Activities.PatientActivity.ASSESS_INCOMPLETE;
-import static com.ug.air.alrite.Fragments.Patient.Allergies.CHOICEY2;
-import static com.ug.air.alrite.Fragments.Patient.Assess.FINAL_DIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
-import static com.ug.air.alrite.Fragments.Patient.Breathless.S5;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.BRONCHODILATOR_WAS_GIVEN;
+import static com.ug.air.alrite.Activities.PatientActivity.DIAGNOSES_ID;
+import static com.ug.air.alrite.Activities.PatientActivity.SUMMARY_ID;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DURATION;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.FILENAME;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USED_BRONCHODILATOR;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USERNAME;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.PATIENT_ASSESSMENT_ID;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.CLINICIAN_USERNAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.UUIDS;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator2.BDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator2.REASON;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.AFTER_BRONCHODILATOR;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.B3DIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.CHOICE7;
-import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.CHOICE72;
-import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.CIDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT;
-import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT2;
-import static com.ug.air.alrite.Fragments.Patient.Cough.DIFFICULTY_BREATHING;
-import static com.ug.air.alrite.Fragments.Patient.Cough.NODIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.CoughD.DAY1;
-import static com.ug.air.alrite.Fragments.Patient.Eczema.CHOICEX2;
-import static com.ug.air.alrite.Fragments.Patient.FTouch.FTDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.FTouch.TOUCH;
-import static com.ug.air.alrite.Fragments.Patient.HIVCare.CHOICEHC;
-import static com.ug.air.alrite.Fragments.Patient.HIVStatus.CHOICE3;
-import static com.ug.air.alrite.Fragments.Patient.HIVStatus.HDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
-import static com.ug.air.alrite.Fragments.Patient.Initials.INITIAL_DATE;
-import static com.ug.air.alrite.Fragments.Patient.Initials.PARENT_INITIALS;
-import static com.ug.air.alrite.Fragments.Patient.Kerosene.ADIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Kerosene.CHOICET2;
-import static com.ug.air.alrite.Fragments.Patient.Kerosene.TUDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Nasal.CHOICEGN;
-import static com.ug.air.alrite.Fragments.Patient.Oxygen.OXY;
-import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING;
-import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING2;
-import static com.ug.air.alrite.Fragments.Patient.RRCounter.INITIAL_DATE_2;
-import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_YEARS;
-import static com.ug.air.alrite.Fragments.Patient.Sex.KILO;
-import static com.ug.air.alrite.Fragments.Patient.Sex.MDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Sex.MUAC;
-import static com.ug.air.alrite.Fragments.Patient.Sex.SEX;
-import static com.ug.air.alrite.Fragments.Patient.Smoke.CHOICET1;
-import static com.ug.air.alrite.Fragments.Patient.Stridor.CHOICE6;
-import static com.ug.air.alrite.Fragments.Patient.Temperature.TDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Temperature.TEMP;
-import static com.ug.air.alrite.Fragments.Patient.WheezD.CHOICEX;
-import static com.ug.air.alrite.Fragments.Patient.WheezY.DAY2;
-import static com.ug.air.alrite.Fragments.Patient.Wheezing.CHOICE82;
-import static com.ug.air.alrite.Fragments.Patient.Wheezing.WHEEZING_SOUNDS;
+import static com.ug.air.alrite.Fragments.Patient.InitialsModified.CHILD_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.InitialsModified.INITIAL_DATE;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.AGE_IN_MONTHS;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.AGE_IN_YEARS;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.KILO;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.MUAC;
+import static com.ug.air.alrite.Fragments.Patient.SexModified.SEX;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -87,16 +43,15 @@ import com.ug.air.alrite.Models.Assessment;
 import com.ug.air.alrite.Models.Diagnosis;
 import com.ug.air.alrite.Models.Summary;
 import com.ug.air.alrite.R;
-import com.ug.air.alrite.Utils.Calculations.Instructions;
 import com.ug.air.alrite.Utils.Credentials;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -117,12 +72,10 @@ public class DiagnosisActivityModified extends AppCompatActivity {
     List<String> messages = new ArrayList<>();;
     List messageList = new ArrayList<>();;
     public static final String SHARED_PREFS = "sharedPrefs";
-    public static final String DATE_2 = "end_date_2";
-    public static final String PENDING = "pending";
-    public static final String DURATION_2 = "duration_2";
-    SharedPreferences sharedPreferences, sharedPreferences1;
-    SharedPreferences.Editor editor, editor1;
-    String ageInYears, uniqueID, ageInMonths, folder, isPending;
+    SharedPreferences summaryPrefs, diagnosesPrefs;
+    SharedPreferences.Editor summaryEditor, diagnosesEditor;
+    String summaryPrefsID, diagnosesPrefsID;
+    String ageInYears, ageInMonths, isPending;
     float ag;
     Dialog dialog;
     RecyclerView recyclerView;
@@ -153,17 +106,21 @@ public class DiagnosisActivityModified extends AppCompatActivity {
         diagnosisListRV = findViewById(R.id.recyclerView2);
 
         // Get an editor for our shared preferences
-        sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
+        summaryPrefsID = getIntent().getStringExtra(SUMMARY_ID);
+        summaryPrefs = getSharedPreferences(summaryPrefsID, Context.MODE_PRIVATE);
+        summaryEditor = summaryPrefs.edit();
+        diagnosesPrefsID = getIntent().getStringExtra(DIAGNOSES_ID);
+        diagnosesPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        diagnosesEditor = diagnosesPrefs.edit();
 
         // Save the patient's age, for reference in the diagnosis instructions
-        ageInMonths = sharedPreferences.getString(AGE_IN_MONTHS, "");
+        ageInMonths = summaryPrefs.getString(AGE_IN_MONTHS, "");
 
         // At the top of the page, display the patient's initials, age, and gender
-        String initials = sharedPreferences.getString(CHILD_INITIALS, "");
-        ageInYears = sharedPreferences.getString(AGE_IN_YEARS, "");
+        String initials = summaryPrefs.getString(CHILD_INITIALS, "");
+        ageInYears = summaryPrefs.getString(AGE_IN_YEARS, "");
         String[] ageInYearsSplit = ageInYears.split("\\.");
-        String gender = sharedPreferences.getString(SEX, "");
+        String gender = summaryPrefs.getString(SEX, "");
         txtInitials.setText(initials);
         txtAge.setText("Age: " + ageInYearsSplit[0] + " years and " + ageInYearsSplit[1] + " months");
         txtGender.setText("Gender: " + gender);
@@ -282,6 +239,13 @@ public class DiagnosisActivityModified extends AppCompatActivity {
 
     }
 
+    /**
+     * Create a list of all of the current diagnoses (in the future, this should
+     * happen within the diagnosis activity)
+     * TODO: implement gathering diagnosis in the editor, then in the app
+     *
+     * @return a list of diagnoses for the patient
+     */
     private List<Diagnosis> buildDiagnosisList() {
         List<Diagnosis> diagnosisList = new ArrayList<>();
         return diagnosisList;
@@ -299,21 +263,17 @@ public class DiagnosisActivityModified extends AppCompatActivity {
 
     private List<Summary> buildSummaryList(){
         summaryList = new ArrayList<>();
-        String pin = sharedPreferences.getString(PARENT_INITIALS, "");
-        String weight = sharedPreferences.getString(KILO, "");
-        String muac = sharedPreferences.getString(MUAC, "");
+        String weight = summaryPrefs.getString(KILO, "");
+        String muac = summaryPrefs.getString(MUAC, "");
 
-        addToSummaryList("Parent's initials", pin);
         addToSummaryList("Child's weight", weight);
         addToSummaryList("MUAC value", muac);
 
-        Map<String, ?> all = sharedPreferences.getAll();
+        Map<String, ?> all = summaryPrefs.getAll();
         System.out.println(all);
         for (Map.Entry<String, ?> x : all.entrySet()) {
-            String question = x.getKey();
-            if (question.substring(0, 3).equals("?: ")) {
-                addToSummaryList(question.substring(3), (String) x.getValue());
-            }
+            // TODO: prevent non-summary results from showing
+            addToSummaryList(x.getKey(), x.getValue().toString());
         }
 
         return summaryList;
@@ -332,52 +292,34 @@ public class DiagnosisActivityModified extends AppCompatActivity {
         }
     }
 
+    // TODO: implement logic for revisiting page upon the use of a bronchodilator
+    /**
+     * After confirming the information on the diagnosis page, we complete the assessment
+     * and move to the FinalActivity which confirms the collected information.
+     */
     private void saveForm() {
-
-        String file = sharedPreferences.getString(FILENAME, "");
-
+        // We get the current date and time
         Date currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
         String formattedDate = df.format(currentTime);
+        enterDurationIntoSharedPrefs(currentTime);
 
+        // We get the current clinician's username
         Credentials credentials = new Credentials();
         String username = credentials.creds(DiagnosisActivityModified.this).getUsername();
 
-        uniqueID = UUID.randomUUID().toString();
+        // Put the assessment info into the SharedPrefs
+        summaryEditor.putString(CLINICIAN_USERNAME, username);
+        summaryEditor.putString(DATE, formattedDate);
+        summaryEditor.apply();
 
-        if (file.isEmpty()){
-
-            getDuration(currentTime);
-
-            editor.putString(USERNAME, username);
-            editor.putString(DATE, formattedDate);
-            editor.putString(UUIDS, uniqueID);
-            editor.putString(PENDING, isPending);
-            editor.putString(ASSESS_INCOMPLETE, "complete");
-            editor.apply();
-
-            String filename = formattedDate + "_" + uniqueID;
-            editor.putString(FILENAME, filename);
-            editor.apply();
-//            Toast.makeText(this, "empty", Toast.LENGTH_SHORT).show();
-            doLogic(filename);
-        }else {
-            editor.putString(PENDING, isPending);
-            editor.putString(ASSESS_INCOMPLETE, "complete");
-            String filename = formattedDate + "_" + uniqueID;
-            editor.putString(FILENAME, filename);
-            editor.putString(DATE, formattedDate);
-            editor.apply();
-
-            getDuration2(currentTime);
-//            Toast.makeText(this, "not empty", Toast.LENGTH_SHORT).show();
-            doLogic(filename);
-        }
-
+        // Go to the final activity, since we aren't using a bronchodilator and therefore
+        // aren't revisiting this page (currently)
+        startFinalActivity();
     }
 
-    private void getDuration(Date currentTime) {
-        String initial_date = sharedPreferences.getString(INITIAL_DATE, "");
+    private void enterDurationIntoSharedPrefs(Date currentTime) {
+        String initial_date = summaryPrefs.getString(INITIAL_DATE, "");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
         try {
             Date d1 = format.parse(initial_date);
@@ -386,8 +328,8 @@ public class DiagnosisActivityModified extends AppCompatActivity {
 
             long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
             String duration = String.valueOf(minutes);
-            editor.putString(DURATION, duration);
-            editor.apply();
+            summaryEditor.putString(DURATION, duration);
+            summaryEditor.apply();
             Log.d("Difference in time", "getTimeDifference: " + minutes);
 
         } catch (ParseException e) {
@@ -395,71 +337,11 @@ public class DiagnosisActivityModified extends AppCompatActivity {
         }
     }
 
-    private void getDuration2(Date currentTime) {
-        String initial_date = sharedPreferences.getString(INITIAL_DATE_2, "");
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
-        try {
-            Date d1 = format.parse(initial_date);
-
-            long diff = currentTime.getTime() - d1.getTime();//as given
-
-            long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
-            String duration = String.valueOf(minutes);
-            editor.putString(DURATION_2, duration);
-            editor.apply();
-            Log.d("Difference in time", "getTimeDifference: " + minutes);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void doLogic(String file) {
-        // Create a new shared preferences object + editor
-        sharedPreferences1 = getSharedPreferences(file, Context.MODE_PRIVATE);
-        editor1 = sharedPreferences1.edit();
-
-        // Put all values from the current Shared Preferences object into the shared
-        // preferences for the given file
-        Map<String, ?> all = sharedPreferences.getAll();
-        for (Map.Entry<String, ?> x : all.entrySet()) {
-            if (x.getValue().getClass().equals(String.class))  editor1.putString(x.getKey(),  (String)x.getValue());
-//            else if (x.getValue().getClass().equals(Boolean.class)) editor1.putBoolean(x.getKey(), (Boolean)x.getValue());
-        }
-        editor1.commit();
-        editor.clear();
-        editor.commit();
-
-        String filename = sharedPreferences1.getString(SECOND, "");
-        if (!filename.isEmpty()){
-            filename = filename + ".xml";
-            File src = new File("/data/data/" + BuildConfig.APPLICATION_ID + "/shared_prefs/" + filename);
-            if (src.exists()){
-                src.delete();
-//                Toast.makeText(this, "filename", Toast.LENGTH_SHORT).show();
-            }else{
-//                Toast.makeText(this, "no file filename", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        String bron = sharedPreferences1.getString(USED_BRONCHODILATOR, "");
-        String fin = sharedPreferences1.getString(AFTER_BRONCHODILATOR, "");
-        Intent intent;
-        if (bron.equals("Bronchodialtor Given") && fin.isEmpty()){
-            intent = new Intent(DiagnosisActivityModified.this, Dashboard.class);
-        }else{
-            if (isPending.equals("not pending")){
-                intent = new Intent(DiagnosisActivityModified.this, FinalActivity.class);
-                intent.putExtra("filename", file);
-            }else {
-                editor1.putString(SECOND, file);
-                editor1.apply();
-                intent = new Intent(DiagnosisActivityModified.this, Dashboard.class);
-            }
-        }
-
-        startActivity(intent);
-
+    private void startFinalActivity() {
+        Intent finalActivityIntent = new Intent(DiagnosisActivityModified.this, FinalActivity.class);
+        finalActivityIntent.putExtra(SUMMARY_ID, summaryPrefsID);
+        finalActivityIntent.putExtra(DIAGNOSES_ID, diagnosesPrefsID);
+        startActivity(finalActivityIntent);
     }
 
     @Override

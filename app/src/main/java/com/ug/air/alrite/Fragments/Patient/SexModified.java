@@ -47,11 +47,11 @@ public class SexModified extends Fragment {
     private static final int YES = 0;
     private static final int NO = 1;
     public static final String MDIAGNOSIS = "diagnosis_malnutrition";
-    public static final String AGE_IN_MONTHS = "age";
-    public static final String AGE_IN_YEARS = "age2";
-    public static final String KILO = "weight";
-    public static final String MUAC = "muac";
-    public static final String SEX = "gender";
+    public static final String AGE_IN_MONTHS = "Age in months";
+    public static final String AGE_IN_YEARS = "Age in years";
+    public static final String KILO = "Weight";
+    public static final String MUAC = "MUAC";
+    public static final String SEX = "Gender";
     public static final String SHARED_PREFS = "sharedPrefs";
     SharedPreferences sharedPreferences, sharedPreferences1;
     SharedPreferences.Editor editor;

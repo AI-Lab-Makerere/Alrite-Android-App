@@ -1,10 +1,7 @@
 package com.ug.air.alrite.Activities;
 
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.REASSESS;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,17 +10,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
 
 import com.ug.air.alrite.APIs.ApiClient;
-import com.ug.air.alrite.APIs.DecisionTreeJSON;
+import com.ug.air.alrite.APIs.BackendRequests;
 import com.ug.air.alrite.BuildConfig;
 import com.ug.air.alrite.Database.DatabaseHelper;
-import com.ug.air.alrite.Fragments.navigation.AccountFragment;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Counter;
 import com.ug.air.alrite.Utils.Credentials;
@@ -36,18 +31,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.http.GET;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -69,7 +56,7 @@ public class SplashActivity extends AppCompatActivity {
     public static final String ECZEMA_COUNT = "eczema_count";
 
     // TODO: change this if you want to get from online
-    Boolean shouldGetNewAssessment = true;
+    Boolean shouldGetNewAssessmentOnStartup = true;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
@@ -148,9 +135,9 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void getCurrentAssessmentIfConnectedToInternet() {
-        if (isNetworkAvailable() && shouldGetNewAssessment) {
-            DecisionTreeJSON dtJson = ApiClient.getClient(ApiClient.REMOTE_URL_TEMP).create(DecisionTreeJSON.class);
-            Call<String> call = dtJson.getJson("Demo_Workflow");
+        if (isNetworkAvailable() && shouldGetNewAssessmentOnStartup) {
+            BackendRequests dtJson = ApiClient.getClient(ApiClient.REMOTE_URL_TEMP).create(BackendRequests.class);
+            Call<String> call = dtJson.getJson("June_6_Demo");
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {

@@ -96,8 +96,6 @@ public class TextInputTextFragment extends Fragment {
         etDay.setHint(InputHint);
         TextView InputInformationDisplay = view.findViewById(R.id.ti_IInformation);
         InputInformationDisplay.setText(InputInformation);
-        TextView SkipInformationDisplay = view.findViewById(R.id.ti_SInformation);
-        SkipInformationDisplay.setText(SkipInformation);
 
         next = view.findViewById(R.id.next);
         back = view.findViewById(R.id.back);

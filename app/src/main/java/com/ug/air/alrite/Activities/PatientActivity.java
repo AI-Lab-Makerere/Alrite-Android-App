@@ -4,17 +4,18 @@ import static com.ug.air.alrite.Activities.DiagnosisActivity.DATE_2;
 import static com.ug.air.alrite.Activities.DiagnosisActivity.DURATION_2;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DURATION;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.FILENAME;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USERNAME;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.PATIENT_ASSESSMENT_ID;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.CLINICIAN_USERNAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.UUIDS;
 import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
 import static com.ug.air.alrite.Fragments.Patient.Initials.INITIAL_DATE;
 import static com.ug.air.alrite.Fragments.Patient.Initials.PARENT_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.Initials.STUDY_ID;
+import static com.ug.air.alrite.Fragments.Patient.Initials.STUDY_ID_2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.INITIAL_DATE_2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -31,10 +32,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.makeramen.roundedimageview.BuildConfig;
-import com.ug.air.alrite.APIs.ApiClient;
-import com.ug.air.alrite.APIs.DecisionTreeJSON;
 import com.ug.air.alrite.Fragments.Patient.ActivePatients;
-import com.ug.air.alrite.Fragments.Patient.Initials;
 import com.ug.air.alrite.Fragments.Patient.InitialsModified;
 import com.ug.air.alrite.Fragments.Patient.MultipleChoiceFragment;
 import com.ug.air.alrite.Fragments.Patient.MultipleSelectionFragment;
@@ -42,7 +40,6 @@ import com.ug.air.alrite.Fragments.Patient.OtherPatients;
 import com.ug.air.alrite.Fragments.Patient.ParagraphFragment;
 import com.ug.air.alrite.Fragments.Patient.SexModified;
 import com.ug.air.alrite.Fragments.Patient.TextInputFragment;
-import com.ug.air.alrite.Fragments.Patient.TextInputTextFragment;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.Credentials;
 
@@ -52,11 +49,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -65,29 +57,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Retrofit;
-import retrofit2.Response;
-
 public class PatientActivity extends AppCompatActivity implements
         MultipleChoiceFragment.onGetResultListener, MultipleSelectionFragment.onGetResultListener,
-        TextInputFragment.onGetResultListener, TextInputTextFragment.onGetResultListener,
-        ParagraphFragment.onGetResultListener {
+        TextInputFragment.onGetResultListener, ParagraphFragment.onGetResultListener {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String INCOMPLETE = "incomplete";
 
     public static final String ASSESS_INCOMPLETE = "incomplete";
-    SharedPreferences sharedPreferences, sharedPreferences1;
-    SharedPreferences.Editor editor, editor1;
+    SharedPreferences sharedPreferences, sharedPreferences1, patientSummaryPrefs, patientDiagnosesPrefs, developerPrefs;
+    SharedPreferences.Editor editor, editor1, patientSummaryEditor, patientDiagnosesEditor, developerEditor;
     int frag = 0;
 
     @Override
@@ -155,7 +137,7 @@ public class PatientActivity extends AppCompatActivity implements
                         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
                         String formattedDate = df.format(currentTime);
 
-                        String file = sharedPreferences.getString(FILENAME, "");
+                        String file = sharedPreferences.getString(PATIENT_ASSESSMENT_ID, "");
 
                         Credentials credentials = new Credentials();
                         String username = credentials.creds(PatientActivity.this).getUsername();
@@ -167,7 +149,7 @@ public class PatientActivity extends AppCompatActivity implements
                             String uniqueID = UUID.randomUUID().toString();
 
                             editor.putString(DATE, formattedDate);
-                            editor.putString(USERNAME, username);
+                            editor.putString(CLINICIAN_USERNAME, username);
                             editor.putString(UUIDS, uniqueID);
                             editor.putString(INCOMPLETE, "incomplete");
                             editor.apply();
@@ -283,87 +265,146 @@ public class PatientActivity extends AppCompatActivity implements
     public static final String LABEL = "label";
     public static final String CHOICES = "choices";
     public static final String TEXT = "text";
-    public static final String VALUE = "value";
     public static final String LINK = "link";
     public static final String CONTENT = "content";
     public static final String MULTIPLE_CHOICE = "MultipleChoice";
     public static final String TEXT_INPUT = "TextInput";
-    public static final String DIAGNOSIS_PAGE = "Diagnosis Page";
-    public static final String TITLE = "title";
     public static final String IS_DIAGNOSIS_PAGE = "isDiagnosisPage";
     public static final String NULL = "null";
     public static final String DEFAULT_LINK = "defaultLink";
     public static final String TARGET_VALUE_ID = "targetValueID";
     public static final String VALUE_ID = "valueID";
     public static final String SATISFIED_LINK = "satisfiedLink";
-    public static final String NOT_SATISFIED_LINK = "notSatisfiedLink";
     public static final String TYPE = "type";
     public static final String THRESHOLD = "threshold";
-    public static final String NUMERIC_TYPE = "numeric";
-    public static final String ALPHANUMERIC_TYPE = "alphanumeric";
-    public static final String TEXT_TYPE = "text";
-    public static final String ANY_TYPE = "any";
     public static final String PARAGRAPH = "Paragraph";
+    public static final String META = "meta";
+    public static final String VERSION = "version";
+    public static final String NAME = "name";
+    public static final String SUMMARY_ID = "SUMMARY_ID";
+    public static final String DIAGNOSES_ID = "DIAGNOSES_ID";
 
-     // Full JSON infos to call getNextPage
-     JSONArray pages;
 
-     // Information gotten from JSON for the current page
-     // Information gotten from JSON
-     String question;
-     ArrayList<JSONObject> choices;
-     ArrayList<String> backstack;
-     // Other than question there is more information needed
-     // from the JSON for text input
-     String InputHint; //The preview text shown in the input bubble (enter the value here)  *optional (prefer this not to be optional)
-    String InputInformation; //Extra stuff below the input bubble telling user more information (its in celcius) *optional
-    String SkipInformation; //Text shown above the skip button telling user when to skip (no thermometer available) *optional
-    int MinValue; //The minimum value allowed to be inputted
-    int MaxValue; //The maximum value allowed to be inputted
-    int diagnosisCutoff; //The minimum value to be inputted in order to get the diagnosis
-    JSONObject pageID;
+    // Full JSON infos to call getNextPage
+    JSONArray pages;
+    String summaryPrefsID;
+    String diagnosesPrefsID;
+    String developerPrefsID;
+
+    // Information gotten from JSON for the current page
+    // Information gotten from JSON
+    String question;
+    ArrayList<JSONObject> choices;
+    ArrayList<String> backstack;
+
+    // Other than question there is more information needed
+    // from the JSON for text input
+    String inputType;
+    public enum INPUT_TYPES {
+        numeric,
+        alphanumeric,
+        text,
+        any;
+    }
+    public enum COMPARISON_TYPES {
+        G(">"),
+        L("<"),
+        GE(">="),
+        LE("<="),
+        EQ("=");
+
+        public final String symbol;
+
+        COMPARISON_TYPES(String symbol) {
+            this.symbol = symbol;
+        }
+    }
+    JSONObject nextPageJSON;
     String targetValue_id; // for text input
     String targetValueID; // for multiple selection
     String paragraph; //Content for paragraph fragment
 
     /**
-     *
-     * @throws JSONException
-     * @throws IOException
+     * Get the copy of the workflow that we have stored on the device and turn it
+     * into a JSONObject
      */
-    private void implementEditableDecisionTree(JSONObject json) throws JSONException, IOException {
-//        DecisionTreeJSON json = ApiClient.getClient(ApiClient.TEMP_SERV_URL)
-//                                    .create(DecisionTreeJSON.class);
-//        Call<String> call = DecisionTreeJSON.getJson();
-//        System.out.println(json);
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void getJSONFromBackend() {
+        File assessment = new File(getFilesDir(), "assessment.json");
 
+        try {
+            BufferedReader br = Files.newBufferedReader(assessment.toPath());
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            String json = sb.toString();
+
+            br.close();
+
+            implementEditableDecisionTree(new JSONObject(json));
+        } catch (Exception e) {
+            System.out.println("did a bad: " + e);
+        }
+    }
+
+    /**
+     * This is the function that is called to set up the process of looping through
+     * the pages until we get to the diagnosis page
+     *
+     * @throws JSONException for working with JSONObject
+     */
+    private void implementEditableDecisionTree(JSONObject json) throws JSONException {
         backstack = new ArrayList<>();
         pages = json.getJSONArray(PAGES);
+
         // This is just an array because it needs to be mutable: think of it as
         // its own element
         String nextPage = pages.getJSONObject(0).getString(PAGE_ID);
 
-        // Handling the intent
+        // Create a shared preferences object for the current patient
+        // TODO: better security for the SharedPreferences (use EncryptedSharedPreferences)
+        String patientInfoID = createUniquePatientInfoID();
+        summaryPrefsID = patientInfoID + "_Summary";
+        diagnosesPrefsID = patientInfoID + "_Diagnoses";
+        developerPrefsID = patientInfoID + "_DevInfo";
+
+        patientSummaryPrefs = getSharedPreferences(summaryPrefsID, Context.MODE_PRIVATE);
+        patientSummaryEditor = patientSummaryPrefs.edit();
+
+        patientDiagnosesPrefs = getSharedPreferences(diagnosesPrefsID, Context.MODE_PRIVATE);
+        patientDiagnosesEditor = patientDiagnosesPrefs.edit();
+        // MUST INCLUDE THIS: code in OtherPatients was written with the intent that there
+        // would be at least one diagnosis lol
+        patientDiagnosesEditor.putString(DIAGNOSES_ID, diagnosesPrefsID);
+        patientDiagnosesEditor.apply();
+
+        developerPrefs = getSharedPreferences(developerPrefsID, Context.MODE_PRIVATE);
+        developerEditor = developerPrefs.edit();
+        developerEditor.putString(VERSION, json.getJSONObject(META).getString(VERSION));
+        developerEditor.putString(NAME, json.getString(NAME));
+        developerEditor.apply();
+
+        // Clear out the old editor so that it can be used again for a new patient
+        Map<String, ?> currPatientInfos = sharedPreferences.getAll();
+        for (String info : currPatientInfos.keySet()) {
+            if (info.equals("app_version") || info.equals(STUDY_ID) || info.equals(STUDY_ID_2)
+                || info.equals("age") || info.equals("start_date")) {
+                developerEditor.putString(info, (String) currPatientInfos.get(info));
+            } else {
+                patientSummaryEditor.putString(info, (String) currPatientInfos.get(info));
+            }
+        }
+        patientSummaryEditor.apply();
+        developerEditor.apply();
+        editor.clear().apply();
 
         // Continue looping through each page in sequence: depending on the component,
         // inflate a new fragment for that component type
         // If the next page is the final page, exit the loop
         getNextPage(nextPage);
-    }
-
-    /**
-     * NOTE: THIS SHOULD ONLY BE USED FOR SINGLE-LAYER ARRAYS
-     *
-     * @param jsonArray
-     * @return
-     * @throws JSONException
-     */
-    private ArrayList<JSONObject> JSONArrayToListOfJSONObjects(JSONArray jsonArray) throws JSONException {
-        ArrayList<JSONObject> ret = new ArrayList<>();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            ret.add(jsonArray.getJSONObject(i));
-        }
-        return ret;
     }
 
     /**
@@ -396,7 +437,7 @@ public class PatientActivity extends AppCompatActivity implements
         }
 
         // Get all of the items that should be displayed on the page
-        JSONObject nextPageJSON = pages.getJSONObject(findIndexInPagesGivenPageId(nextPageID));
+        nextPageJSON = pages.getJSONObject(findIndexInPagesGivenPageId(nextPageID));
         JSONArray nextPageContent = nextPageJSON.getJSONArray(CONTENT);
 
         // If the next page would be the final page, then the assessment is over!
@@ -405,63 +446,39 @@ public class PatientActivity extends AppCompatActivity implements
             exitActivity();
             return;
         }
-        pageID = nextPageJSON;
+
+        // Since we're not implementing multiple types of data input per page at
+        // the moment, we should default to having the index be 0:
+        int contentIndex = 0;
 
         // Then, for each component that we're given within the page, display a
         // fragment for that component.
-        JSONObject nextPageComponent = nextPageContent.getJSONObject(0);
+        JSONObject nextPageComponent = nextPageContent.getJSONObject(contentIndex);
         String nextPageComponentType = nextPageComponent.getString(COMPONENT);
 
-        // Multiple choice option(s):
         if (nextPageComponentType.equals(MULTIPLE_CHOICE)) {
-            Boolean isMultiSelect = nextPageComponent.getBoolean(MULTISELECT);
+            // Multiselect and multiple choice options:
+            boolean isMultiSelect = nextPageComponent.getBoolean(MULTISELECT);
+            String valueID = getValueID(nextPageJSON, contentIndex);
             if (isMultiSelect) {
-                createMultiSelectFragment(nextPageComponent);
+                createMultiSelectFragment(nextPageComponent, valueID);
             } else {
-                createMultipleChoiceFragment(nextPageComponent);
+                createMultipleChoiceFragment(nextPageComponent, valueID);
             }
 
         // Text input option:
         } else if (nextPageComponentType.equals(TEXT_INPUT)) {
-            if (nextPageComponent.getString(TYPE).equals(NUMERIC_TYPE)) {
-                createTextInputFragment(nextPageComponent);
-            } else {
-                createTextInputTextFragment(nextPageComponent);
-            }
+            String valueID = getValueID(nextPageJSON, contentIndex);
+            createTextInputFragment(nextPageComponent, valueID);
 
         // Paragraph option:
         } else if (nextPageComponentType.equals(PARAGRAPH)) {
             createParagraphFragment(nextPageComponent);
 
-        // There was an issue with identifying the page...
+        // There was an issue with identifying the page... just go to the next page instead
         } else {
             System.out.println("should never get here lol: just go to the next page");
-            getNextPage(pageID.getString(DEFAULT_LINK));
-        }
-    }
-
-    /**
-     * Essentially, make an asynchronous API call to get the HTTP
-     */
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void getJSONFromBackend() {
-        File assessment = new File(getFilesDir(), "assessment.json");
-
-        try {
-            BufferedReader br = Files.newBufferedReader(assessment.toPath());
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-
-            String json = sb.toString();
-
-            br.close();
-
-            implementEditableDecisionTree(new JSONObject(json));
-        } catch (Exception e) {
-            System.out.println("did a bad: " + e);
+            getNextPage(nextPageJSON.getString(DEFAULT_LINK));
         }
     }
 
@@ -470,66 +487,61 @@ public class PatientActivity extends AppCompatActivity implements
      * the activity.
      */
     private void exitActivity() {
-        startActivity(new Intent(PatientActivity.this, DiagnosisActivityModified.class));
+        Intent intent = new Intent(PatientActivity.this, DiagnosisActivityModified.class);
+        intent.putExtra(SUMMARY_ID, summaryPrefsID);
+        intent.putExtra(DIAGNOSES_ID, diagnosesPrefsID);
+
+        startActivity(intent);
         this.finish();
     }
 
-    private void createMultipleChoiceFragment(JSONObject nextPageComponent) throws JSONException {
+    /**
+     * NOTE: THIS SHOULD ONLY BE USED FOR SINGLE-LAYER ARRAYS
+     *
+     * @param jsonArray
+     * @return
+     * @throws JSONException
+     */
+    private ArrayList<JSONObject> JSONArrayToListOfJSONObjects(JSONArray jsonArray) throws JSONException {
+        ArrayList<JSONObject> ret = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            ret.add(jsonArray.getJSONObject(i));
+        }
+        return ret;
+    }
+
+    private void createMultipleChoiceFragment(JSONObject nextPageComponent, String valueID) throws JSONException {
         // Collect the important arguments from the component
         question = nextPageComponent.getString(LABEL);
         choices = JSONArrayToListOfJSONObjects(nextPageComponent.getJSONArray(CHOICES));
 
         // Get the new page's fragment, and set a listener for when the next button
         // is clicked
-        MultipleChoiceFragment mc_fragment = MultipleChoiceFragment.newInstance(question, choices);
+        MultipleChoiceFragment mc_fragment =
+                MultipleChoiceFragment.newInstance(question, choices, valueID, summaryPrefsID);
 
         // Replace and commit the fragment
         completeFragmentTransaction(mc_fragment);
     }
+
     /**
      * Creating the Fragment for Text Input
      *
      * @throws JSONException because we use json objects
      */
-    private void createTextInputFragment(JSONObject page) throws JSONException {
+    private void createTextInputFragment(JSONObject nextPageComponent, String valueID) throws JSONException {
         // Collect the important arguments from the component
-        question = page.getString(LABEL);
-        InputHint = "none right now";
-        InputInformation = "none right now";
-        SkipInformation = "none right now";
-        MinValue = 0;
-        MaxValue = 100;
-        diagnosisCutoff = 50;
-        targetValue_id = page.getString(VALUE_ID);
+        question = nextPageComponent.getString(LABEL);
+        inputType = nextPageComponent.getString(TYPE);
+        targetValue_id = valueID;
 
         // Get the new page's fragment, and set a listener for when the next button
         // is clicked
-        TextInputFragment ti_fragment = TextInputFragment.newInstance(question, InputHint, InputInformation, SkipInformation,
-        MinValue, MaxValue, diagnosisCutoff);
+        TextInputFragment ti_fragment =
+                TextInputFragment.newInstance(question, inputType, valueID, summaryPrefsID);
 
         // Replace and commit the fragment
         completeFragmentTransaction(ti_fragment);
-    }
-
-    /**
-     * Create the TextInputTextFragment
-     *
-     * @param nextPageComponent the component to be displayed on screen
-     * @throws JSONException because json
-     */
-    private void createTextInputTextFragment(JSONObject nextPageComponent) throws JSONException {
-        question = nextPageComponent.getString(LABEL);
-        InputHint = "none right now";
-        InputInformation = "none right now";
-        SkipInformation = "none right now";
-        targetValue_id = nextPageComponent.getString(VALUE_ID);
-
-        // Get the new page's fragment, and set a listener for when the next button
-        // is clicked
-        TextInputTextFragment tit_fragment = TextInputTextFragment.newInstance(question, InputHint, InputInformation, SkipInformation);
-
-        // Replace and commit the fragment
-        completeFragmentTransaction(tit_fragment);
     }
 
     /**
@@ -537,18 +549,20 @@ public class PatientActivity extends AppCompatActivity implements
      *
      * @throws JSONException because we use json objects
      */
-    private void createMultiSelectFragment(JSONObject page) throws JSONException {
+    private void createMultiSelectFragment(JSONObject page, String valueID) throws JSONException {
         question = page.getString(LABEL);
         choices = JSONArrayToListOfJSONObjects(page.getJSONArray(CHOICES));
         targetValueID = page.getString(VALUE_ID);
 
         // Get the new page's fragment
         // set a listener for when the next button is clicked
-        MultipleSelectionFragment ms_fragment = MultipleSelectionFragment.newInstance(question, choices);
+        MultipleSelectionFragment ms_fragment =
+                MultipleSelectionFragment.newInstance(question, choices, valueID, summaryPrefsID);
 
         // Replace and commit the fragment
         completeFragmentTransaction(ms_fragment);
     }
+
     /**
      * Create the ParagraphFragment
      *
@@ -576,17 +590,15 @@ public class PatientActivity extends AppCompatActivity implements
      */
     @Override
     public void getResultFromMultipleChoiceFragment(int choiceIndex) throws JSONException {
-        String diagnosis = choices.get(choiceIndex - 1).getString(TEXT);
-        String nextPageName = choices.get(choiceIndex - 1).getString(LINK);
+        // Enter the diagnosis into the editor
+        String diagnosis = choices.get(choiceIndex).getString(TEXT);
+        enterStringIntoSummaryEditor(nextPageJSON, diagnosis);
 
         // If the link is null, then we should go to the default page
+        String nextPageName = choices.get(choiceIndex).getString(LINK);
         if (nextPageName.equals(NULL)) {
-            nextPageName = pageID.getString(DEFAULT_LINK);
+            nextPageName = nextPageJSON.getString(DEFAULT_LINK);
         }
-        System.out.println("NEXT PAGE NAME:" + nextPageName);
-
-        // Enter the diagnosis into the editor
-        enterSymptomIntoEditor(pageID, diagnosis);
 
         // Decide on the next page based on the result
         try {
@@ -603,19 +615,22 @@ public class PatientActivity extends AppCompatActivity implements
         String NextPage;
 
         if (chosenOptionIds.isEmpty()) {
-            NextPage =  pageID.getString(DEFAULT_LINK);
+            NextPage =  nextPageJSON.getString(DEFAULT_LINK);
         }
         else {
-            String allDiagnoses = choices.get(chosenOptionIds.get(0)).getString(TEXT);
-            for (int i = 1; i < chosenOptionIds.size(); i++) {
-                allDiagnoses += "\n" + choices.get(i).getString(TEXT);
+            String allDiagnoses = "";
+            for (int i = 0; i < chosenOptionIds.size(); i++) {
+                allDiagnoses += choices.get(chosenOptionIds.get(i) - 1).getString(TEXT);
+                if (i != chosenOptionIds.size() - 1) {
+                    allDiagnoses += "\n";
+                }
                 // Enter the diagnosis into the editor
             }
-            enterSymptomIntoEditor(pageID, allDiagnoses);
+            enterStringIntoSummaryEditor(nextPageJSON, allDiagnoses);
 
-            JSONObject foundLink = getContentFromPageID(pageID, targetValueID);
+            JSONObject foundLink = getContentFromPageID(nextPageJSON, targetValueID);
             if (foundLink == null) {
-                NextPage = pageID.getString(DEFAULT_LINK);
+                NextPage = nextPageJSON.getString(DEFAULT_LINK);
             } else {
                 NextPage = foundLink.getString(SATISFIED_LINK);
             }
@@ -630,60 +645,58 @@ public class PatientActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void getResultFromTextInputFragment(Float numberInputted) throws JSONException {
-        String diagnosis = String.valueOf(numberInputted);
-        ArrayList<JSONObject> foundLinks = getContentFromPageIDArray(pageID, targetValue_id);
-        String NextPage = pageID.getString(DEFAULT_LINK);
-        if(!foundLinks.isEmpty()) {
-            // Replace BranchedLink with whatever the name is for the link field
-            // once the branched link logic is completed in the JSON file
-            for (JSONObject foundLink : foundLinks) {
-                if (foundLink.get("type").equals(">")) {
-                    if (numberInputted > Float.parseFloat(foundLink.getString(THRESHOLD))) {
-                        NextPage = foundLink.getString(SATISFIED_LINK);
-                        break;
-                    }
-                } else if (foundLink.get("type").equals("<")) {
-                    if (numberInputted < Float.parseFloat(foundLink.getString(THRESHOLD))) {
-                        NextPage = foundLink.getString(SATISFIED_LINK);
-                        break;
-                    }
-                } else if (foundLink.get("type").equals("<")) {
-                    if (numberInputted < Float.parseFloat(foundLink.getString(THRESHOLD))) {
-                        NextPage = foundLink.getString(SATISFIED_LINK);
-                        break;
-                    }
-                } else {
-                    if (numberInputted == Float.parseFloat(foundLink.getString(THRESHOLD))) {
-                        NextPage = foundLink.getString(SATISFIED_LINK);
+    public void getResultFromTextInputFragment(String inputted) throws JSONException {
+        // First, we get the next page where this will lead eventually, or the default
+        ArrayList<JSONObject> foundLinks = getContentFromPageIDArray(nextPageJSON, targetValue_id);
+        String nextPage = nextPageJSON.getString(DEFAULT_LINK);
+
+        // Next, we get the type of the object that was passed up from the TextInput:
+        // was it a number, or a string?
+        if (inputType.equals(INPUT_TYPES.numeric.name())) {
+            // If it was a number, we can then go through and run all of the comparison types for
+            // each comparison logic component
+            Float diagnosis = Float.valueOf(inputted);
+            if(!foundLinks.isEmpty()) {
+                for (JSONObject foundLink : foundLinks) {
+                    String compType = foundLink.getString(TYPE);
+                    float threshold = Float.parseFloat(foundLink.getString(THRESHOLD));
+                    // greater than
+                    if ((compType.equals(COMPARISON_TYPES.G.symbol) && diagnosis < threshold)
+                    || (compType.equals(COMPARISON_TYPES.L.symbol) && diagnosis < threshold)
+                    || (compType.equals(COMPARISON_TYPES.GE.symbol) && diagnosis >= threshold)
+                    || (compType.equals(COMPARISON_TYPES.LE.symbol) && diagnosis <= threshold)
+                    || (compType.equals(COMPARISON_TYPES.EQ.symbol) && diagnosis == threshold)) {
+                        nextPage = foundLink.getString(SATISFIED_LINK);
                         break;
                     }
                 }
             }
-        }
-        // Enter the diagnosis into the editor
-        enterSymptomIntoEditor(pageID, diagnosis);
-        try {
-            getNextPage(NextPage);
-        } catch(JSONException e) {
-            throw new RuntimeException();
-        }
-    }
+            enterFloatIntoSummaryEditor(nextPageJSON, diagnosis);
+        } else {
+            // In the case that we're comparing strings, we'll compare equality with .equals,
+            // and the other ones it doesn't make sense to compare, so we'll just say that
+            // it doesn't work
+            if(!foundLinks.isEmpty()) {
+                for (JSONObject foundLink : foundLinks) {
+                    String compType = foundLink.getString(TYPE);
+                    String other = foundLink.getString(THRESHOLD);
+                    // all cases where equals is included
+                    if ((compType.equals(COMPARISON_TYPES.GE.symbol) ||
+                        compType.equals(COMPARISON_TYPES.LE.symbol) ||
+                        compType.equals(COMPARISON_TYPES.EQ.symbol)) &&
+                        inputted.equals(other)) {
 
-    @Override
-    public void getResultFromTextInputTextFragment(String textInputted) throws JSONException {
-        String recordedSymptom = textInputted;
-        JSONObject logicComponent = getContentFromPageID(pageID, targetValue_id);
-        String nextPage = pageID.getString(DEFAULT_LINK);
-        if (logicComponent != null) {
-            if (logicComponent.getString(TYPE).equals("=")) {
-                if (recordedSymptom.equals(logicComponent.getString(THRESHOLD))) {
-                    nextPage = logicComponent.getString(SATISFIED_LINK);
+                        nextPage = foundLink.getString(SATISFIED_LINK);
+                        break;
+
+                    // If we don't have an equals, just go to the default page
+                    }
                 }
             }
+            enterStringIntoSummaryEditor(nextPageJSON, inputted);
         }
 
-        enterSymptomIntoEditor(pageID, recordedSymptom);
+        // Finally, we go to the decided next page
         try {
             getNextPage(nextPage);
         } catch(JSONException e) {
@@ -693,13 +706,14 @@ public class PatientActivity extends AppCompatActivity implements
 
     @Override
     public void getResultFromParagraphFragment() throws JSONException {
-        String nextPage = pageID.getString(DEFAULT_LINK);
+        String nextPage = nextPageJSON.getString(DEFAULT_LINK);
         try {
             getNextPage(nextPage);
         } catch(JSONException e) {
             throw new RuntimeException();
         }
     }
+
     /**
      * Takes the page id and returns where we wish to go
      *
@@ -794,9 +808,59 @@ public class PatientActivity extends AppCompatActivity implements
         return -1;
     }
 
-    public void enterSymptomIntoEditor(JSONObject page, String symptom) throws JSONException {
+    /**
+     * Abstracts away the process of adding a symptom to the sharedPreference object
+     *
+     * @param page is the page in the workflow that we're entering a symptom for
+     * @param symptom is the associated string to enter in given the page
+     * @throws JSONException because we look at JSON
+     */
+    public void enterStringIntoSummaryEditor(JSONObject page, String symptom) throws JSONException {
         // Enter the diagnosis into the editor
-        editor.putString("?: " + page.getString(TITLE), symptom);
-        editor.apply();
+        patientSummaryEditor.putString(getValueID(page, 0), symptom);
+        patientSummaryEditor.apply();
+    }
+
+    /**
+     * Abstracts away the process of adding a symptom to the sharedPreference object
+     *
+     * @param page is the page in the workflow that we're entering a symptom for
+     * @param symptom is the associated float to enter in given the page
+     * @throws JSONException because we look at JSON
+     */
+    public void enterFloatIntoSummaryEditor(JSONObject page, Float symptom) throws JSONException {
+        // Enter the diagnosis into the editor
+        patientSummaryEditor.putFloat(getValueID(page, 0), symptom);
+        patientSummaryEditor.apply();
+    }
+
+    /**
+     * Function to get the ValueID (official name for a piece of content)
+     *
+     * @param page is the page in the workflow that the valueID is on
+     * @param contentIndex is the index within the content array that this valueID refers to
+     * @return a string that is the valueID
+     */
+    public String getValueID(JSONObject page, int contentIndex) throws JSONException {
+        return page.getJSONArray(CONTENT).getJSONObject(contentIndex).getString(VALUE_ID);
+    }
+
+    /**
+     * Create a unique ID which is used for uniquely storing patient data on the
+     * current device
+     *
+     * @return the unique ID
+     */
+    public String createUniquePatientInfoID() {
+        String patientInitials = sharedPreferences.getString(CHILD_INITIALS, "");
+        Date currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
+        String formattedDate = df.format(currentTime);
+
+        return patientInitials + "_" + formattedDate;
+    }
+
+    public Boolean isDiagnosisPage(JSONObject page) throws JSONException {
+        return (Boolean) page.get(IS_DIAGNOSIS_PAGE);
     }
 }

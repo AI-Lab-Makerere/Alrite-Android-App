@@ -55,39 +55,48 @@
                     android:textColor="@color/black"
                     android:textSize="18sp" />
 
-                <RadioGroup
-                    android:id="@+id/mc_options"
+                <LinearLayout
+                    android:id="@+id/multiple_choice_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp">
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
 
-                    <RadioButton
-                        android:id="@+id/choice1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/black"
-                        android:text="@string/choice1"
-                        android:textSize="18sp" />
+<!--                    <RadioGroup-->
+<!--                        android:id="@+id/mc_options"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="20dp">-->
+<!--    -->
+<!--                        <RadioButton-->
+<!--                            android:id="@+id/choice1"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:buttonTint="@color/black"-->
+<!--                            android:text="@string/choice1"-->
+<!--                            android:textSize="18sp" />-->
+<!--    -->
+<!--                        <RadioButton-->
+<!--                            android:id="@+id/choice2"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginTop="10dp"-->
+<!--                            android:buttonTint="@color/black"-->
+<!--                            android:text="@string/choice2"-->
+<!--                            android:textSize="18sp" />-->
+<!--    -->
+<!--                        <RadioButton-->
+<!--                            android:id="@+id/choice3"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginTop="10dp"-->
+<!--                            android:buttonTint="@color/black"-->
+<!--                            android:text="%s"-->
+<!--                            android:textSize="18sp" />-->
+<!--    -->
+<!--                    </RadioGroup>-->
 
-                    <RadioButton
-                        android:id="@+id/choice2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:buttonTint="@color/black"
-                        android:text="@string/choice2"
-                        android:textSize="18sp" />
-
-                    <RadioButton
-                        android:id="@+id/choice3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:buttonTint="@color/black"
-                        android:text="%s"
-                        android:textSize="18sp" />
-
-                </RadioGroup>
+                </LinearLayout>
 
             </LinearLayout>
 

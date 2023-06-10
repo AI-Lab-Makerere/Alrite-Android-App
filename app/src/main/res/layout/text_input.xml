@@ -71,7 +71,6 @@
                         android:background="@drawable/text_input_bg"
                         android:gravity="center"
                         android:hint="@string/ti_IHint"
-                        android:inputType="numberDecimal"
                         android:maxLength="4" />
 
                 </LinearLayout>
@@ -81,35 +80,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:text="@string/ti_IInformation"
+                    android:text=""
                     android:textSize="12sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/ti_SInformation"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:text="@string/ti_SInformation"
-                        android:textSize="12sp" />
-
-                    <Button
-                        android:id="@+id/skip"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/bg_button"
-                        android:text="Skip"
-                        android:textColor="@color/color_background" />
-
-                </LinearLayout>
 
             </LinearLayout>
 

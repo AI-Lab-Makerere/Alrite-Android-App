@@ -71,9 +71,9 @@ public class Bronchodilator extends Fragment {
     SharedPreferences sharedPreferences, sharedPreferences2;
     SharedPreferences.Editor editor, editor2;
     public static final String DATE = "end_date";
-    public static final String FILENAME = "filename";
+    public static final String PATIENT_ASSESSMENT_ID = "filename";
     public static final String UUIDS = "patient_uuid";
-    public static final String USERNAME = "clinician";
+    public static final String CLINICIAN_USERNAME = "clinician";
     public static final String DURATION = "duration";
     TextView txtDisease, txtDefinition, txtOk, txtDiagnosis;
     LinearLayout linearLayoutDisease;
@@ -239,7 +239,7 @@ public class Bronchodilator extends Fragment {
 
         Credentials credentials = new Credentials();
         String username = credentials.creds(getActivity()).getUsername();
-        editor.putString(USERNAME, username);
+        editor.putString(CLINICIAN_USERNAME, username);
 
         uniqueID = UUID.randomUUID().toString();
 
@@ -247,7 +247,7 @@ public class Bronchodilator extends Fragment {
         editor.putString(UUIDS, uniqueID);
 
         filename = formattedDate + "_" + uniqueID;
-        editor.putString(FILENAME, filename);
+        editor.putString(PATIENT_ASSESSMENT_ID, filename);
         editor.apply();
 
         Data inputData = new Data.Builder()
