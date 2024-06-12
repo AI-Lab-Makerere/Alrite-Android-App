@@ -2,28 +2,28 @@ package com.ug.air.alrite.Activities;
 
 import static com.ug.air.alrite.Activities.FinalActivity.S6;
 import static com.ug.air.alrite.Activities.FinalActivity.S7;
-import static com.ug.air.alrite.Activities.PatientActivity.INCOMPLETE;
+import static com.ug.air.alrite.Activities.PatientActivity.ASSESS_INCOMPLETE;
 import static com.ug.air.alrite.Fragments.Patient.Allergies.CHOICEY2;
-import static com.ug.air.alrite.Fragments.Patient.Assess.DIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Assess.FINAL_DIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
 import static com.ug.air.alrite.Fragments.Patient.Breathless.S5;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.BRONCHODILATOR;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.BRONCHODILATOR_WAS_GIVEN;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USED_BRONCHODILATOR;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DURATION;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.FILENAME;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.USERNAME;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.PATIENT_ASSESSMENT_ID;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.CLINICIAN_USERNAME;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.UUIDS;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator2.BDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator2.REASON;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.B3DIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.BRONC;
+import static com.ug.air.alrite.Fragments.Patient.Bronchodilator3.AFTER_BRONCHODILATOR;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.CHOICE7;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.CHOICE72;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.CIDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT;
 import static com.ug.air.alrite.Fragments.Patient.ChestIndrawing.POINT2;
-import static com.ug.air.alrite.Fragments.Patient.Cough.CHOICE2;
+import static com.ug.air.alrite.Fragments.Patient.Cough.DIFFICULTY_BREATHING;
 import static com.ug.air.alrite.Fragments.Patient.Cough.NODIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.CoughD.DAY1;
 import static com.ug.air.alrite.Fragments.Patient.Eczema.CHOICEX2;
@@ -32,35 +32,31 @@ import static com.ug.air.alrite.Fragments.Patient.FTouch.TOUCH;
 import static com.ug.air.alrite.Fragments.Patient.HIVCare.CHOICEHC;
 import static com.ug.air.alrite.Fragments.Patient.HIVStatus.CHOICE3;
 import static com.ug.air.alrite.Fragments.Patient.HIVStatus.HDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Initials.CIN;
+import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
 import static com.ug.air.alrite.Fragments.Patient.Initials.INITIAL_DATE;
-import static com.ug.air.alrite.Fragments.Patient.Initials.PIN;
+import static com.ug.air.alrite.Fragments.Patient.Initials.PARENT_INITIALS;
 import static com.ug.air.alrite.Fragments.Patient.Kerosene.ADIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Kerosene.CHOICET2;
 import static com.ug.air.alrite.Fragments.Patient.Kerosene.TUDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Nasal.CHOICEGN;
-import static com.ug.air.alrite.Fragments.Patient.Nasal.GNDIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Oxygen.OXDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Oxygen.OXY;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.FASTBREATHING2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.INITIAL_DATE_2;
 import static com.ug.air.alrite.Fragments.Patient.RRCounter.SECOND;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE2;
-import static com.ug.air.alrite.Fragments.Patient.Sex.CHOICE;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_YEARS;
+import static com.ug.air.alrite.Fragments.Patient.Sex.SEX;
 import static com.ug.air.alrite.Fragments.Patient.Sex.KILO;
 import static com.ug.air.alrite.Fragments.Patient.Sex.MDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Sex.MUAC;
 import static com.ug.air.alrite.Fragments.Patient.Smoke.CHOICET1;
 import static com.ug.air.alrite.Fragments.Patient.Stridor.CHOICE6;
-import static com.ug.air.alrite.Fragments.Patient.Stridor.STDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Temperature.TDIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Temperature.TEMP;
 import static com.ug.air.alrite.Fragments.Patient.WheezD.CHOICEX;
 import static com.ug.air.alrite.Fragments.Patient.WheezY.DAY2;
-import static com.ug.air.alrite.Fragments.Patient.Wheezing.CHECKSTETHO;
-import static com.ug.air.alrite.Fragments.Patient.Wheezing.CHOICE8;
+import static com.ug.air.alrite.Fragments.Patient.Wheezing.WHEEZING_SOUNDS;
 import static com.ug.air.alrite.Fragments.Patient.Wheezing.CHOICE82;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -71,7 +67,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -111,10 +106,10 @@ import java.util.concurrent.TimeUnit;
 
 public class DiagnosisActivity extends AppCompatActivity {
 
-    LinearLayout linearLayout1, linearLayout2, linearLayout3, linearLayout4;
+    LinearLayout summaryTabLayout, summaryExpandedLayout, diagnosisTabLayout, diagnosisExpandedLayout;
     Button btnExit, btnExit2, btnContinue, btnSave;
-    ImageView imageView1, imageView2;
-    RecyclerView recyclerView1, recyclerView2;
+    ImageView summaryTabIcon, diagnosisTabIcon;
+    RecyclerView summaryListRV, diagnosisListRV;
     TextView txtInitials, txtAge, txtGender;
     DiagnosisAdapter diagnosisAdapter;
     SummaryAdapter summaryAdapter;
@@ -127,7 +122,7 @@ public class DiagnosisActivity extends AppCompatActivity {
     public static final String DURATION_2 = "duration_2";
     SharedPreferences sharedPreferences, sharedPreferences1;
     SharedPreferences.Editor editor, editor1;
-    String age, uniqueID, age2, folder, value;
+    String ageInYears, uniqueID, ageInMonths, folder, isPending;
     float ag;
     Dialog dialog;
     RecyclerView recyclerView;
@@ -142,20 +137,23 @@ public class DiagnosisActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diagnosis);
 
+        // Get references to page objects
         txtAge = findViewById(R.id.patient_age);
         txtGender = findViewById(R.id.patient_sex);
         txtInitials = findViewById(R.id.initials);
-        imageView1 = findViewById(R.id.accordion);
-        linearLayout1 = findViewById(R.id.clickable);
-        linearLayout2 = findViewById(R.id.summary2);
-        recyclerView1 = findViewById(R.id.recyclerView1);
-        imageView2 = findViewById(R.id.accordion2);
-        linearLayout3 = findViewById(R.id.clickable2);
-        linearLayout4 = findViewById(R.id.summary3);
+        summaryTabIcon = findViewById(R.id.accordion);
+        summaryTabLayout = findViewById(R.id.clickable);
+        summaryExpandedLayout = findViewById(R.id.summary2);
+        summaryListRV = findViewById(R.id.recyclerView1);
+        diagnosisTabIcon = findViewById(R.id.accordion2);
+        diagnosisTabLayout = findViewById(R.id.clickable2);
+        diagnosisExpandedLayout = findViewById(R.id.summary3);
         btnExit = findViewById(R.id.btnExit);
         btnSave = findViewById(R.id.btnExit2);
-        recyclerView2 = findViewById(R.id.recyclerView2);
+        diagnosisListRV = findViewById(R.id.recyclerView2);
 
+        // If we have "filename" then we should get the SharedPreferences object
+        // associated with the filename
         Intent intent = getIntent();
         if (intent.hasExtra("filename")){
             folder = intent.getExtras().getString("filename");
@@ -164,6 +162,10 @@ public class DiagnosisActivity extends AppCompatActivity {
             String pending = sharedPreferences.getString(PENDING, "");
 //            String incomplete = sharedPreferences.getString(INCOMPLETE, "");
 
+            // If we've opened this page before and indicated that we don't want
+            // to exit, then this time we'll be forced to exit.
+            // If we indicated last time that we want to save and exit, then make
+            // sure that we can't press either of those buttons again
             if (pending.equals("pending")){
                 btnSave.setVisibility(View.GONE);
                 btnExit.setVisibility(View.VISIBLE);
@@ -172,11 +174,16 @@ public class DiagnosisActivity extends AppCompatActivity {
                 btnExit.setVisibility(View.GONE);
             }
 
+        // If we don't have "filename" then we should get the generic shared preferences,
+        // and then check in on what we entered for the bronchodilator
         }else{
             sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-            String bron = sharedPreferences.getString(BRONCHODILATOR, "");
-            String fin = sharedPreferences.getString(BRONC, "");
-            if (bron.equals("Bronchodialtor Given") && fin.isEmpty()){
+            String bron = sharedPreferences.getString(USED_BRONCHODILATOR, "");
+            String fin = sharedPreferences.getString(AFTER_BRONCHODILATOR, "");
+
+            // If we used a bronchodilator on the patient, but we haven't checked
+            // in on if it worked or not, then set buttons as visible/not visible
+            if (bron.equals(BRONCHODILATOR_WAS_GIVEN) && fin.isEmpty()){
                 btnSave.setVisibility(View.GONE);
             }else {
                 btnSave.setVisibility(View.VISIBLE);
@@ -184,73 +191,77 @@ public class DiagnosisActivity extends AppCompatActivity {
             btnExit.setVisibility(View.VISIBLE);
         }
 
+        // Get an editor for our shared preferences
         editor = sharedPreferences.edit();
 
-        String initials = sharedPreferences.getString(CIN, "");
-        age2 = sharedPreferences.getString(AGE, "");
-        age = sharedPreferences.getString(AGE2, "");
-        String[] split = age.split("\\.");
-        ag = Float.parseFloat(age2);
-        String gender = sharedPreferences.getString(CHOICE, "");
+        // Save the patient's age, for reference in the diagnosis instructions
+        ageInMonths = sharedPreferences.getString(AGE_IN_MONTHS, "");
+
+        // At the top of the page, display the patient's initials, age, and gender
+        String initials = sharedPreferences.getString(CHILD_INITIALS, "");
+        ageInYears = sharedPreferences.getString(AGE_IN_YEARS, "");
+        String[] ageInYearsSplit = ageInYears.split("\\.");
+        String gender = sharedPreferences.getString(SEX, "");
         txtInitials.setText(initials);
-        txtAge.setText("Age: " + split[0] + " years and " + split[1] + " months");
+        txtAge.setText("Age: " + ageInYearsSplit[0] + " years and " + ageInYearsSplit[1] + " months");
         txtGender.setText("Gender: " + gender);
 
-        linearLayout1.setOnClickListener(new View.OnClickListener() {
+        // Click on the summary tab to expand it to show a summary of the patient's health
+        summaryTabLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (linearLayout2.getVisibility() == View.GONE){
-                    linearLayout2.setVisibility(View.VISIBLE);
-                    imageView1.setImageResource(R.drawable.ic_sub);
+                if (summaryExpandedLayout.getVisibility() == View.GONE){
+                    summaryExpandedLayout.setVisibility(View.VISIBLE);
+                    summaryTabIcon.setImageResource(R.drawable.ic_sub);
                 }else{
-                    linearLayout2.setVisibility(View.GONE);
-                    imageView1.setImageResource(R.drawable.ic_add);
+                    summaryExpandedLayout.setVisibility(View.GONE);
+                    summaryTabIcon.setImageResource(R.drawable.ic_add);
                 }
             }
         });
 
-        LinearLayoutManager layoutManager1 = new LinearLayoutManager(DiagnosisActivity.this);
+        // Add the list to be expanded + a manager to expand it
+        LinearLayoutManager summaryLayoutManager = new LinearLayoutManager(DiagnosisActivity.this);
         summaryAdapter = new SummaryAdapter(buildSummaryList());
-        recyclerView1.setAdapter(summaryAdapter);
-        recyclerView1.setLayoutManager(layoutManager1);
+        summaryListRV.setAdapter(summaryAdapter);
+        summaryListRV.setLayoutManager(summaryLayoutManager);
 
-        linearLayout3.setOnClickListener(new View.OnClickListener() {
+        // Same for diagnosis tab
+        diagnosisTabLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (linearLayout4.getVisibility() == View.GONE){
-                    linearLayout4.setVisibility(View.VISIBLE);
-                    imageView2.setImageResource(R.drawable.ic_sub);
+                if (diagnosisExpandedLayout.getVisibility() == View.GONE){
+                    diagnosisExpandedLayout.setVisibility(View.VISIBLE);
+                    diagnosisTabIcon.setImageResource(R.drawable.ic_sub);
                 }else{
-                    linearLayout4.setVisibility(View.GONE);
-                    imageView2.setImageResource(R.drawable.ic_add);
+                    diagnosisExpandedLayout.setVisibility(View.GONE);
+                    diagnosisTabIcon.setImageResource(R.drawable.ic_add);
                 }
             }
         });
 
-        LinearLayoutManager layoutManager2 = new LinearLayoutManager(DiagnosisActivity.this);
-        diagnosisAdapter = new DiagnosisAdapter(buildItemList());
-        recyclerView2.setAdapter(diagnosisAdapter);
-        recyclerView2.setLayoutManager(layoutManager2);
+        LinearLayoutManager diagnosisLayoutManager = new LinearLayoutManager(DiagnosisActivity.this);
+        diagnosisAdapter = new DiagnosisAdapter(buildDiagnosisList());
+        diagnosisListRV.setAdapter(diagnosisAdapter);
+        diagnosisListRV.setLayoutManager(diagnosisLayoutManager);
 
+        // Inside of the expanded diagnosis tab, if we click on one of the diagnoses,
+        // expand the tab and give instructions on what to do
         diagnosisAdapter.setOnItemClickListener(new DiagnosisAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
-                Diagnosis diagnosis = buildItemList().get(position);
+                Diagnosis diagnosis = buildDiagnosisList().get(position);
                 String dia = diagnosis.getDiagnosis();
                 showInstructions(dia);
 //                Toast.makeText(DiagnosisActivity.this, dia, Toast.LENGTH_SHORT).show();
             }
-
-            @Override
-            public void onClick2(int position) {
-
-            }
         });
 
+        // If we click "save and complete" then set PENDING to false and
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                value = "not pending";
+                isPending = "not pending";
                 saveForm();
             }
         });
@@ -258,7 +269,7 @@ public class DiagnosisActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                value = "pending";
+                isPending = "pending";
                 saveForm();
             }
         });
@@ -310,7 +321,7 @@ public class DiagnosisActivity extends AppCompatActivity {
 
     }
 
-    private List<Diagnosis> buildItemList() {
+    private List<Diagnosis> buildDiagnosisList() {
         List<Diagnosis> diagnosisList = new ArrayList<>();
 
         String mDiagnosis = sharedPreferences.getString(MDIAGNOSIS, "");
@@ -332,20 +343,20 @@ public class DiagnosisActivity extends AppCompatActivity {
 //            addToList2("Severe Pneumonia OR very Severe Disease");
 //        }
 
-        addToList2(oneDiagnosis);
-        addToList2(mDiagnosis);
-        addToList2(tDiagnosis);
+        addToDiagnosisList(oneDiagnosis);
+        addToDiagnosisList(mDiagnosis);
+        addToDiagnosisList(tDiagnosis);
 //        addToList2(oxDiagnosis);
-        addToList2(noDiagnosis);
-        addToList2(hDiagnosis);
+        addToDiagnosisList(noDiagnosis);
+        addToDiagnosisList(hDiagnosis);
 //        addToList2(stDiagnosis);
 //        addToList2(gnDiagnosis);
-        addToList2(ciDiagnosis);
-        addToList2(wDiagnosis);
-        addToList2(asDiagnosis);
-        addToList2(tuDiagnosis);
-        addToList2(b3Diagnosis);
-        addToList2(ftDiagnosis);
+        addToDiagnosisList(ciDiagnosis);
+        addToDiagnosisList(wDiagnosis);
+        addToDiagnosisList(asDiagnosis);
+        addToDiagnosisList(tuDiagnosis);
+        addToDiagnosisList(b3Diagnosis);
+        addToDiagnosisList(ftDiagnosis);
 
 
         for (int i=0; i < messages.size(); i++) {
@@ -369,16 +380,16 @@ public class DiagnosisActivity extends AppCompatActivity {
 
     private List<Summary> buildSummaryList(){
         summaryList = new ArrayList<>();
-        String pin = sharedPreferences.getString(PIN, "");
+        String pin = sharedPreferences.getString(PARENT_INITIALS, "");
         String weight = sharedPreferences.getString(KILO, "");
         String muac = sharedPreferences.getString(MUAC, "");
-        String assess = sharedPreferences.getString(S4, "");
+        String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
         String temp = sharedPreferences.getString(TEMP, "");
         String feb = sharedPreferences.getString(TOUCH, "");
         String ox = sharedPreferences.getString(OXY, "");
-        String wheez = sharedPreferences.getString(CHOICE8, "");
+        String wheez = sharedPreferences.getString(WHEEZING_SOUNDS, "");
         String wheez2 = sharedPreferences.getString(CHOICE82, "");
-        String cough = sharedPreferences.getString(CHOICE2, "");
+        String cough = sharedPreferences.getString(DIFFICULTY_BREATHING, "");
         String hiv = sharedPreferences.getString(CHOICE3, "");
         String care = sharedPreferences.getString(CHOICEHC, "");
         String coughD = sharedPreferences.getString(DAY1, "");
@@ -388,7 +399,7 @@ public class DiagnosisActivity extends AppCompatActivity {
         String nasal = sharedPreferences.getString(CHOICEGN, "");
         String chest = sharedPreferences.getString(CHOICE7, "");
         String chest2 = sharedPreferences.getString(CHOICE72, "");
-        String bronch = sharedPreferences.getString(BRONCHODILATOR, "");
+        String bronch = sharedPreferences.getString(USED_BRONCHODILATOR, "");
         String reason = sharedPreferences.getString(REASON, "");
         String wheezD = sharedPreferences.getString(CHOICEX, "");
         String wheezY = sharedPreferences.getString(DAY2, "");
@@ -398,58 +409,58 @@ public class DiagnosisActivity extends AppCompatActivity {
         String smoke = sharedPreferences.getString(CHOICET1, "");
         String kerosene = sharedPreferences.getString(CHOICET2, "");
         String fastbreathing2 = sharedPreferences.getString(FASTBREATHING2, "");
-        String better = sharedPreferences.getString(BRONC, "");
+        String better = sharedPreferences.getString(AFTER_BRONCHODILATOR, "");
         String point1 = sharedPreferences.getString(POINT, "");
         String point2 = sharedPreferences.getString(POINT2, "");
         String diagnosis = sharedPreferences.getString(S7, "");
         String treatment = sharedPreferences.getString(S6, "");
 
-        addToList("Parent's initials", pin);
-        addToList("Child's weight", weight);
-        addToList("MUAC value", muac);
-        addToList("Danger Signs", assess);
-        addToList("Child Coughing", cough);
-        addToList("Days coughing", coughD);
-        addToList("Temperature", temp);
-        addToList("Febrile to touch", feb);
-        addToList("HIV Status", hiv);
-        addToList("Child in HIV Care", care);
-        addToList("Oxgyen Saturation", ox);
-        addToList("Respiratory Rate", fastbreathing);
-        addToList("Child has Stridor", stidor);
-        addToList("Child Wheezing", wheez);
+        addToSummaryList("Parent's initials", pin);
+        addToSummaryList("Child's weight", weight);
+        addToSummaryList("MUAC value", muac);
+        addToSummaryList("Danger Signs", assess);
+        addToSummaryList("Child Coughing", cough);
+        addToSummaryList("Days coughing", coughD);
+        addToSummaryList("Temperature", temp);
+        addToSummaryList("Febrile to touch", feb);
+        addToSummaryList("HIV Status", hiv);
+        addToSummaryList("Child in HIV Care", care);
+        addToSummaryList("Oxgyen Saturation", ox);
+        addToSummaryList("Respiratory Rate", fastbreathing);
+        addToSummaryList("Child has Stridor", stidor);
+        addToSummaryList("Child Wheezing", wheez);
 //        addToList("Stethoscope was used", String.valueOf(steth));
-        addToList("Child has grunting or nasal flaring", nasal);
-        addToList("Child has chest indrawing", chest);
-        addToList("Respiratory score", point1);
-        addToList("Bronchodilator", bronch);
-        addToList("Reason", reason);
-        addToList("Respiratory Rate (After bronchodilator)", fastbreathing2);
-        addToList("Child Wheezing", wheez2);
-        addToList("Child has chest indrawing", chest2);
-        addToList("Child's breathing after bronchodilator", better);
-        addToList("Respiratory score 2", point2);
-        addToList("Child has breathing difficulty", wheezD);
-        addToList("Episodes in the past year", wheezY);
-        addToList("Child his breathless", breathless);
-        addToList("Child has Eczema", eczema);
-        addToList("Child's family has Allergies", allergies);
-        addToList("Any family member smoking tobacco", smoke);
-        addToList("Any family member using kerosene", kerosene);
-        addToList("Clinician's diagnosis", diagnosis);
-        addToList("Clinician's treatment", treatment);
+        addToSummaryList("Child has grunting or nasal flaring", nasal);
+        addToSummaryList("Child has chest indrawing", chest);
+        addToSummaryList("Respiratory score", point1);
+        addToSummaryList("Bronchodilator", bronch);
+        addToSummaryList("Reason", reason);
+        addToSummaryList("Respiratory Rate (After bronchodilator)", fastbreathing2);
+        addToSummaryList("Child Wheezing", wheez2);
+        addToSummaryList("Child has chest indrawing", chest2);
+        addToSummaryList("Child's breathing after bronchodilator", better);
+        addToSummaryList("Respiratory score 2", point2);
+        addToSummaryList("Child has breathing difficulty", wheezD);
+        addToSummaryList("Episodes in the past year", wheezY);
+        addToSummaryList("Child his breathless", breathless);
+        addToSummaryList("Child has Eczema", eczema);
+        addToSummaryList("Child's family has Allergies", allergies);
+        addToSummaryList("Any family member smoking tobacco", smoke);
+        addToSummaryList("Any family member using kerosene", kerosene);
+        addToSummaryList("Clinician's diagnosis", diagnosis);
+        addToSummaryList("Clinician's treatment", treatment);
 
         return summaryList;
     }
 
-    private void addToList(String s, String pin) {
+    private void addToSummaryList(String s, String pin) {
         if (!pin.isEmpty()){
             Summary summary = new Summary(s, pin);
             summaryList.add(summary);
         }
     }
 
-    private void addToList2(String s) {
+    private void addToDiagnosisList(String s) {
         if (!s.isEmpty()){
             messages.add(s);
         }
@@ -457,10 +468,10 @@ public class DiagnosisActivity extends AppCompatActivity {
 
     private void createList(String s) {
         String weight = sharedPreferences.getString(KILO, "");
-        int ag = Integer.parseInt(age2);
+        int ag = Integer.parseInt(ageInMonths);
 
         if (s.equals("Severe Pneumonia OR very Severe Disease")){
-            String st = sharedPreferences.getString(S4, "");
+            String st = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
             Instructions instructions = new Instructions();
             messageList = instructions.GetInstructions(ag, weight, st);
         }
@@ -556,7 +567,7 @@ public class DiagnosisActivity extends AppCompatActivity {
 
     private void saveForm() {
 
-        String file = sharedPreferences.getString(FILENAME, "");
+        String file = sharedPreferences.getString(PATIENT_ASSESSMENT_ID, "");
 
         Date currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
@@ -571,23 +582,23 @@ public class DiagnosisActivity extends AppCompatActivity {
 
             getDuration(currentTime);
 
-            editor.putString(USERNAME, username);
+            editor.putString(CLINICIAN_USERNAME, username);
             editor.putString(DATE, formattedDate);
             editor.putString(UUIDS, uniqueID);
-            editor.putString(PENDING, value);
-            editor.putString(INCOMPLETE, "complete");
+            editor.putString(PENDING, isPending);
+            editor.putString(ASSESS_INCOMPLETE, "complete");
             editor.apply();
 
             String filename = formattedDate + "_" + uniqueID;
-            editor.putString(FILENAME, filename);
+            editor.putString(PATIENT_ASSESSMENT_ID, filename);
             editor.apply();
 //            Toast.makeText(this, "empty", Toast.LENGTH_SHORT).show();
             doLogic(filename);
         }else {
-            editor.putString(PENDING, value);
-            editor.putString(INCOMPLETE, "complete");
+            editor.putString(PENDING, isPending);
+            editor.putString(ASSESS_INCOMPLETE, "complete");
             String filename = formattedDate + "_" + uniqueID;
-            editor.putString(FILENAME, filename);
+            editor.putString(PATIENT_ASSESSMENT_ID, filename);
             editor.putString(DATE, formattedDate);
             editor.apply();
 
@@ -637,8 +648,12 @@ public class DiagnosisActivity extends AppCompatActivity {
     }
 
     private void doLogic(String file) {
+        // Create a new shared preferences object + editor
         sharedPreferences1 = getSharedPreferences(file, Context.MODE_PRIVATE);
         editor1 = sharedPreferences1.edit();
+
+        // Put all values from the current Shared Preferences object into the shared
+        // preferences for the given file
         Map<String, ?> all = sharedPreferences.getAll();
         for (Map.Entry<String, ?> x : all.entrySet()) {
             if (x.getValue().getClass().equals(String.class))  editor1.putString(x.getKey(),  (String)x.getValue());
@@ -660,13 +675,13 @@ public class DiagnosisActivity extends AppCompatActivity {
             }
         }
 
-        String bron = sharedPreferences1.getString(BRONCHODILATOR, "");
-        String fin = sharedPreferences1.getString(BRONC, "");
+        String bron = sharedPreferences1.getString(USED_BRONCHODILATOR, "");
+        String fin = sharedPreferences1.getString(AFTER_BRONCHODILATOR, "");
         Intent intent;
         if (bron.equals("Bronchodialtor Given") && fin.isEmpty()){
             intent = new Intent(DiagnosisActivity.this, Dashboard.class);
         }else{
-            if (value.equals("not pending")){
+            if (isPending.equals("not pending")){
                 intent = new Intent(DiagnosisActivity.this, FinalActivity.class);
                 intent.putExtra("filename", file);
             }else {

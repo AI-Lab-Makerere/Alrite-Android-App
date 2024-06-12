@@ -3,6 +3,7 @@ package com.ug.air.alrite.Fragments.Patient;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -22,15 +23,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ug.air.alrite.Activities.PatientActivity;
 import com.ug.air.alrite.R;
 import com.ug.air.alrite.Utils.XML.ItemFactory;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.Objects;
 
 
-public class Sex extends Fragment {
+public class SexModified extends Fragment {
     View view;
     EditText etYears, etKilo, etKilo2, etMonths, etMuac;
     Button buttonBack, buttonNext;
@@ -44,11 +47,11 @@ public class Sex extends Fragment {
     private static final int YES = 0;
     private static final int NO = 1;
     public static final String MDIAGNOSIS = "diagnosis_malnutrition";
-    public static final String AGE_IN_MONTHS = "age";
-    public static final String AGE_IN_YEARS = "age2";
-    public static final String KILO = "weight";
-    public static final String MUAC = "muac";
-    public static final String SEX = "gender";
+    public static final String AGE_IN_MONTHS = "Age in months";
+    public static final String AGE_IN_YEARS = "Age in years";
+    public static final String KILO = "Weight";
+    public static final String MUAC = "MUAC";
+    public static final String SEX = "Gender";
     public static final String SHARED_PREFS = "sharedPrefs";
     SharedPreferences sharedPreferences, sharedPreferences1;
     SharedPreferences.Editor editor;
@@ -117,10 +120,13 @@ public class Sex extends Fragment {
                 }else{
                     int year = Integer.parseInt(years);
                     int ageInMos = (year*12) + Integer.parseInt(months);
-                    ageInMonths = String.valueOf(ageInMonths);
+                    ageInMonths = String.valueOf(ageInMos);
                     ageInYearsAndMonths = years + "." + months;
                     weight = kg;
                     saveData();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        ((PatientActivity) Objects.requireNonNull(getActivity())).getJSONFromBackend();
+                    }
                 }
             }
         });
@@ -129,7 +135,7 @@ public class Sex extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-                fr.replace(R.id.fragment_container, new Initials());
+                fr.replace(R.id.fragment_container, new InitialsModified());
                 fr.commit();
             }
         });
@@ -265,9 +271,7 @@ public class Sex extends Fragment {
                 }
                 makeDecisions();
 
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (XmlPullParserException | IOException e) {
                 e.printStackTrace();
             }
         }else{
@@ -389,10 +393,5 @@ public class Sex extends Fragment {
         editor.putString(AGE_IN_YEARS, ageInYearsAndMonths);
         editor.putString(SEX, value_sex);
         editor.apply();
-
-        FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-        fr.replace(R.id.fragment_container, new Assess());
-        fr.addToBackStack(null);
-        fr.commit();
     }
 }

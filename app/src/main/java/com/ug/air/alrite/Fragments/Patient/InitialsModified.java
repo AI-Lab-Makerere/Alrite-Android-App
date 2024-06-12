@@ -6,16 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.ug.air.alrite.Activities.Dashboard;
 import com.ug.air.alrite.R;
@@ -27,15 +26,15 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-public class Initials extends Fragment {
+public class InitialsModified extends Fragment {
 
    View view;
    EditText etChildInitials, etParentInitials, etStudy, etCode;
    Button back, next;
    String childInitials, parentInitials, formattedDate, studyId, code, h_code, counter, filename;
-   public static final String CHILD_INITIALS = "patient_initials";
+   public static final String CHILD_INITIALS = "Patient Initials";
     public static final String  VERSION = "app_version";
-   public static final String PARENT_INITIALS = "parent_initials";
+   public static final String PARENT_INITIALS = "Parent Initials";
    public static final String STUDY_ID = "study_id";
     public static final String STUDY_ID_2 = "study_id_2";
    public static final String INITIAL_DATE = "start_date";
@@ -58,26 +57,7 @@ public class Initials extends Fragment {
         back = view.findViewById(R.id.back);
 
         Intent intent = getActivity().getIntent();
-        // If ____, then we can combine the data for
-        // Otherwise, just get the current activity's shared preferences
-        if (intent.hasExtra("filename")) {
-            filename = intent.getExtras().getString("filename");
-            sharedPreferences1 = requireActivity().getSharedPreferences(filename, Context.MODE_PRIVATE);
-            sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-            editor = sharedPreferences.edit();
-            Map<String, ?> all = sharedPreferences1.getAll();
-            for (Map.Entry<String, ?> x : all.entrySet()) {
-                if (x.getValue().getClass().equals(String.class))  editor.putString(x.getKey(),  (String)x.getValue());
-            }
-            editor.commit();
-            editor.putString(SECOND, filename);
-            editor.apply();
-
-        }else {
-            sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        }
-
-        // Get an editor for the shared preferences
+        sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
         // Get the parent's initials and the child's initials and store them in
@@ -145,7 +125,7 @@ public class Initials extends Fragment {
         }
 
         FragmentTransaction fr = requireActivity().getSupportFragmentManager().beginTransaction();
-        fr.replace(R.id.fragment_container, new Sex());
+        fr.replace(R.id.fragment_container, new SexModified());
         fr.addToBackStack(null);
         fr.commit();
     }

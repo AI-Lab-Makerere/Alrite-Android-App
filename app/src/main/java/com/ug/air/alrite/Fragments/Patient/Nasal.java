@@ -2,10 +2,9 @@ package com.ug.air.alrite.Fragments.Patient;
 
 import static com.ug.air.alrite.Activities.SplashActivity.GRANT_COUNT;
 import static com.ug.air.alrite.Activities.SplashActivity.NASAL_COUNT;
-import static com.ug.air.alrite.Activities.SplashActivity.STRIDOR_COUNT;
 import static com.ug.air.alrite.Fragments.Patient.Assess.FINAL_DIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
 import static com.ug.air.alrite.Fragments.Patient.Sex.KILO;
 
 import android.app.Dialog;
@@ -13,7 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
@@ -213,8 +211,8 @@ public class Nasal extends Fragment {
         assessments = new ArrayList<>();
         assessmentAdapter = new AssessmentAdapter(assessments);
 
-        String age = sharedPreferences.getString(AGE, "");
-        String s = sharedPreferences.getString(S4, "");
+        String age = sharedPreferences.getString(AGE_IN_MONTHS, "");
+        String s = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
         String weight = sharedPreferences.getString(KILO, "");
         int ag = Integer.parseInt(age);
 

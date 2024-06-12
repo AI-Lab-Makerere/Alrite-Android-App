@@ -2,27 +2,22 @@ package com.ug.air.alrite.Worker;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static android.content.Context.VIBRATOR_SERVICE;
 
-import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.DATE;
 import static com.ug.air.alrite.Fragments.Patient.Bronchodilator.REASSESS;
-import static com.ug.air.alrite.Fragments.Patient.Initials.CIN;
-import static com.ug.air.alrite.Fragments.Patient.Initials.PIN;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE2;
-import static com.ug.air.alrite.Fragments.Patient.Sex.CHOICE;
+import static com.ug.air.alrite.Fragments.Patient.Initials.CHILD_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.Initials.PARENT_INITIALS;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_YEARS;
+import static com.ug.air.alrite.Fragments.Patient.Sex.SEX;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
 
@@ -35,14 +30,9 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.ug.air.alrite.BuildConfig;
-import com.ug.air.alrite.Fragments.Patient.Bronchodilator;
 import com.ug.air.alrite.R;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class NotifyWorker extends Worker {
 
@@ -89,10 +79,10 @@ public class NotifyWorker extends Worker {
                         if (name.equals(filename)){
                             SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(name, MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            String cin = sharedPreferences.getString(CIN, "");
-                            String pin = sharedPreferences.getString(PIN, "");
-                            String age = sharedPreferences.getString(AGE2, "");
-                            String gender = sharedPreferences.getString(CHOICE, "");
+                            String cin = sharedPreferences.getString(CHILD_INITIALS, "");
+                            String pin = sharedPreferences.getString(PARENT_INITIALS, "");
+                            String age = sharedPreferences.getString(AGE_IN_YEARS, "");
+                            String gender = sharedPreferences.getString(SEX, "");
                             String[] split = age.split("\\.");
                             String ag = split[0] + " years and " + split[1] + " months";
                             editor.putBoolean(REASSESS, true);

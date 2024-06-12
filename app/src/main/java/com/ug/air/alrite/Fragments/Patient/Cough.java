@@ -1,9 +1,7 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Fragments.Patient.Assess.DATE;
-import static com.ug.air.alrite.Fragments.Patient.Assess.DIAGNOSIS;
 import static com.ug.air.alrite.Fragments.Patient.Assess.FINAL_DIAGNOSIS;
-import static com.ug.air.alrite.Fragments.Patient.Assess.S4;
+import static com.ug.air.alrite.Fragments.Patient.Assess.SEVERE_SYMPTOMS;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -29,21 +27,14 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ug.air.alrite.Activities.Dashboard;
 import com.ug.air.alrite.Activities.DiagnosisActivity;
 import com.ug.air.alrite.Adapters.AssessmentAdapter;
 import com.ug.air.alrite.Models.Assessment;
 import com.ug.air.alrite.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
 
 
 public class Cough extends Fragment {
@@ -55,7 +46,7 @@ public class Cough extends Fragment {
     String value3 = "none";
     private static final int YES = 0;
     private static final int NO = 1;
-    public static final String CHOICE2 = "difficulty_breathing";
+    public static final String DIFFICULTY_BREATHING = "difficulty_breathing";
     public static final String NODIAGNOSIS = "diagnosis_3";
     public static final String SHARED_PREFS = "sharedPrefs";
     Dialog dialog;
@@ -130,7 +121,7 @@ public class Cough extends Fragment {
     }
 
     private void saveData() {
-        editor.putString(CHOICE2, value3);
+        editor.putString(DIFFICULTY_BREATHING, value3);
         editor.apply();
 
         if (value3.equals("No")){
@@ -139,7 +130,7 @@ public class Cough extends Fragment {
                 editor.remove(NODIAGNOSIS);
                 editor.apply();
             }
-            String assess = sharedPreferences.getString(S4, "");
+            String assess = sharedPreferences.getString(SEVERE_SYMPTOMS, "");
             if (!assess.equals("None of these")){
                 startActivity(new Intent(getActivity(), DiagnosisActivity.class));
             }else {
@@ -157,7 +148,7 @@ public class Cough extends Fragment {
     private void loadData() {
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
-        value3 = sharedPreferences.getString(CHOICE2, "");
+        value3 = sharedPreferences.getString(DIFFICULTY_BREATHING, "");
     }
 
     private void updateViews() {

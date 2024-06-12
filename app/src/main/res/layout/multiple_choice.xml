@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Fragments.Patient.FTouch">
+    tools:context=".Fragments.Patient.Fever">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,39 +46,57 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/mc_question"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="25dp"
                     android:gravity="center_horizontal"
-                    android:text="Is the child febrile to touch?"
+                    android:text="@string/mc_question"
                     android:textColor="@color/black"
                     android:textSize="18sp" />
 
-                <RadioGroup
-                    android:id="@+id/radioGroup1"
+                <LinearLayout
+                    android:id="@+id/multiple_choice_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp">
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
 
-                    <RadioButton
-                        android:id="@+id/yes1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/black"
-                        android:text="Yes"
-                        android:textSize="18sp" />
+<!--                    <RadioGroup-->
+<!--                        android:id="@+id/mc_options"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="20dp">-->
+<!--    -->
+<!--                        <RadioButton-->
+<!--                            android:id="@+id/choice1"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:buttonTint="@color/black"-->
+<!--                            android:text="@string/choice1"-->
+<!--                            android:textSize="18sp" />-->
+<!--    -->
+<!--                        <RadioButton-->
+<!--                            android:id="@+id/choice2"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginTop="10dp"-->
+<!--                            android:buttonTint="@color/black"-->
+<!--                            android:text="@string/choice2"-->
+<!--                            android:textSize="18sp" />-->
+<!--    -->
+<!--                        <RadioButton-->
+<!--                            android:id="@+id/choice3"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginTop="10dp"-->
+<!--                            android:buttonTint="@color/black"-->
+<!--                            android:text="%s"-->
+<!--                            android:textSize="18sp" />-->
+<!--    -->
+<!--                    </RadioGroup>-->
 
-                    <RadioButton
-                        android:id="@+id/no1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:buttonTint="@color/black"
-                        android:text="No"
-                        android:textSize="18sp" />
-
-
-                </RadioGroup>
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -107,13 +125,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
+                android:layout_margin="10dp"
                 android:background="@drawable/primary_button"
                 android:text="next"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"/>
 
         </RelativeLayout>
 

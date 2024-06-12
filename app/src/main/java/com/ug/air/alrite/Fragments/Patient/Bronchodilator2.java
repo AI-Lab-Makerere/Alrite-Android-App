@@ -1,9 +1,9 @@
 package com.ug.air.alrite.Fragments.Patient;
 
-import static com.ug.air.alrite.Fragments.Patient.Cough.CHOICE2;
+import static com.ug.air.alrite.Fragments.Patient.Cough.DIFFICULTY_BREATHING;
 import static com.ug.air.alrite.Fragments.Patient.CoughD.DAY1;
-import static com.ug.air.alrite.Fragments.Patient.Sex.AGE;
-import static com.ug.air.alrite.Fragments.Patient.Wheezing.CHOICE8;
+import static com.ug.air.alrite.Fragments.Patient.Sex.AGE_IN_MONTHS;
+import static com.ug.air.alrite.Fragments.Patient.Wheezing.WHEEZING_SOUNDS;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -50,7 +50,7 @@ public class Bronchodilator2 extends Fragment {
     EditText etOther;
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String REASON = "bronchodilator_not_given_reason";
-    public static final String BDIAGNOSIS = "diagnosis_8";
+    public static final String BDIAGNOSIS = "bronchodilator_diagnosis";
     SharedPreferences sharedPreferences, sharedPreferences1;
     SharedPreferences.Editor editor, editor1;
     String diagnosis;
@@ -150,8 +150,8 @@ public class Bronchodilator2 extends Fragment {
         editor.putString(REASON, s);
         editor.apply();
 
-        String cough = sharedPreferences.getString(CHOICE2, "");
-        String wheezing = sharedPreferences.getString(CHOICE8, "");
+        String cough = sharedPreferences.getString(DIFFICULTY_BREATHING, "");
+        String wheezing = sharedPreferences.getString(WHEEZING_SOUNDS, "");
         String days = sharedPreferences.getString(DAY1, "");
         day = Long.parseLong(days);
 
@@ -229,7 +229,7 @@ public class Bronchodilator2 extends Fragment {
         linearLayout_instruction.setBackgroundColor(getResources().getColor(R.color.moderateDiagnosisColor));
         txtDiagnosis.setText(R.string.wheez_ill);
 
-        String age = sharedPreferences.getString(AGE, "");
+        String age = sharedPreferences.getString(AGE_IN_MONTHS, "");
         float ag = Float.parseFloat(age);
         if (ag < 2){
             messages = Arrays.asList(R.string.wheez_ill1, R.string.wheez_ill2, R.string.wheez_ill3,

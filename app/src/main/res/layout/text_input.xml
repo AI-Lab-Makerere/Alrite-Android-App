@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Fragments.Patient.FTouch">
+    tools:context=".Fragments.Patient.Temperature">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,41 +46,46 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/ti_question"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="25dp"
                     android:gravity="center_horizontal"
-                    android:text="Is the child febrile to touch?"
+                    android:text="@string/ti_question"
                     android:textColor="@color/black"
                     android:textSize="18sp" />
 
-                <RadioGroup
-                    android:id="@+id/radioGroup1"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp">
+                    android:layout_marginTop="5dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
 
-                    <RadioButton
-                        android:id="@+id/yes1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/black"
-                        android:text="Yes"
-                        android:textSize="18sp" />
+                    <EditText
+                        android:id="@+id/IHint"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="10dp"
+                        android:layout_weight=".5"
+                        android:background="@drawable/text_input_bg"
+                        android:gravity="center"
+                        android:hint="@string/ti_IHint"
+                        android:maxLength="4" />
 
-                    <RadioButton
-                        android:id="@+id/no1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:buttonTint="@color/black"
-                        android:text="No"
-                        android:textSize="18sp" />
+                </LinearLayout>
 
+                <TextView
+                    android:id="@+id/ti_IInformation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text=""
+                    android:textSize="12sp" />
 
-                </RadioGroup>
 
             </LinearLayout>
+
 
         </ScrollView>
 

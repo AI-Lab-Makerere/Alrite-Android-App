@@ -1,5 +1,9 @@
 package com.ug.air.alrite.Activities;
 
+import static com.ug.air.alrite.Activities.DiagnosisActivityModified.SHARED_PREFS;
+import static com.ug.air.alrite.Activities.PatientActivity.DIAGNOSES_ID;
+import static com.ug.air.alrite.Activities.PatientActivity.SUMMARY_ID;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -15,26 +19,34 @@ import android.widget.Toast;
 
 import com.ug.air.alrite.R;
 
+import org.json.JSONObject;
+
+import java.util.Map;
+
 public class FinalActivity extends AppCompatActivity {
 
     CheckBox checkBox1, checkBox2, checkBox3, checkBox4, checkBox5, checkBox6, checkBox7, checkBox8, checkBox9, checkBox10, checkBox11, checkBox12, checkBox13, checkBox14;
     EditText etOther1, etOther2;
     Button btnSave;
-    String s1, s2, diagnosis, treatment, filename;
+    String s1, s2, diagnosis, treatment;
     public static final String S6 = "clinician_treatment";
     public static final String S7 = "clinician_diagnosis";
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    SharedPreferences summaryPrefs, diagnosesPrefs;
+    SharedPreferences.Editor summaryEditor, diagnosesEditor;
+    String summaryPrefsID, diagnosesPrefsID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_final);
 
-        filename = getIntent().getStringExtra("filename");
-
-        sharedPreferences = getSharedPreferences(filename, Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
+        // Get an editor for our shared preferences
+        summaryPrefsID = getIntent().getStringExtra(SUMMARY_ID);
+        summaryPrefs = getSharedPreferences(summaryPrefsID, Context.MODE_PRIVATE);
+        summaryEditor = summaryPrefs.edit();
+        diagnosesPrefsID = getIntent().getStringExtra(DIAGNOSES_ID);
+        diagnosesPrefs = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        diagnosesEditor = diagnosesPrefs.edit();
 
         btnSave = findViewById(R.id.btnExit);
         etOther1 = findViewById(R.id.otherText);
@@ -160,10 +172,11 @@ public class FinalActivity extends AppCompatActivity {
     }
 
     private void saveData() {
-        editor.putString(S7, s1);
-        editor.putString(S6, s2);
-        editor.apply();
-        editor.commit();
+        diagnosesEditor.putString(S7, s1);
+        diagnosesEditor.putString(S6, s2);
+        diagnosesEditor.commit();
+
+        // Finally, we can exit: go back to the dashboard home page
         startActivity(new Intent(FinalActivity.this, Dashboard.class));
         finish();
     }

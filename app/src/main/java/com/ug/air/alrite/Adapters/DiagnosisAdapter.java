@@ -33,7 +33,6 @@ public class DiagnosisAdapter extends RecyclerView.Adapter<DiagnosisAdapter.Diag
 
     public interface OnItemClickListener {
         void onClick(int position);
-        void onClick2(int position);
     }
 
     @NonNull

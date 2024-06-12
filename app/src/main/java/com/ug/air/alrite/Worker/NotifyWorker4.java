@@ -71,7 +71,7 @@ public class NotifyWorker4 extends Worker {
     }
 
     private void readData3() {
-        jsonPlaceHolder = ApiClient.getClient().create(JsonPlaceHolder.class);
+        jsonPlaceHolder = ApiClient.getClient(ApiClient.BASE_URL).create(JsonPlaceHolder.class);
         File src = new File("/data/data/" + BuildConfig.APPLICATION_ID + "/shared_prefs/counter_file.xml");
         if (src.exists()){
             RequestBody filePart = RequestBody.create(MediaType.parse("*/*"), src);

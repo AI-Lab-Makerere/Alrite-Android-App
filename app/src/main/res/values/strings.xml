@@ -268,4 +268,20 @@
     <string name="st2">A noise on breathing in due to obstruction of the upper airway</string>
     <string name="st4">Stridor is a loud whistling sound made when taking in a breath. It is a sign of upper airway blockage and must be treated right away to prevent the airway from completely closing.</string>
 
+    <string name="mc_question">%s</string>
+    <string name="choice1">%s</string>
+    <string name="choice2">%s</string>
+
+    <!--   New Strings for the text input -->
+    <string name="ti_question">%s</string>
+    <string name="ti_IHint">%s</string>
+    <string name="ti_IInformation">%s</string>
+    <string name="ti_SInformation">%s</string>
+    <string name="ti_minval">%s</string>
+    <string name="ti_maxval">%s</string>
+    <string name="ti_minvalforDiagnosis">%s</string>
+
+    <!--   New Strings for the paragraph input -->
+    <string name="p_question">%s</string>
+    <string name="p_paragraph">%s</string>
 </resources>

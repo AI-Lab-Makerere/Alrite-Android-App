@@ -1,0 +1,177 @@
+{
+  "name": "IMCI",
+  "pages": [
+    {
+      "pageID": "page_1",
+      "title": "Patient Details",
+      "content": [
+        {
+          "label": "Enter parent or guardian's initials:",
+          "type": "default",
+          "valueID": "guardian_initials",
+          "component": "TextInput"
+        },
+        {
+          "label": "Enter child's initials:",
+          "type": "default",
+          "valueID": "child_initials",
+          "component": "TextInput"
+        }
+      ],
+      "defaultLink": "page_2",
+      "isDiagnosisPage": false
+    },
+    {
+      "pageID": "page_2",
+      "title": "Patient Details",
+      "content": [
+        {
+          "label": "What is the child's sex?",
+          "valueID": "patient_sex",
+          "multiselect": false,
+          "choices": [
+            {
+              "text": "Male",
+              "value": "male",
+              "link": "null"
+            },
+            {
+              "text": "Female",
+              "value": "female",
+              "link": "null"
+            }
+          ],
+          "component": "MultipleChoice"
+        },
+        {
+          "label": "How old is the child?",
+          "type": "numeric",
+          "valueID": "child_age",
+          "units": "years",
+          "component": "TextInput"
+        },
+        {
+          "label": "What is the child's weight?",
+          "type": "numeric",
+          "valueID": "child_weight",
+          "units": "kg",
+          "component": "TextInput"
+        }
+      ],
+      "defaultLink": "page_3",
+      "isDiagnosisPage": false
+    },
+    {
+      "pageID": "page_3",
+      "title": "Assess Patient",
+      "content": [
+        {
+          "label": "What symptoms does the child have?",
+          "valueID": "child_symptoms",
+          "multiselect": true,
+          "choices": [
+            {
+              "text": "Unable to drink or breastfeed",
+              "value": "unable to drink",
+              "link": "page_1"
+            },
+            {
+              "text": "Vomiting everything",
+              "value": "vomiting",
+              "link": "page_1"
+            },
+            {
+              "text": "Unresponsive, no awareness of surroundings",
+              "value": "unresponsive",
+              "link": "page_1"
+            },
+            {
+              "text": "Convulsions (uncontrolled jerking / seizures)",
+              "value": "convlusions",
+              "link": "page_1"
+            }
+          ],
+          "component": "MultipleChoice"
+        },
+        {
+          "type": "at_least_one",
+          "targetValueID": "child_symptoms",
+          "satisfiedLink": "page_8",
+          "component": "Selection"
+        }
+      ],
+      "defaultLink": "page_6",
+      "isDiagnosisPage": false
+    },
+    {
+      "pageID": "page_8",
+      "title": "Severe Disease",
+      "content": [
+        {
+          "text": "Give the first dose of antibiotic-intramuscular injection, Ampicillin and Gentamicin. Oral amoxicillin otherwise.",
+          "component": "Paragraph"
+        },
+        {
+          "text": "For AMPICILLIN: Dilute 500mg vial with 2.1ml sterile water (500mg/2.5ml). Give 5ml ONE TIME via intramuscular injection. If referral is not possible or delayed, repeat the same dose of AMPICILLIN every 6 hours.",
+          "component": "Paragraph"
+        },
+        {
+          "text": "For GENTAMICIN: (2ml/40mg/ml vial). Give 2.8-35.ml ONE TIME via intramuscular injection. If referral is not possible or delayed, repeat gentamicin once daily.",
+          "component": "Paragraph"
+        },
+        {
+          "text": "If wheezing now, give salbutamol 4-6 puffs with spacer or 1 nebulization (2.5-5mg) if available while awaiting referral. Do not delay referral.",
+          "component": "Paragraph"
+        }
+      ],
+      "defaultLink": "page_6",
+      "isDiagnosisPage": false
+    },
+    {
+      "pageID": "page_6",
+      "title": "Patient's History (1/3)",
+      "content": [
+        {
+          "label": "Does the child have a cough or difficulty breathing?",
+          "valueID": "child_has_cough",
+          "multiselect": false,
+          "choices": [
+            {
+              "text": "Yes",
+              "value": "true",
+              "link": "null"
+            },
+            {
+              "text": "No",
+              "value": "false",
+              "link": "null"
+            }
+          ],
+          "component": "MultipleChoice"
+        }
+      ],
+      "defaultLink": "page_7",
+      "isDiagnosisPage": false
+    },
+    {
+      "pageID": "page_7",
+      "title": "Patient's History (2/3)",
+      "content": [],
+      "defaultLink": "page_4",
+      "isDiagnosisPage": false
+    },
+    {
+      "pageID": "page_4",
+      "title": "Diagnosis Page",
+      "content": [],
+      "defaultLink": "page_1",
+      "isDiagnosisPage": true
+    }
+  ],
+  "meta": {
+    "version": 4,
+    "apipath": "/alrite/apis/workflows/IMCI/4/",
+    "time_created": "2023-05-11 19:44:23.369807+00:00",
+    "created_by": null
+  }
+}
